@@ -1,0 +1,10 @@
+# .github/metadata.yaml
+# Triaged by AI-assisted bulk pass (2026-04-29).
+description: "Swift implementation of RFC 4648: The Base16, Base32, and Base64 Data Encodings."
+topics:
+  - standards
+  - rfc
+  - rfc-4648
+  - encoding
+  - base64
+homepage: "https://swift-institute.org"
