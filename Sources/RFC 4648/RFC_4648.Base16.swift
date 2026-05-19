@@ -262,13 +262,14 @@ extension RFC_4648.Base16 {
                 // First byte is not '0', need to pair it with next
                 guard let second = iterator.next() else { return false }
                 // Skip whitespace for first byte
+                // audit: underlying — stdlib-interop boundary (Base64/32 alphabet)
                 var high = first
-                while high.ascii.isWhitespace {
+                while ASCII.Code(high).isWhitespace {
                     guard let next = iterator.next() else { return false }
                     high = next
                 }
                 var low = second
-                while low.ascii.isWhitespace {
+                while ASCII.Code(low).isWhitespace {
                     guard let next = iterator.next() else { return false }
                     low = next
                 }
@@ -283,7 +284,7 @@ extension RFC_4648.Base16 {
         while let high = iterator.next() {
             // Skip whitespace
             var highByte = high
-            while highByte.ascii.isWhitespace {
+            while ASCII.Code(highByte).isWhitespace {
                 guard let next = iterator.next() else { return true }  // trailing whitespace ok
                 highByte = next
             }
@@ -291,7 +292,7 @@ extension RFC_4648.Base16 {
             guard let low = iterator.next() else { return false }  // odd number of hex chars
 
             var lowByte = low
-            while lowByte.ascii.isWhitespace {
+            while ASCII.Code(lowByte).isWhitespace {
                 guard let next = iterator.next() else { return false }
                 lowByte = next
             }
@@ -392,7 +393,7 @@ extension RFC_4648.Base16 {
                 if let second = iterator.next() {
                     if second == 0x78 || second == 0x58 {  // 'x' or 'X'
                         // Prefix consumed, continue
-                    } else if !second.ascii.isWhitespace {
+                    } else if !ASCII.Code(second).isWhitespace {
                         // Not a prefix, these are hex digits
                         let highNibble = decodeTable[Int(first)]
                         let lowNibble = decodeTable[Int(second)]
@@ -410,7 +411,7 @@ extension RFC_4648.Base16 {
                     // Just "0"
                     return 0
                 }
-            } else if !first.ascii.isWhitespace {
+            } else if !ASCII.Code(first).isWhitespace {
                 let nibble = decodeTable[Int(first)]
                 guard nibble != 255 else { return nil }
                 result = T(nibble)
@@ -420,7 +421,7 @@ extension RFC_4648.Base16 {
 
         // Process remaining nibbles
         while let byte = iterator.next() {
-            guard !byte.ascii.isWhitespace else { continue }
+            guard !ASCII.Code(byte).isWhitespace else { continue }
 
             let nibble = decodeTable[Int(byte)]
             guard nibble != 255 else { return nil }

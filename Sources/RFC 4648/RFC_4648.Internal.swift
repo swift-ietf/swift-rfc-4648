@@ -96,7 +96,8 @@ extension RFC_4648 {
                     hitPadding = true
                     continue
                 }
-                if byte.ascii.isWhitespace { continue }
+                // audit: underlying — stdlib-interop boundary (Base64/32 alphabet)
+                if ASCII.Code(byte).isWhitespace { continue }
                 // Padding in the middle is invalid
                 if paddingCount > 0 { return false }
                 let value = decodeTable[Int(byte)]
@@ -159,7 +160,7 @@ extension RFC_4648 {
 
         while let byte = iterator.next() {
             if byte == RFC_4648.padding { break }
-            guard !byte.ascii.isWhitespace else { continue }
+            guard !ASCII.Code(byte).isWhitespace else { continue }
 
             let value = decodeTable[Int(byte)]
             guard value != 255 else { return nil }
@@ -298,7 +299,7 @@ extension RFC_4648 {
                     hitPadding = true
                     break
                 }
-                if byte.ascii.isWhitespace { continue }
+                if ASCII.Code(byte).isWhitespace { continue }
                 let value = decodeTable[Int(byte)]
                 guard value != 255 else { return false }
                 values.append(value)
@@ -354,7 +355,7 @@ extension RFC_4648 {
 
         while let byte = iterator.next() {
             if byte == RFC_4648.padding { break }
-            guard !byte.ascii.isWhitespace else { continue }
+            guard !ASCII.Code(byte).isWhitespace else { continue }
 
             let value = decodeTable[Int(byte)]
             guard value != 255 else { return nil }
