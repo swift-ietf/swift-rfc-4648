@@ -96,7 +96,6 @@ extension RFC_4648 {
                     hitPadding = true
                     continue
                 }
-                // audit: underlying — stdlib-interop boundary (Base64/32 alphabet)
                 if ASCII.Code(byte).isWhitespace { continue }
                 // Padding in the middle is invalid
                 if paddingCount > 0 { return false }

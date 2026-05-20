@@ -262,7 +262,6 @@ extension RFC_4648.Base16 {
                 // First byte is not '0', need to pair it with next
                 guard let second = iterator.next() else { return false }
                 // Skip whitespace for first byte
-                // audit: underlying — stdlib-interop boundary (Base64/32 alphabet)
                 var high = first
                 while ASCII.Code(high).isWhitespace {
                     guard let next = iterator.next() else { return false }
