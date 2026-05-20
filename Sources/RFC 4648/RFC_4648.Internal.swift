@@ -3,6 +3,17 @@
 //
 // Internal shared implementations to eliminate code duplication
 // These are implementation details, not public API
+//
+// Per codec-split-design (2026-05-20), per-direction substrate:
+// - encode: `Bytes.Element == Byte` IN, `Buffer.Element == ASCII.Code` OUT,
+//   `table: [ASCII.Code]`. Body bridges Byte→UInt8 via `.underlying` for
+//   arithmetic (Byte has no arithmetic by design per Q3 / [API-BYTE-002]).
+// - decode: `Bytes.Element == ASCII.Code` IN, `Buffer.Element == Byte` OUT,
+//   `decodeTable: [UInt8?]` (sextet/quintet values are arithmetic-domain
+//   UInt8 per Q3; Optional wrapping types validity at the type-system
+//   level — nil = invalid). Body bridges UInt8→Byte at buffer boundary.
+
+public import ASCII_Primitives
 
 // MARK: - Base64 Shared Implementation
 
@@ -18,16 +29,18 @@ extension RFC_4648 {
     static func encodeBase64<Bytes: Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
-        table: [UInt8],
+        table: [ASCII.Code],
         padding: Bool
-    ) where Bytes.Element == UInt8, Buffer.Element == UInt8 {
+    ) where Bytes.Element == Byte, Buffer.Element == ASCII.Code {
         guard !bytes.isEmpty else { return }
 
         var iterator = bytes.makeIterator()
 
-        while let b1 = iterator.next() {
-            let b2 = iterator.next()
-            let b3 = iterator.next()
+        while let b1Byte = iterator.next() {
+            // Bridge Byte → UInt8 at iterator boundary for arithmetic.
+            let b1 = b1Byte.underlying
+            let b2 = iterator.next()?.underlying
+            let b3 = iterator.next()?.underlying
 
             // First character: high 6 bits of b1
             buffer.append(table[Int((b1 >> 2) & 0x3F)])
@@ -73,9 +86,9 @@ extension RFC_4648 {
     static func decodeBase64<Bytes: Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
-        decodeTable: [UInt8],
+        decodeTable: [UInt8?],
         requirePadding: Bool
-    ) -> Bool where Bytes.Element == UInt8, Buffer.Element == UInt8 {
+    ) -> Bool where Bytes.Element == ASCII.Code, Buffer.Element == Byte {
         guard !bytes.isEmpty else { return true }
 
         var iterator = bytes.makeIterator()
@@ -90,17 +103,16 @@ extension RFC_4648 {
 
             // Collect up to 4 characters for this group
             while values.count + paddingCount < 4 {
-                guard let byte = iterator.next() else { break }
-                if byte == RFC_4648.padding {
+                guard let code = iterator.next() else { break }
+                if code == RFC_4648.padding {
                     paddingCount += 1
                     hitPadding = true
                     continue
                 }
-                if ASCII.Code(byte).isWhitespace { continue }
+                if code.isWhitespace { continue }
                 // Padding in the middle is invalid
                 if paddingCount > 0 { return false }
-                let value = decodeTable[Int(byte)]
-                guard value != 255 else { return false }
+                guard let value = decodeTable[Int(code.underlying)] else { return false }
                 values.append(value)
             }
 
@@ -126,15 +138,15 @@ extension RFC_4648 {
             hasDecodedAny = true
 
             // First byte: 6 bits from v1 + high 2 bits from v2
-            buffer.append((values[0] << 2) | (values[1] >> 4))
+            buffer.append(Byte((values[0] << 2) | (values[1] >> 4)))
 
             if values.count >= 3 {
                 // Second byte: low 4 bits from v2 + high 4 bits from v3
-                buffer.append((values[1] << 4) | (values[2] >> 2))
+                buffer.append(Byte((values[1] << 4) | (values[2] >> 2)))
 
                 if values.count >= 4 {
                     // Third byte: low 2 bits from v3 + 6 bits from v4
-                    buffer.append((values[2] << 6) | values[3])
+                    buffer.append(Byte((values[2] << 6) | values[3]))
                 }
             }
 
@@ -148,8 +160,8 @@ extension RFC_4648 {
     @inlinable
     static func decodeBase64ToInteger<Bytes: Collection, T: FixedWidthInteger>(
         _ bytes: Bytes,
-        decodeTable: [UInt8]
-    ) -> T? where Bytes.Element == UInt8 {
+        decodeTable: [UInt8?]
+    ) -> T? where Bytes.Element == ASCII.Code {
         guard !bytes.isEmpty else { return 0 }
 
         var iterator = bytes.makeIterator()
@@ -157,12 +169,11 @@ extension RFC_4648 {
         var bitCount = 0
         let maxBits = T.bitWidth
 
-        while let byte = iterator.next() {
-            if byte == RFC_4648.padding { break }
-            guard !ASCII.Code(byte).isWhitespace else { continue }
+        while let code = iterator.next() {
+            if code == RFC_4648.padding { break }
+            guard !code.isWhitespace else { continue }
 
-            let value = decodeTable[Int(byte)]
-            guard value != 255 else { return nil }
+            guard let value = decodeTable[Int(code.underlying)] else { return nil }
 
             bitCount += 6
             guard bitCount <= maxBits else { return nil }
@@ -188,18 +199,20 @@ extension RFC_4648 {
     static func encodeBase32<Bytes: Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
-        table: [UInt8],
+        table: [ASCII.Code],
         padding: Bool
-    ) where Bytes.Element == UInt8, Buffer.Element == UInt8 {
+    ) where Bytes.Element == Byte, Buffer.Element == ASCII.Code {
         guard !bytes.isEmpty else { return }
 
         var iterator = bytes.makeIterator()
 
-        while let b1 = iterator.next() {
-            let b2 = iterator.next()
-            let b3 = iterator.next()
-            let b4 = iterator.next()
-            let b5 = iterator.next()
+        while let b1Byte = iterator.next() {
+            // Bridge Byte → UInt8 at iterator boundary for arithmetic.
+            let b1 = b1Byte.underlying
+            let b2 = iterator.next()?.underlying
+            let b3 = iterator.next()?.underlying
+            let b4 = iterator.next()?.underlying
+            let b5 = iterator.next()?.underlying
 
             // First character: high 5 bits of b1
             buffer.append(table[Int((b1 >> 3) & 0x1F)])
@@ -278,8 +291,8 @@ extension RFC_4648 {
     static func decodeBase32<Bytes: Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
-        decodeTable: [UInt8]
-    ) -> Bool where Bytes.Element == UInt8, Buffer.Element == UInt8 {
+        decodeTable: [UInt8?]
+    ) -> Bool where Bytes.Element == ASCII.Code, Buffer.Element == Byte {
         guard !bytes.isEmpty else { return true }
 
         var iterator = bytes.makeIterator()
@@ -293,14 +306,13 @@ extension RFC_4648 {
 
             // Collect quintets for this group
             while values.count < 8 {
-                guard let byte = iterator.next() else { break }
-                if byte == RFC_4648.padding {
+                guard let code = iterator.next() else { break }
+                if code == RFC_4648.padding {
                     hitPadding = true
                     break
                 }
-                if ASCII.Code(byte).isWhitespace { continue }
-                let value = decodeTable[Int(byte)]
-                guard value != 255 else { return false }
+                if code.isWhitespace { continue }
+                guard let value = decodeTable[Int(code.underlying)] else { return false }
                 values.append(value)
             }
 
@@ -311,26 +323,26 @@ extension RFC_4648 {
             hasDecodedAny = true
 
             // First byte: 5 bits from v1 + high 3 bits from v2
-            buffer.append((values[0] << 3) | (values[1] >> 2))
+            buffer.append(Byte((values[0] << 3) | (values[1] >> 2)))
 
             if values.count >= 4 {
                 // Second byte
-                buffer.append((values[1] << 6) | (values[2] << 1) | (values[3] >> 4))
+                buffer.append(Byte((values[1] << 6) | (values[2] << 1) | (values[3] >> 4)))
             }
 
             if values.count >= 5 {
                 // Third byte
-                buffer.append((values[3] << 4) | (values[4] >> 1))
+                buffer.append(Byte((values[3] << 4) | (values[4] >> 1)))
             }
 
             if values.count >= 7 {
                 // Fourth byte
-                buffer.append((values[4] << 7) | (values[5] << 2) | (values[6] >> 3))
+                buffer.append(Byte((values[4] << 7) | (values[5] << 2) | (values[6] >> 3)))
             }
 
             if values.count >= 8 {
                 // Fifth byte
-                buffer.append((values[6] << 5) | values[7])
+                buffer.append(Byte((values[6] << 5) | values[7]))
             }
 
             if values.count < 8 { break }
@@ -343,8 +355,8 @@ extension RFC_4648 {
     @inlinable
     static func decodeBase32ToInteger<Bytes: Collection, T: FixedWidthInteger>(
         _ bytes: Bytes,
-        decodeTable: [UInt8]
-    ) -> T? where Bytes.Element == UInt8 {
+        decodeTable: [UInt8?]
+    ) -> T? where Bytes.Element == ASCII.Code {
         guard !bytes.isEmpty else { return 0 }
 
         var iterator = bytes.makeIterator()
@@ -352,12 +364,11 @@ extension RFC_4648 {
         var bitCount = 0
         let maxBits = T.bitWidth
 
-        while let byte = iterator.next() {
-            if byte == RFC_4648.padding { break }
-            guard !ASCII.Code(byte).isWhitespace else { continue }
+        while let code = iterator.next() {
+            if code == RFC_4648.padding { break }
+            guard !code.isWhitespace else { continue }
 
-            let value = decodeTable[Int(byte)]
-            guard value != 255 else { return nil }
+            guard let value = decodeTable[Int(code.underlying)] else { return nil }
 
             bitCount += 5
             guard bitCount <= maxBits else { return nil }

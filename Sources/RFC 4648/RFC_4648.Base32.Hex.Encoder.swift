@@ -26,7 +26,7 @@ extension RFC_4648.Base32.Hex {
         public func callAsFunction<Bytes: Collection>(
             _ bytes: Bytes,
             padding: Bool = true
-        ) -> String where Bytes.Element == UInt8 {
+        ) -> String where Bytes.Element == Byte {
             String(decoding: RFC_4648.Base32.Hex.encode(bytes, padding: padding), as: UTF8.self)
         }
 

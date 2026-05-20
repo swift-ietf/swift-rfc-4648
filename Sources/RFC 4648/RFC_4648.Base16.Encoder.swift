@@ -27,8 +27,8 @@ extension RFC_4648.Base16 {
         public func callAsFunction<Bytes: Collection>(
             _ bytes: Bytes,
             uppercase: Bool = false
-        ) -> String where Bytes.Element == UInt8 {
-            let encoded: [UInt8] = RFC_4648.Base16.encode(bytes, uppercase: uppercase)
+        ) -> String where Bytes.Element == Byte {
+            let encoded: [ASCII.Code] = RFC_4648.Base16.encode(bytes, uppercase: uppercase)
             return String(decoding: encoded, as: UTF8.self)
         }
 

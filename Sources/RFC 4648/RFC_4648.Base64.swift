@@ -47,7 +47,7 @@ extension RFC_4648 {
 extension RFC_4648.Base64 {
     /// Base64 encoding table (RFC 4648 Section 4)
     public static let encodingTable = RFC_4648.EncodingTable(
-        encode: Array("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".utf8)
+        encode: Array<ASCII.Code>("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".utf8)
     )
 }
 
@@ -66,16 +66,16 @@ extension RFC_4648.Base64 {
     /// ## Example
     ///
     /// ```swift
-    /// var buffer: [UInt8] = []
-    /// RFC_4648.Base64.encode("Hello".utf8, into: &buffer)
-    /// // buffer contains "SGVsbG8=" as bytes
+    /// var buffer: [ASCII.Code] = []
+    /// RFC_4648.Base64.encode([Byte](Array("Hello".utf8)), into: &buffer)
+    /// // buffer contains "SGVsbG8=" as ASCII codes
     /// ```
     @inlinable
     public static func encode<Bytes: Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
         padding: Bool = true
-    ) where Bytes.Element == UInt8, Buffer.Element == UInt8 {
+    ) where Bytes.Element == Byte, Buffer.Element == ASCII.Code {
         RFC_4648.encodeBase64(bytes, into: &buffer, table: encodingTable.encode, padding: padding)
     }
 
@@ -84,13 +84,13 @@ extension RFC_4648.Base64 {
     /// - Parameters:
     ///   - bytes: The bytes to encode
     ///   - padding: Whether to include padding characters (default: true)
-    /// - Returns: Base64 encoded bytes
+    /// - Returns: Base64 encoded ASCII codes
     @inlinable
     public static func encode<Bytes: Collection>(
         _ bytes: Bytes,
         padding: Bool = true
-    ) -> [UInt8] where Bytes.Element == UInt8 {
-        var result: [UInt8] = []
+    ) -> [ASCII.Code] where Bytes.Element == Byte {
+        var result: [ASCII.Code] = []
         result.reserveCapacity(((bytes.count + 2) / 3) * 4)
         encode(bytes, into: &result, padding: padding)
         return result
@@ -102,36 +102,36 @@ extension RFC_4648.Base64 {
 extension RFC_4648.Base64 {
     /// Decodes a single Base64 character to its 6-bit value (PRIMITIVE)
     ///
-    /// - Parameter sextet: ASCII byte of Base64 character
-    /// - Returns: 6-bit value (0-63), or nil if invalid
+    /// - Parameter sextet: ASCII code of Base64 character
+    /// - Returns: 6-bit value (0-63), or nil if invalid. Value is arithmetic-domain
+    ///   UInt8 per [API-BYTE-004] Q3 rubric.
     ///
     /// ## Example
     ///
     /// ```swift
-    /// RFC_4648.Base64.decode(sextet: UInt8(ascii: "A"))  // 0
-    /// RFC_4648.Base64.decode(sextet: UInt8(ascii: "/"))  // 63
-    /// RFC_4648.Base64.decode(sextet: UInt8(ascii: "@"))  // nil (invalid)
+    /// RFC_4648.Base64.decode(sextet: .A)              // 0
+    /// RFC_4648.Base64.decode(sextet: .slash)          // 63
+    /// RFC_4648.Base64.decode(sextet: .commercialAt)   // nil (invalid)
     /// ```
     @inlinable
-    public static func decode(sextet: UInt8) -> UInt8? {
-        let value = encodingTable.decode[Int(sextet)]
-        return value == 255 ? nil : value
+    public static func decode(sextet: ASCII.Code) -> UInt8? {
+        encodingTable.decode[Int(sextet.underlying)]
     }
 
-    /// Decodes Base64 bytes into a buffer (streaming, no allocation)
+    /// Decodes Base64 ASCII codes into a buffer (streaming, no allocation)
     ///
     /// Standard Base64 requires proper padding (groups of 4 characters).
     ///
     /// - Parameters:
-    ///   - bytes: Base64 encoded bytes
+    ///   - bytes: Base64 encoded ASCII codes
     ///   - buffer: The buffer to append decoded bytes to
     /// - Returns: `true` if decoding succeeded, `false` if invalid input
     ///
     /// ## Example
     ///
     /// ```swift
-    /// var buffer: [UInt8] = []
-    /// let success = RFC_4648.Base64.decode("SGVsbG8=".utf8, into: &buffer)
+    /// var buffer: [Byte] = []
+    /// let success = RFC_4648.Base64.decode(Array<ASCII.Code>("SGVsbG8=".utf8), into: &buffer)
     /// // buffer == [72, 101, 108, 108, 111] ("Hello")
     /// ```
     @inlinable
@@ -139,26 +139,26 @@ extension RFC_4648.Base64 {
     public static func decode<Bytes: Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer
-    ) -> Bool where Bytes.Element == UInt8, Buffer.Element == UInt8 {
+    ) -> Bool where Bytes.Element == ASCII.Code, Buffer.Element == Byte {
         RFC_4648.decodeBase64(bytes, into: &buffer, decodeTable: encodingTable.decode, requirePadding: true)
     }
 
-    /// Decodes Base64 encoded bytes to a new array
+    /// Decodes Base64 encoded ASCII codes to a new byte array
     ///
-    /// - Parameter bytes: Base64 encoded bytes
+    /// - Parameter bytes: Base64 encoded ASCII codes
     /// - Returns: Decoded bytes, or nil if invalid
     ///
     /// ## Example
     ///
     /// ```swift
-    /// let decoded = RFC_4648.Base64.decode("SGVsbG8=".utf8)
+    /// let decoded = RFC_4648.Base64.decode(Array<ASCII.Code>("SGVsbG8=".utf8))
     /// // decoded == [72, 101, 108, 108, 111] ("Hello")
     /// ```
     @inlinable
     public static func decode<Bytes: Collection>(
         _ bytes: Bytes
-    ) -> [UInt8]? where Bytes.Element == UInt8 {
-        var result: [UInt8] = []
+    ) -> [Byte]? where Bytes.Element == ASCII.Code {
+        var result: [Byte] = []
         result.reserveCapacity((bytes.count * 3) / 4)
         guard decode(bytes, into: &result) else { return nil }
         return result
@@ -166,7 +166,8 @@ extension RFC_4648.Base64 {
 
     /// Decodes Base64 encoded string
     ///
-    /// Convenience overload that delegates to the byte-based version.
+    /// Convenience overload that delegates to the ASCII-code-based version,
+    /// lifting `string.utf8` to the `ASCII.Code` substrate at entry.
     ///
     /// - Parameter string: Base64 encoded string
     /// - Returns: Decoded bytes, or nil if invalid
@@ -178,28 +179,28 @@ extension RFC_4648.Base64 {
     /// // decoded == [72, 101, 108, 108, 111] ("Hello")
     /// ```
     @inlinable
-    public static func decode(_ string: some StringProtocol) -> [UInt8]? {
-        decode(string.utf8)
+    public static func decode(_ string: some StringProtocol) -> [Byte]? {
+        decode(Array<ASCII.Code>(string.utf8))
     }
 
     /// Decodes Base64 to a FixedWidthInteger (PRIMITIVE)
     ///
-    /// Decodes Base64 bytes directly to an integer value without intermediate array allocation.
+    /// Decodes Base64 ASCII codes directly to an integer value without intermediate array allocation.
     ///
-    /// - Parameter bytes: Base64 encoded bytes
+    /// - Parameter bytes: Base64 encoded ASCII codes
     /// - Returns: Decoded integer value, or nil if invalid or overflow
     ///
     /// ## Example
     ///
     /// ```swift
-    /// let value: UInt32? = RFC_4648.Base64.decode("AQIDBA==".utf8)
+    /// let value: UInt32? = RFC_4648.Base64.decode(Array<ASCII.Code>("AQIDBA==".utf8))
     /// // value == 0x01020304
     /// ```
     @inlinable
     public static func decode<Bytes: Collection, T: FixedWidthInteger>(
         _ bytes: Bytes,
         as type: T.Type = T.self
-    ) -> T? where Bytes.Element == UInt8 {
+    ) -> T? where Bytes.Element == ASCII.Code {
         RFC_4648.decodeBase64ToInteger(bytes, decodeTable: encodingTable.decode)
     }
 }
@@ -224,11 +225,9 @@ extension RFC_4648.Base64.Wrapper {
     }
 }
 
-// MARK: - Instance Methods (Convenience) - Bytes
+// MARK: - Instance Methods (Convenience) - Encode (raw bytes IN)
 
-extension RFC_4648.Base64.Wrapper where Wrapped: Collection, Wrapped.Element == UInt8 {
-    // MARK: Encoding (bytes → Base64)
-
+extension RFC_4648.Base64.Wrapper where Wrapped: Collection, Wrapped.Element == Byte {
     /// Encodes wrapped bytes to Base64 into a buffer
     ///
     /// Delegates to static `RFC_4648.Base64.encode(_:into:padding:)`.
@@ -236,7 +235,7 @@ extension RFC_4648.Base64.Wrapper where Wrapped: Collection, Wrapped.Element == 
     public func encode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer,
         padding: Bool = true
-    ) where Buffer.Element == UInt8 {
+    ) where Buffer.Element == ASCII.Code {
         RFC_4648.Base64.encode(wrapped, into: &buffer, padding: padding)
     }
 
@@ -253,33 +252,32 @@ extension RFC_4648.Base64.Wrapper where Wrapped: Collection, Wrapped.Element == 
     public func callAsFunction(padding: Bool = true) -> String {
         encoded(padding: padding)
     }
+}
 
-    // MARK: Decoding (Base64 bytes → raw bytes)
+// MARK: - Instance Methods (Convenience) - Decode (encoded ASCII codes IN)
 
-    /// Decodes wrapped Base64-encoded bytes into a buffer
+extension RFC_4648.Base64.Wrapper where Wrapped: Collection, Wrapped.Element == ASCII.Code {
+    /// Decodes wrapped Base64-encoded ASCII codes into a buffer
     ///
-    /// Treats the wrapped bytes as ASCII Base64 characters and decodes them.
     /// Delegates to static `RFC_4648.Base64.decode(_:into:)`.
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer
-    ) -> Bool where Buffer.Element == UInt8 {
+    ) -> Bool where Buffer.Element == Byte {
         RFC_4648.Base64.decode(wrapped, into: &buffer)
     }
 
-    /// Decodes wrapped Base64-encoded bytes to raw bytes
+    /// Decodes wrapped Base64-encoded ASCII codes to raw bytes
     ///
-    /// Treats the wrapped bytes as ASCII Base64 characters and decodes them.
     /// Delegates to static `RFC_4648.Base64.decode(_:)`.
     @inlinable
-    public func decoded() -> [UInt8]? {
+    public func decoded() -> [Byte]? {
         RFC_4648.Base64.decode(wrapped)
     }
 
-    /// Decodes wrapped Base64-encoded bytes to a FixedWidthInteger
+    /// Decodes wrapped Base64-encoded ASCII codes to a FixedWidthInteger
     ///
-    /// Treats the wrapped bytes as ASCII Base64 characters and decodes them.
     /// Delegates to static `RFC_4648.Base64.decode(_:as:)`.
     @inlinable
     public func decoded<T: FixedWidthInteger>(as type: T.Type = T.self) -> T? {
@@ -292,28 +290,30 @@ extension RFC_4648.Base64.Wrapper where Wrapped: Collection, Wrapped.Element == 
 extension RFC_4648.Base64.Wrapper where Wrapped: StringProtocol {
     /// Decodes wrapped Base64 string into a buffer
     ///
+    /// Lifts `wrapped.utf8` to the `ASCII.Code` substrate at entry.
     /// Delegates to static `RFC_4648.Base64.decode(_:into:)`.
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer
-    ) -> Bool where Buffer.Element == UInt8 {
-        RFC_4648.Base64.decode(wrapped.utf8, into: &buffer)
+    ) -> Bool where Buffer.Element == Byte {
+        RFC_4648.Base64.decode(Array<ASCII.Code>(wrapped.utf8), into: &buffer)
     }
 
     /// Decodes wrapped Base64 string to bytes
     ///
     /// Delegates to static `RFC_4648.Base64.decode(_:)`.
     @inlinable
-    public func decoded() -> [UInt8]? {
+    public func decoded() -> [Byte]? {
         RFC_4648.Base64.decode(wrapped)
     }
 
     /// Decodes wrapped Base64 string to a FixedWidthInteger
     ///
+    /// Lifts `wrapped.utf8` to the `ASCII.Code` substrate at entry.
     /// Delegates to static `RFC_4648.Base64.decode(_:as:)`.
     @inlinable
     public func decoded<T: FixedWidthInteger>(as type: T.Type = T.self) -> T? {
-        RFC_4648.Base64.decode(wrapped.utf8, as: type)
+        RFC_4648.Base64.decode(Array<ASCII.Code>(wrapped.utf8), as: type)
     }
 }

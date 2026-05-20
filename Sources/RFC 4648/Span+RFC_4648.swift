@@ -19,13 +19,15 @@
 
 // MARK: - Span Extensions
 
-extension Span where Element == UInt8 {
+import ASCII_Primitives
+
+extension Span where Element == Byte {
     /// Access to Base16/Hex encoding for Span
     ///
     /// ## Usage
     ///
     /// ```swift
-    /// let span: Span<UInt8> = ...
+    /// let span: Span<Byte> = ...
     /// span.hex.encoded()  // "deadbeef"
     /// span.hex.encoded(uppercase: true)  // "DEADBEEF"
     /// ```
@@ -42,7 +44,7 @@ extension Span where Element == UInt8 {
     /// ## Usage
     ///
     /// ```swift
-    /// let span: Span<UInt8> = ...
+    /// let span: Span<Byte> = ...
     /// span.base64.encoded()  // Standard Base64
     /// span.base64.url.encoded()  // URL-safe Base64
     /// ```
@@ -59,7 +61,7 @@ extension Span where Element == UInt8 {
     /// ## Usage
     ///
     /// ```swift
-    /// let span: Span<UInt8> = ...
+    /// let span: Span<Byte> = ...
     /// span.base32.encoded()  // Standard Base32
     /// span.base32.hex.encoded()  // Base32-HEX
     /// ```

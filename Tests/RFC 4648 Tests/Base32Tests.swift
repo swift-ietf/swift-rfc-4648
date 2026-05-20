@@ -23,11 +23,11 @@ struct Base32Tests {
         ]
     )
     func rFCVectors(input: String, expected: String) {
-        let bytes = Array(input.utf8)
+        let bytes = Array<Byte>(input.utf8)
         let encoded = String.base32(bytes)
         #expect(encoded == expected, "Encoding '\(input)' should produce '\(expected)'")
 
-        let decoded = [UInt8](base32Encoded: encoded)
+        let decoded = [Byte](base32Encoded: encoded)
         #expect(decoded == bytes, "Round-trip failed for '\(input)'")
     }
 
@@ -43,14 +43,14 @@ struct Base32Tests {
         ]
     )
     func caseInsensitive(encoded: String) {
-        let expected: [UInt8] = Array("foo".utf8)
-        let decoded = [UInt8](base32Encoded: encoded)
+        let expected: [Byte] = Array<Byte>("foo".utf8)
+        let decoded = [Byte](base32Encoded: encoded)
         #expect(decoded == expected, "Case-insensitive decoding should work for '\(encoded)'")
     }
 
     @Test
     func `Base32 encoding produces uppercase`() {
-        let input: [UInt8] = Array("hello".utf8)
+        let input: [Byte] = Array<Byte>("hello".utf8)
         let encoded = String.base32(input)
 
         // All letters should be uppercase (A-Z)
@@ -66,21 +66,21 @@ struct Base32Tests {
     @Test(
         "Base32 padding variations",
         arguments: [
-            (Array("f".utf8), false, "MY", false),  // no padding
-            (Array("f".utf8), true, "MY======", true),  // with padding
-            (Array("foo".utf8), false, "MZXW6", false),  // no padding
-            (Array("foo".utf8), true, "MZXW6===", true),  // with padding
+            (Array<Byte>("f".utf8), false, "MY", false),  // no padding
+            (Array<Byte>("f".utf8), true, "MY======", true),  // with padding
+            (Array<Byte>("foo".utf8), false, "MZXW6", false),  // no padding
+            (Array<Byte>("foo".utf8), true, "MZXW6===", true),  // with padding
         ]
     )
     func paddingVariations(
-        input: [UInt8], padding: Bool, expectedEncoded: String, shouldHavePadding: Bool
+        input: [Byte], padding: Bool, expectedEncoded: String, shouldHavePadding: Bool
     ) {
         let encoded = String.base32(input, padding: padding)
         #expect(encoded == expectedEncoded)
         #expect(encoded.contains("=") == shouldHavePadding)
 
         // Decoding should work both with and without padding
-        let decoded = [UInt8](base32Encoded: encoded)
+        let decoded = [Byte](base32Encoded: encoded)
         #expect(decoded == input)
     }
 
@@ -96,7 +96,7 @@ struct Base32Tests {
         ]
     )
     func whitespaceHandling(input: String) {
-        let decoded = [UInt8](base32Encoded: input)
+        let decoded = [Byte](base32Encoded: input)
         #expect(decoded != nil, "Whitespace should be ignored in '\(input)'")
     }
 
@@ -115,7 +115,7 @@ struct Base32Tests {
         ]
     )
     func invalidInput(input: String) {
-        let decoded = [UInt8](base32Encoded: input)
+        let decoded = [Byte](base32Encoded: input)
         #expect(decoded == nil, "\(input) should be rejected")
     }
 
@@ -124,7 +124,7 @@ struct Base32Tests {
     @Test
     func `Base32 uses correct alphabet (A-Z, 2-7)`() {
         // Test that all characters in encoding are within A-Z, 2-7 range
-        let input: [UInt8] = Array("The quick brown fox jumps over the lazy dog".utf8)
+        let input: [Byte] = Array<Byte>("The quick brown fox jumps over the lazy dog".utf8)
         let encoded = String.base32(input, padding: false)
 
         for char in encoded {
@@ -143,14 +143,14 @@ struct Base32Tests {
             ([0x00, 0x01, 0x02, 0x03, 0x04], nil),  // sequential bytes
         ]
     )
-    func binaryDataPatterns(input: [UInt8], expectedEncoded: String?) {
+    func binaryDataPatterns(input: [Byte], expectedEncoded: String?) {
         let encoded = String.base32(input)
 
         if let expected = expectedEncoded {
             #expect(encoded == expected)
         }
 
-        let decoded = [UInt8](base32Encoded: encoded)
+        let decoded = [Byte](base32Encoded: encoded)
         #expect(decoded == input)
     }
 
@@ -159,7 +159,7 @@ struct Base32Tests {
     @Test
     func `Base32 secret key (typical TOTP use)`() {
         // Typical TOTP secret: 20 random bytes
-        let secret: [UInt8] = [
+        let secret: [Byte] = [
             0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x21, 0xDE, 0xAD,
             0xBE, 0xEF, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x21,
             0xDE, 0xAD, 0xBE, 0xEF,
@@ -168,7 +168,7 @@ struct Base32Tests {
         let encoded = String.base32(secret, padding: false)
 
         // Should be decodable case-insensitively
-        let decoded = [UInt8](base32Encoded: encoded.lowercased())
+        let decoded = [Byte](base32Encoded: encoded.lowercased())
         #expect(decoded == secret)
     }
 
@@ -177,9 +177,9 @@ struct Base32Tests {
     @Test
     func `Base32 round-trip various sizes`() {
         for size in [1, 2, 3, 4, 5, 10, 20, 50, 100] {
-            let input: [UInt8] = (0..<size).map { UInt8($0 % 256) }
+            let input: [Byte] = (0..<size).map { Byte(UInt8($0 % 256)) }
             let encoded = String.base32(input)
-            let decoded = [UInt8](base32Encoded: encoded)
+            let decoded = [Byte](base32Encoded: encoded)
             #expect(decoded == input)
         }
     }
@@ -187,9 +187,9 @@ struct Base32Tests {
     @Test
     func `Base32 round-trip long string`() {
         let longString = String(repeating: "Hello, World! ", count: 100)
-        let input = Array(longString.utf8)
+        let input = Array<Byte>(longString.utf8)
         let encoded = String.base32(input)
-        let decoded = [UInt8](base32Encoded: encoded)
+        let decoded = [Byte](base32Encoded: encoded)
         #expect(decoded == input)
     }
 }

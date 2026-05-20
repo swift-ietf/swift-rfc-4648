@@ -23,11 +23,11 @@ struct HexTests {
         ]
     )
     func rFCVectors(input: String, expected: String) {
-        let bytes = Array(input.utf8)
+        let bytes = Array<Byte>(input.utf8)
         let encoded = String.hex(bytes)
         #expect(encoded == expected, "Encoding '\(input)' should produce '\(expected)'")
 
-        let decoded = [UInt8](hexEncoded: encoded)
+        let decoded = [Byte](hexEncoded: encoded)
         #expect(decoded == bytes, "Round-trip failed for '\(input)'")
     }
 
@@ -35,14 +35,14 @@ struct HexTests {
 
     @Test
     func `Hex encoding lowercase by default`() {
-        let input: [UInt8] = [0xFF, 0xAB, 0xCD]
+        let input: [Byte] = [0xFF, 0xAB, 0xCD]
         let encoded = String.hex(input)
         #expect(encoded == "ffabcd")
     }
 
     @Test
     func `Hex encoding uppercase when requested`() {
-        let input: [UInt8] = [0xFF, 0xAB, 0xCD]
+        let input: [Byte] = [0xFF, 0xAB, 0xCD]
         let encoded = String.hex(input, uppercase: true)
         #expect(encoded == "FFABCD")
     }
@@ -57,8 +57,8 @@ struct HexTests {
         ]
     )
     func decodingCaseInsensitive(encoded: String) {
-        let expected: [UInt8] = [0xFF, 0xAB]
-        let decoded = [UInt8](hexEncoded: encoded)
+        let expected: [Byte] = [0xFF, 0xAB]
+        let decoded = [Byte](hexEncoded: encoded)
         #expect(decoded == expected, "Case-insensitive decoding should work for '\(encoded)'")
     }
 
@@ -74,8 +74,8 @@ struct HexTests {
             ("0Xdeadbeef", [0xDE, 0xAD, 0xBE, 0xEF]),
         ]
     )
-    func prefixHandling(input: String, expected: [UInt8]) {
-        let decoded = [UInt8](hexEncoded: input)
+    func prefixHandling(input: String, expected: [Byte]) {
+        let decoded = [Byte](hexEncoded: input)
         #expect(decoded == expected, "'\(input)' should decode to \(expected)")
     }
 
@@ -92,8 +92,8 @@ struct HexTests {
         ]
     )
     func whitespaceHandling(input: String) {
-        let expected: [UInt8] = [0xDE, 0xAD, 0xBE, 0xEF]
-        let decoded = [UInt8](hexEncoded: input)
+        let expected: [Byte] = [0xDE, 0xAD, 0xBE, 0xEF]
+        let decoded = [Byte](hexEncoded: input)
         #expect(decoded == expected, "Whitespace should be ignored in '\(input)'")
     }
 
@@ -109,7 +109,7 @@ struct HexTests {
         ]
     )
     func invalidInput(input: String) {
-        let decoded = [UInt8](hexEncoded: input)
+        let decoded = [Byte](hexEncoded: input)
         #expect(decoded == nil, "\(input) should be rejected")
     }
 
@@ -118,40 +118,40 @@ struct HexTests {
     @Test
     func `Hex encoding all byte values`() {
         for byte in 0...255 {
-            let input: [UInt8] = [UInt8(byte)]
+            let input: [Byte] = [Byte(UInt8(byte))]
             let encoded = String.hex(input)
-            let decoded = [UInt8](hexEncoded: encoded)
+            let decoded = [Byte](hexEncoded: encoded)
             #expect(decoded == input)
         }
     }
 
     @Test
     func `Hex encoding all zeros`() {
-        let input: [UInt8] = [0x00, 0x00, 0x00]
+        let input: [Byte] = [0x00, 0x00, 0x00]
         let encoded = String.hex(input)
         #expect(encoded == "000000")
 
-        let decoded = [UInt8](hexEncoded: encoded)
+        let decoded = [Byte](hexEncoded: encoded)
         #expect(decoded == input)
     }
 
     @Test
     func `Hex encoding all ones`() {
-        let input: [UInt8] = [0xFF, 0xFF, 0xFF]
+        let input: [Byte] = [0xFF, 0xFF, 0xFF]
         let encoded = String.hex(input)
         #expect(encoded == "ffffff")
 
-        let decoded = [UInt8](hexEncoded: encoded)
+        let decoded = [Byte](hexEncoded: encoded)
         #expect(decoded == input)
     }
 
     @Test
     func `Hex encoding sequential bytes`() {
-        let input: [UInt8] = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05]
+        let input: [Byte] = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05]
         let encoded = String.hex(input)
         #expect(encoded == "000102030405")
 
-        let decoded = [UInt8](hexEncoded: encoded)
+        let decoded = [Byte](hexEncoded: encoded)
         #expect(decoded == input)
     }
 
@@ -160,7 +160,7 @@ struct HexTests {
     @Test
     func `Hex encoding SHA-256 hash`() {
         // Typical SHA-256 hash: 32 bytes
-        let hash: [UInt8] = [
+        let hash: [Byte] = [
             0xE3, 0xB0, 0xC4, 0x42, 0x98, 0xFC, 0x1C, 0x14,
             0x9A, 0xFB, 0xF4, 0xC8, 0x99, 0x6F, 0xB9, 0x24,
             0x27, 0xAE, 0x41, 0xE4, 0x64, 0x9B, 0x93, 0x4C,
@@ -170,34 +170,34 @@ struct HexTests {
         let encoded = String.hex(hash)
         #expect(encoded.count == 64)  // 32 bytes * 2 chars per byte
 
-        let decoded = [UInt8](hexEncoded: encoded)
+        let decoded = [Byte](hexEncoded: encoded)
         #expect(decoded == hash)
     }
 
     @Test
     func `Hex encoding UUID bytes`() {
         // Typical UUID: 16 bytes
-        let uuid: [UInt8] = [
+        let uuid: [Byte] = [
             0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0,
             0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0,
         ]
 
         let encoded = String.hex(uuid)
-        let decoded = [UInt8](hexEncoded: encoded)
+        let decoded = [Byte](hexEncoded: encoded)
         #expect(decoded == uuid)
     }
 
     @Test
     func `Hex encoding color values`() {
         // RGB color: #FF5733
-        let color: [UInt8] = [0xFF, 0x57, 0x33]
+        let color: [Byte] = [0xFF, 0x57, 0x33]
         let encoded = String.hex(color, uppercase: true)
         #expect(encoded == "FF5733")
 
-        let decoded = [UInt8](hexEncoded: "#FF5733")
+        let decoded = [Byte](hexEncoded: "#FF5733")
         #expect(decoded == nil)  // # is not valid hex
 
-        let decoded2 = [UInt8](hexEncoded: "FF5733")
+        let decoded2 = [Byte](hexEncoded: "FF5733")
         #expect(decoded2 == color)
     }
 
@@ -206,9 +206,9 @@ struct HexTests {
     @Test
     func `Hex round-trip various sizes`() {
         for size in [1, 2, 10, 100, 1000] {
-            let input: [UInt8] = (0..<size).map { UInt8($0 % 256) }
+            let input: [Byte] = (0..<size).map { Byte(UInt8($0 % 256)) }
             let encoded = String.hex(input)
-            let decoded = [UInt8](hexEncoded: encoded)
+            let decoded = [Byte](hexEncoded: encoded)
             #expect(decoded == input)
         }
     }
@@ -216,9 +216,9 @@ struct HexTests {
     @Test
     func `Hex round-trip long string`() {
         let longString = String(repeating: "Hello, World! ", count: 100)
-        let input = Array(longString.utf8)
+        let input = Array<Byte>(longString.utf8)
         let encoded = String.hex(input)
-        let decoded = [UInt8](hexEncoded: encoded)
+        let decoded = [Byte](hexEncoded: encoded)
         #expect(decoded == input)
     }
 
@@ -236,14 +236,14 @@ struct HexTests {
         ]
     )
     func formatVariations(input: String) {
-        let expected: [UInt8] = [0xDE, 0xAD]
-        let decoded = [UInt8](hexEncoded: input)
+        let expected: [Byte] = [0xDE, 0xAD]
+        let decoded = [Byte](hexEncoded: input)
         #expect(decoded == expected, "'\(input)' should decode to \(expected)")
     }
 
     @Test
     func `Hex encoding produces consistent output`() {
-        let input: [UInt8] = [0xAB, 0xCD, 0xEF]
+        let input: [Byte] = [0xAB, 0xCD, 0xEF]
 
         let encoded1 = String.hex(input)
         let encoded2 = String.hex(input)

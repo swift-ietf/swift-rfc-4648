@@ -26,7 +26,7 @@ extension RFC_4648.Base64.URL {
         public func callAsFunction<Bytes: Collection>(
             _ bytes: Bytes,
             padding: Bool = false
-        ) -> String where Bytes.Element == UInt8 {
+        ) -> String where Bytes.Element == Byte {
             String(decoding: RFC_4648.Base64.URL.encode(bytes, padding: padding), as: UTF8.self)
         }
 

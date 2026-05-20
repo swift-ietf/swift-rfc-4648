@@ -45,7 +45,7 @@ extension RFC_4648 {
 extension RFC_4648.Base32 {
     /// Base32 encoding table (RFC 4648 Section 6)
     public static let encodingTable = RFC_4648.EncodingTable(
-        encode: Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".utf8),
+        encode: Array<ASCII.Code>("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".utf8),
         caseInsensitive: true
     )
 }
@@ -56,40 +56,22 @@ extension RFC_4648.Base32 {
     /// Encodes bytes to Base32 into a buffer (streaming)
     ///
     /// Base32 encodes 5 bytes into 8 characters.
-    ///
-    /// - Parameters:
-    ///   - bytes: The bytes to encode
-    ///   - buffer: The buffer to append Base32 characters to
-    ///   - padding: Whether to include padding characters (default: true)
-    ///
-    /// ## Example
-    ///
-    /// ```swift
-    /// var buffer: [UInt8] = []
-    /// RFC_4648.Base32.encode("Hello".utf8, into: &buffer)
-    /// // buffer contains "JBSWY3DP" as bytes
-    /// ```
     @inlinable
     public static func encode<Bytes: Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
         padding: Bool = true
-    ) where Bytes.Element == UInt8, Buffer.Element == UInt8 {
+    ) where Bytes.Element == Byte, Buffer.Element == ASCII.Code {
         RFC_4648.encodeBase32(bytes, into: &buffer, table: encodingTable.encode, padding: padding)
     }
 
     /// Encodes bytes to Base32, returning a new array
-    ///
-    /// - Parameters:
-    ///   - bytes: The bytes to encode
-    ///   - padding: Whether to include padding characters (default: true)
-    /// - Returns: Base32 encoded bytes
     @inlinable
     public static func encode<Bytes: Collection>(
         _ bytes: Bytes,
         padding: Bool = true
-    ) -> [UInt8] where Bytes.Element == UInt8 {
-        var result: [UInt8] = []
+    ) -> [ASCII.Code] where Bytes.Element == Byte {
+        var result: [ASCII.Code] = []
         result.reserveCapacity(((bytes.count + 4) / 5) * 8)
         encode(bytes, into: &result, padding: padding)
         return result
@@ -101,61 +83,30 @@ extension RFC_4648.Base32 {
 extension RFC_4648.Base32 {
     /// Decodes a single Base32 character to its 5-bit value (PRIMITIVE)
     ///
-    /// - Parameter quintet: ASCII byte of Base32 character (A-Z, 2-7, case-insensitive)
-    /// - Returns: 5-bit value (0-31), or nil if invalid
-    ///
-    /// ## Example
-    ///
-    /// ```swift
-    /// RFC_4648.Base32.decode(quintet: UInt8(ascii: "A"))  // 0
-    /// RFC_4648.Base32.decode(quintet: UInt8(ascii: "7"))  // 31
-    /// RFC_4648.Base32.decode(quintet: UInt8(ascii: "0"))  // nil (invalid)
-    /// ```
+    /// - Parameter quintet: ASCII code of Base32 character (A-Z, 2-7, case-insensitive)
+    /// - Returns: 5-bit value (0-31), or nil if invalid. Value is arithmetic-domain
+    ///   UInt8 per [API-BYTE-004] Q3 rubric.
     @inlinable
-    public static func decode(quintet: UInt8) -> UInt8? {
-        let value = encodingTable.decode[Int(quintet)]
-        return value == 255 ? nil : value
+    public static func decode(quintet: ASCII.Code) -> UInt8? {
+        encodingTable.decode[Int(quintet.underlying)]
     }
 
-    /// Decodes Base32 bytes into a buffer (streaming, no allocation)
-    ///
-    /// - Parameters:
-    ///   - bytes: Base32 encoded bytes
-    ///   - buffer: The buffer to append decoded bytes to
-    /// - Returns: `true` if decoding succeeded, `false` if invalid input
-    ///
-    /// ## Example
-    ///
-    /// ```swift
-    /// var buffer: [UInt8] = []
-    /// let success = RFC_4648.Base32.decode("JBSWY3DP".utf8, into: &buffer)
-    /// // buffer == [72, 101, 108, 108, 111] ("Hello")
-    /// ```
+    /// Decodes Base32 ASCII codes into a buffer (streaming, no allocation)
     @inlinable
     @discardableResult
     public static func decode<Bytes: Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer
-    ) -> Bool where Bytes.Element == UInt8, Buffer.Element == UInt8 {
+    ) -> Bool where Bytes.Element == ASCII.Code, Buffer.Element == Byte {
         RFC_4648.decodeBase32(bytes, into: &buffer, decodeTable: encodingTable.decode)
     }
 
-    /// Decodes Base32 encoded bytes to a new array
-    ///
-    /// - Parameter bytes: Base32 encoded bytes
-    /// - Returns: Decoded bytes, or nil if invalid
-    ///
-    /// ## Example
-    ///
-    /// ```swift
-    /// let decoded = RFC_4648.Base32.decode("JBSWY3DP".utf8)
-    /// // decoded == [72, 101, 108, 108, 111] ("Hello")
-    /// ```
+    /// Decodes Base32 encoded ASCII codes to a new byte array
     @inlinable
     public static func decode<Bytes: Collection>(
         _ bytes: Bytes
-    ) -> [UInt8]? where Bytes.Element == UInt8 {
-        var result: [UInt8] = []
+    ) -> [Byte]? where Bytes.Element == ASCII.Code {
+        var result: [Byte] = []
         result.reserveCapacity((bytes.count * 5) / 8)
         guard decode(bytes, into: &result) else { return nil }
         return result
@@ -163,40 +114,18 @@ extension RFC_4648.Base32 {
 
     /// Decodes Base32 encoded string (case-insensitive)
     ///
-    /// Convenience overload that delegates to the byte-based version.
-    ///
-    /// - Parameter string: Base32 encoded string
-    /// - Returns: Decoded bytes, or nil if invalid
-    ///
-    /// ## Example
-    ///
-    /// ```swift
-    /// let decoded = RFC_4648.Base32.decode("JBSWY3DP")
-    /// // decoded == [72, 101, 108, 108, 111] ("Hello")
-    /// ```
+    /// Lifts `string.utf8` to the `ASCII.Code` substrate at entry.
     @inlinable
-    public static func decode(_ string: some StringProtocol) -> [UInt8]? {
-        decode(string.utf8)
+    public static func decode(_ string: some StringProtocol) -> [Byte]? {
+        decode(Array<ASCII.Code>(string.utf8))
     }
 
     /// Decodes Base32 to a FixedWidthInteger (PRIMITIVE)
-    ///
-    /// Decodes Base32 bytes directly to an integer value without intermediate array allocation.
-    ///
-    /// - Parameter bytes: Base32 encoded bytes
-    /// - Returns: Decoded integer value, or nil if invalid or overflow
-    ///
-    /// ## Example
-    ///
-    /// ```swift
-    /// let value: UInt32? = RFC_4648.Base32.decode("GEZDGNBV".utf8)
-    /// // value == 0x31323334 ("1234" as bytes)
-    /// ```
     @inlinable
     public static func decode<Bytes: Collection, T: FixedWidthInteger>(
         _ bytes: Bytes,
         as type: T.Type = T.self
-    ) -> T? where Bytes.Element == UInt8 {
+    ) -> T? where Bytes.Element == ASCII.Code {
         RFC_4648.decodeBase32ToInteger(bytes, decodeTable: encodingTable.decode)
     }
 }
@@ -221,25 +150,19 @@ extension RFC_4648.Base32.Wrapper {
     }
 }
 
-// MARK: - Instance Methods (Convenience) - Bytes
+// MARK: - Instance Methods (Convenience) - Encode (raw bytes IN)
 
-extension RFC_4648.Base32.Wrapper where Wrapped: Collection, Wrapped.Element == UInt8 {
-    // MARK: Encoding (bytes → Base32)
-
+extension RFC_4648.Base32.Wrapper where Wrapped: Collection, Wrapped.Element == Byte {
     /// Encodes wrapped bytes to Base32 into a buffer
-    ///
-    /// Delegates to static `RFC_4648.Base32.encode(_:into:padding:)`.
     @inlinable
     public func encode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer,
         padding: Bool = true
-    ) where Buffer.Element == UInt8 {
+    ) where Buffer.Element == ASCII.Code {
         RFC_4648.Base32.encode(wrapped, into: &buffer, padding: padding)
     }
 
     /// Encodes wrapped bytes to Base32 string
-    ///
-    /// Delegates to static `RFC_4648.Base32.encode(_:padding:)`.
     @inlinable
     public func encoded(padding: Bool = true) -> String {
         String(decoding: RFC_4648.Base32.encode(wrapped, padding: padding), as: UTF8.self)
@@ -250,34 +173,27 @@ extension RFC_4648.Base32.Wrapper where Wrapped: Collection, Wrapped.Element == 
     public func callAsFunction(padding: Bool = true) -> String {
         encoded(padding: padding)
     }
+}
 
-    // MARK: Decoding (Base32 bytes → raw bytes)
+// MARK: - Instance Methods (Convenience) - Decode (encoded ASCII codes IN)
 
-    /// Decodes wrapped Base32-encoded bytes into a buffer
-    ///
-    /// Treats the wrapped bytes as ASCII Base32 characters and decodes them.
-    /// Delegates to static `RFC_4648.Base32.decode(_:into:)`.
+extension RFC_4648.Base32.Wrapper where Wrapped: Collection, Wrapped.Element == ASCII.Code {
+    /// Decodes wrapped Base32-encoded ASCII codes into a buffer
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer
-    ) -> Bool where Buffer.Element == UInt8 {
+    ) -> Bool where Buffer.Element == Byte {
         RFC_4648.Base32.decode(wrapped, into: &buffer)
     }
 
-    /// Decodes wrapped Base32-encoded bytes to raw bytes
-    ///
-    /// Treats the wrapped bytes as ASCII Base32 characters and decodes them.
-    /// Delegates to static `RFC_4648.Base32.decode(_:)`.
+    /// Decodes wrapped Base32-encoded ASCII codes to raw bytes
     @inlinable
-    public func decoded() -> [UInt8]? {
+    public func decoded() -> [Byte]? {
         RFC_4648.Base32.decode(wrapped)
     }
 
-    /// Decodes wrapped Base32-encoded bytes to a FixedWidthInteger
-    ///
-    /// Treats the wrapped bytes as ASCII Base32 characters and decodes them.
-    /// Delegates to static `RFC_4648.Base32.decode(_:as:)`.
+    /// Decodes wrapped Base32-encoded ASCII codes to a FixedWidthInteger
     @inlinable
     public func decoded<T: FixedWidthInteger>(as type: T.Type = T.self) -> T? {
         RFC_4648.Base32.decode(wrapped, as: type)
@@ -288,29 +204,23 @@ extension RFC_4648.Base32.Wrapper where Wrapped: Collection, Wrapped.Element == 
 
 extension RFC_4648.Base32.Wrapper where Wrapped: StringProtocol {
     /// Decodes wrapped Base32 string into a buffer
-    ///
-    /// Delegates to static `RFC_4648.Base32.decode(_:into:)`.
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer
-    ) -> Bool where Buffer.Element == UInt8 {
-        RFC_4648.Base32.decode(wrapped.utf8, into: &buffer)
+    ) -> Bool where Buffer.Element == Byte {
+        RFC_4648.Base32.decode(Array<ASCII.Code>(wrapped.utf8), into: &buffer)
     }
 
     /// Decodes wrapped Base32 string to bytes
-    ///
-    /// Delegates to static `RFC_4648.Base32.decode(_:)`.
     @inlinable
-    public func decoded() -> [UInt8]? {
+    public func decoded() -> [Byte]? {
         RFC_4648.Base32.decode(wrapped)
     }
 
     /// Decodes wrapped Base32 string to a FixedWidthInteger
-    ///
-    /// Delegates to static `RFC_4648.Base32.decode(_:as:)`.
     @inlinable
     public func decoded<T: FixedWidthInteger>(as type: T.Type = T.self) -> T? {
-        RFC_4648.Base32.decode(wrapped.utf8, as: type)
+        RFC_4648.Base32.decode(Array<ASCII.Code>(wrapped.utf8), as: type)
     }
 }

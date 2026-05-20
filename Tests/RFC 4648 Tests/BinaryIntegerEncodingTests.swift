@@ -99,7 +99,7 @@ struct BinaryIntegerEncodingTests {
 
         for value in values {
             let encoded = String.base64(value)
-            let decoded = [UInt8](base64Encoded: encoded)
+            let decoded = [Byte](base64Encoded: encoded)
 
             // Convert decoded bytes back to UInt32 (big-endian)
             guard let bytes = decoded else {
@@ -165,7 +165,7 @@ struct BinaryIntegerEncodingTests {
     func `Base32: Round-trip`() {
         let value = UInt32(123_456)
         let encoded = String.base32(value)
-        let decoded = [UInt8](base32Encoded: encoded)
+        let decoded = [Byte](base32Encoded: encoded)
 
         #expect(decoded != nil, "Decoding should succeed")
         guard let bytes = decoded else { return }
@@ -216,14 +216,14 @@ struct BinaryIntegerEncodingTests {
         let value = UInt32(0x1234_5678)
 
         // All encodings should use the same byte representation
-        let expectedBytes: [UInt8] = [0x12, 0x34, 0x56, 0x78]
+        let expectedBytes: [Byte] = [0x12, 0x34, 0x56, 0x78]
 
         // Verify each encoding produces consistent results
         let hex = String.hex(value, prefix: "")
         #expect(hex == "12345678")
 
         // Decode and verify bytes
-        let hexDecoded = [UInt8](hexEncoded: hex)
+        let hexDecoded = [Byte](hexEncoded: hex)
         #expect(hexDecoded == expectedBytes)
 
         // Base64 should encode these same bytes

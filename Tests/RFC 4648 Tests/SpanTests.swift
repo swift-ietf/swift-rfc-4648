@@ -14,7 +14,7 @@ struct SpanTests {
 
     @Test
     func `Span hex encoding matches Array encoding`() {
-        let bytes: [UInt8] = [0xDE, 0xAD, 0xBE, 0xEF]
+        let bytes: [Byte] = [0xDE, 0xAD, 0xBE, 0xEF]
         bytes.withUnsafeBufferPointer { buffer in
             let span = Span(_unsafeElements: buffer)
             #expect(span.hex.encoded() == bytes.hex.encoded())
@@ -24,7 +24,7 @@ struct SpanTests {
 
     @Test
     func `Span hex callable syntax`() {
-        let bytes: [UInt8] = [0xCA, 0xFE]
+        let bytes: [Byte] = [0xCA, 0xFE]
         bytes.withUnsafeBufferPointer { buffer in
             let span = Span(_unsafeElements: buffer)
             #expect(span.hex() == "cafe")
@@ -34,7 +34,7 @@ struct SpanTests {
 
     @Test
     func `Empty span hex encoding`() {
-        let bytes: [UInt8] = []
+        let bytes: [Byte] = []
         bytes.withUnsafeBufferPointer { buffer in
             let span = Span(_unsafeElements: buffer)
             #expect(span.hex.encoded().isEmpty)
@@ -45,7 +45,7 @@ struct SpanTests {
 
     @Test
     func `Span base64 encoding matches Array encoding`() {
-        let bytes: [UInt8] = [72, 101, 108, 108, 111]  // "Hello"
+        let bytes: [Byte] = [72, 101, 108, 108, 111]  // "Hello"
         bytes.withUnsafeBufferPointer { buffer in
             let span = Span(_unsafeElements: buffer)
             #expect(span.base64.encoded() == bytes.base64.encoded())
@@ -55,7 +55,7 @@ struct SpanTests {
 
     @Test
     func `Span base64 URL encoding matches Array encoding`() {
-        let bytes: [UInt8] = [0xFB, 0xFF, 0xBF]  // Bytes that produce +/ in standard Base64
+        let bytes: [Byte] = [0xFB, 0xFF, 0xBF]  // Bytes that produce +/ in standard Base64
         bytes.withUnsafeBufferPointer { buffer in
             let span = Span(_unsafeElements: buffer)
             #expect(span.base64.url.encoded() == bytes.base64.url.encoded())
@@ -65,7 +65,7 @@ struct SpanTests {
 
     @Test
     func `Empty span base64 encoding`() {
-        let bytes: [UInt8] = []
+        let bytes: [Byte] = []
         bytes.withUnsafeBufferPointer { buffer in
             let span = Span(_unsafeElements: buffer)
             #expect(span.base64.encoded().isEmpty)
@@ -76,7 +76,7 @@ struct SpanTests {
 
     @Test
     func `Span base32 encoding matches Array encoding`() {
-        let bytes: [UInt8] = [72, 101, 108, 108, 111]  // "Hello"
+        let bytes: [Byte] = [72, 101, 108, 108, 111]  // "Hello"
         bytes.withUnsafeBufferPointer { buffer in
             let span = Span(_unsafeElements: buffer)
             #expect(span.base32.encoded() == bytes.base32.encoded())
@@ -86,7 +86,7 @@ struct SpanTests {
 
     @Test
     func `Span base32 hex encoding matches Array encoding`() {
-        let bytes: [UInt8] = [72, 101, 108, 108, 111]
+        let bytes: [Byte] = [72, 101, 108, 108, 111]
         bytes.withUnsafeBufferPointer { buffer in
             let span = Span(_unsafeElements: buffer)
             #expect(span.base32.hex.encoded() == bytes.base32.hex.encoded())
@@ -96,7 +96,7 @@ struct SpanTests {
 
     @Test
     func `Empty span base32 encoding`() {
-        let bytes: [UInt8] = []
+        let bytes: [Byte] = []
         bytes.withUnsafeBufferPointer { buffer in
             let span = Span(_unsafeElements: buffer)
             #expect(span.base32.encoded().isEmpty)
@@ -107,7 +107,7 @@ struct SpanTests {
 
     @Test
     func `Span encoding from temporary allocation`() {
-        let result = withUnsafeTemporaryAllocation(of: UInt8.self, capacity: 4) { buffer in
+        let result = withUnsafeTemporaryAllocation(of: Byte.self, capacity: 4) { buffer in
             buffer[0] = 0xCA
             buffer[1] = 0xFE
             buffer[2] = 0xBA
@@ -120,7 +120,7 @@ struct SpanTests {
 
     @Test
     func `Span base64 from temporary allocation`() {
-        let result = withUnsafeTemporaryAllocation(of: UInt8.self, capacity: 3) { buffer in
+        let result = withUnsafeTemporaryAllocation(of: Byte.self, capacity: 3) { buffer in
             buffer[0] = 0x48  // H
             buffer[1] = 0x69  // i
             buffer[2] = 0x21  // !

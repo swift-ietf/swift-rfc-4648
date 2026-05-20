@@ -216,7 +216,7 @@ struct ValidationTests {
 
         for test in testCases {
             let isValid = RFC_4648.Base64.isValid(test)
-            let canDecode = [UInt8](base64Encoded: test) != nil
+            let canDecode = [Byte](base64Encoded: test) != nil
 
             #expect(
                 isValid == canDecode,
@@ -235,7 +235,7 @@ struct ValidationTests {
 
         for test in testCases {
             let isValid = RFC_4648.Base32.isValid(test)
-            let canDecode = [UInt8](base32Encoded: test) != nil
+            let canDecode = [Byte](base32Encoded: test) != nil
 
             #expect(
                 isValid == canDecode,
@@ -256,7 +256,7 @@ struct ValidationTests {
 
         for test in testCases {
             let isValid = RFC_4648.Base16.isValid(test)
-            let canDecode = [UInt8](hexEncoded: test) != nil
+            let canDecode = [Byte](hexEncoded: test) != nil
 
             #expect(
                 isValid == canDecode,

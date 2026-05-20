@@ -6,15 +6,17 @@
 
 // MARK: - Base64.URL Span Support
 
+import ASCII_Primitives
+
 extension RFC_4648.Base64.URL {
     /// Wrapper for Span-based URL-safe Base64 encoding
     public struct SpanWrapper: ~Copyable, ~Escapable {
         @usableFromInline
-        let span: Span<UInt8>
+        let span: Span<Byte>
 
         @inlinable
         @_lifetime(copy span)
-        init(_ span: Span<UInt8>) {
+        init(_ span: Span<Byte>) {
             self.span = span
         }
     }
@@ -28,7 +30,7 @@ extension RFC_4648.Base64.URL.SpanWrapper {
     @inlinable
     public func encoded(padding: Bool = false) -> String {
         unsafe span.withUnsafeBufferPointer { buffer in
-            unsafe String(decoding: RFC_4648.Base64.URL.encode(buffer, padding: padding) as [UInt8], as: UTF8.self)
+            unsafe String(decoding: RFC_4648.Base64.URL.encode(buffer, padding: padding) as [ASCII.Code], as: UTF8.self)
         }
     }
 }
