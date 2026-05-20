@@ -138,7 +138,7 @@ extension RFC_4648.Base32.Wrapper {
     /// ## Usage
     ///
     /// ```swift
-    /// let bytes: [UInt8] = [72, 101, 108, 108, 111]
+    /// let bytes: [Byte] = [72, 101, 108, 108, 111]
     /// bytes.base32.hex.encoded()  // "91IMOR3F"
     ///
     /// let encoded = "91IMOR3F"

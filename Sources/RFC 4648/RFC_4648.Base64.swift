@@ -213,7 +213,7 @@ extension RFC_4648.Base64.Wrapper {
     /// ## Usage
     ///
     /// ```swift
-    /// let bytes: [UInt8] = [72, 101, 108, 108, 111]
+    /// let bytes: [Byte] = [72, 101, 108, 108, 111]
     /// bytes.base64.url.encoded()  // "SGVsbG8" (no padding by default)
     ///
     /// let encoded = "SGVsbG8"
