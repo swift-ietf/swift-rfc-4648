@@ -47,7 +47,16 @@ extension RFC_4648 {
 extension RFC_4648.Base64 {
     /// Base64 encoding table (RFC 4648 Section 4)
     public static let encodingTable = RFC_4648.EncodingTable(
-        encode: Array<ASCII.Code>("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".utf8)
+        encode: [
+            .A, .B, .C, .D, .E, .F, .G, .H,
+            .I, .J, .K, .L, .M, .N, .O, .P,
+            .Q, .R, .S, .T, .U, .V, .W, .X,
+            .Y, .Z, .a, .b, .c, .d, .e, .f,
+            .g, .h, .i, .j, .k, .l, .m, .n,
+            .o, .p, .q, .r, .s, .t, .u, .v,
+            .w, .x, .y, .z, .`0`, .`1`, .`2`, .`3`,
+            .`4`, .`5`, .`6`, .`7`, .`8`, .`9`, .plus, .slash,
+        ] as [ASCII.Code]
     )
 }
 
@@ -180,7 +189,13 @@ extension RFC_4648.Base64 {
     /// ```
     @inlinable
     public static func decode(_ string: some StringProtocol) -> [Byte]? {
-        decode(Array<ASCII.Code>(string.utf8))
+        let codes: [ASCII.Code]
+        do {
+            codes = try Array<ASCII.Code>(string.utf8)
+        } catch {
+            return nil
+        }
+        return decode(codes)
     }
 
     /// Decodes Base64 to a FixedWidthInteger (PRIMITIVE)
@@ -291,13 +306,20 @@ extension RFC_4648.Base64.Wrapper where Wrapped: StringProtocol {
     /// Decodes wrapped Base64 string into a buffer
     ///
     /// Lifts `wrapped.utf8` to the `ASCII.Code` substrate at entry.
+    /// Returns `false` if the string contains non-ASCII bytes.
     /// Delegates to static `RFC_4648.Base64.decode(_:into:)`.
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer
     ) -> Bool where Buffer.Element == Byte {
-        RFC_4648.Base64.decode(Array<ASCII.Code>(wrapped.utf8), into: &buffer)
+        let codes: [ASCII.Code]
+        do {
+            codes = try Array<ASCII.Code>(wrapped.utf8)
+        } catch {
+            return false
+        }
+        return RFC_4648.Base64.decode(codes, into: &buffer)
     }
 
     /// Decodes wrapped Base64 string to bytes
@@ -311,9 +333,16 @@ extension RFC_4648.Base64.Wrapper where Wrapped: StringProtocol {
     /// Decodes wrapped Base64 string to a FixedWidthInteger
     ///
     /// Lifts `wrapped.utf8` to the `ASCII.Code` substrate at entry.
+    /// Returns `nil` if the string contains non-ASCII bytes.
     /// Delegates to static `RFC_4648.Base64.decode(_:as:)`.
     @inlinable
     public func decoded<T: FixedWidthInteger>(as type: T.Type = T.self) -> T? {
-        RFC_4648.Base64.decode(Array<ASCII.Code>(wrapped.utf8), as: type)
+        let codes: [ASCII.Code]
+        do {
+            codes = try Array<ASCII.Code>(wrapped.utf8)
+        } catch {
+            return nil
+        }
+        return RFC_4648.Base64.decode(codes, as: type)
     }
 }

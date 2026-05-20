@@ -45,7 +45,12 @@ extension RFC_4648 {
 extension RFC_4648.Base32 {
     /// Base32 encoding table (RFC 4648 Section 6)
     public static let encodingTable = RFC_4648.EncodingTable(
-        encode: Array<ASCII.Code>("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".utf8),
+        encode: [
+            .A, .B, .C, .D, .E, .F, .G, .H,
+            .I, .J, .K, .L, .M, .N, .O, .P,
+            .Q, .R, .S, .T, .U, .V, .W, .X,
+            .Y, .Z, .`2`, .`3`, .`4`, .`5`, .`6`, .`7`,
+        ] as [ASCII.Code],
         caseInsensitive: true
     )
 }
@@ -115,9 +120,16 @@ extension RFC_4648.Base32 {
     /// Decodes Base32 encoded string (case-insensitive)
     ///
     /// Lifts `string.utf8` to the `ASCII.Code` substrate at entry.
+    /// Returns `nil` if the string contains non-ASCII bytes.
     @inlinable
     public static func decode(_ string: some StringProtocol) -> [Byte]? {
-        decode(Array<ASCII.Code>(string.utf8))
+        let codes: [ASCII.Code]
+        do {
+            codes = try Array<ASCII.Code>(string.utf8)
+        } catch {
+            return nil
+        }
+        return decode(codes)
     }
 
     /// Decodes Base32 to a FixedWidthInteger (PRIMITIVE)
@@ -203,13 +215,21 @@ extension RFC_4648.Base32.Wrapper where Wrapped: Collection, Wrapped.Element == 
 // MARK: - Instance Methods (Convenience) - String
 
 extension RFC_4648.Base32.Wrapper where Wrapped: StringProtocol {
-    /// Decodes wrapped Base32 string into a buffer
+    /// Decodes wrapped Base32 string into a buffer.
+    ///
+    /// Returns `false` if the string contains non-ASCII bytes.
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer
     ) -> Bool where Buffer.Element == Byte {
-        RFC_4648.Base32.decode(Array<ASCII.Code>(wrapped.utf8), into: &buffer)
+        let codes: [ASCII.Code]
+        do {
+            codes = try Array<ASCII.Code>(wrapped.utf8)
+        } catch {
+            return false
+        }
+        return RFC_4648.Base32.decode(codes, into: &buffer)
     }
 
     /// Decodes wrapped Base32 string to bytes
@@ -218,9 +238,17 @@ extension RFC_4648.Base32.Wrapper where Wrapped: StringProtocol {
         RFC_4648.Base32.decode(wrapped)
     }
 
-    /// Decodes wrapped Base32 string to a FixedWidthInteger
+    /// Decodes wrapped Base32 string to a FixedWidthInteger.
+    ///
+    /// Returns `nil` if the string contains non-ASCII bytes.
     @inlinable
     public func decoded<T: FixedWidthInteger>(as type: T.Type = T.self) -> T? {
-        RFC_4648.Base32.decode(Array<ASCII.Code>(wrapped.utf8), as: type)
+        let codes: [ASCII.Code]
+        do {
+            codes = try Array<ASCII.Code>(wrapped.utf8)
+        } catch {
+            return nil
+        }
+        return RFC_4648.Base32.decode(codes, as: type)
     }
 }

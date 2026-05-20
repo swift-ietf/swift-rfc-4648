@@ -67,13 +67,19 @@ extension RFC_4648.Base16 {
 
     /// Base16 encoding table - lowercase (RFC 4648 Section 8)
     public static let encodingTable = RFC_4648.EncodingTable(
-        encode: Array<ASCII.Code>("0123456789abcdef".utf8),
+        encode: [
+            .`0`, .`1`, .`2`, .`3`, .`4`, .`5`, .`6`, .`7`,
+            .`8`, .`9`, .a, .b, .c, .d, .e, .f,
+        ] as [ASCII.Code],
         decode: hexDecodeTable
     )
 
     /// Base16 encoding table - uppercase (RFC 4648 Section 8)
     public static let encodingTableUppercase = RFC_4648.EncodingTable(
-        encode: Array<ASCII.Code>("0123456789ABCDEF".utf8),
+        encode: [
+            .`0`, .`1`, .`2`, .`3`, .`4`, .`5`, .`6`, .`7`,
+            .`8`, .`9`, .A, .B, .C, .D, .E, .F,
+        ] as [ASCII.Code],
         decode: hexDecodeTable
     )
 }
@@ -278,12 +284,19 @@ extension RFC_4648.Base16 {
     /// Decodes Base16 encoded string (case-insensitive)
     ///
     /// Lifts `string.utf8` to the `ASCII.Code` substrate at entry.
+    /// Returns `nil` if the string contains non-ASCII bytes.
     @inlinable
     public static func decode(
         _ string: some StringProtocol,
         skipPrefix: Bool = true
     ) -> [Byte]? {
-        decode(Array<ASCII.Code>(string.utf8), skipPrefix: skipPrefix)
+        let codes: [ASCII.Code]
+        do {
+            codes = try Array<ASCII.Code>(string.utf8)
+        } catch {
+            return nil
+        }
+        return decode(codes, skipPrefix: skipPrefix)
     }
 
     /// Decodes Base16 to a FixedWidthInteger (PRIMITIVE)
@@ -408,14 +421,22 @@ extension RFC_4648.Base16.Wrapper where Wrapped: Collection, Wrapped.Element == 
 // MARK: - Instance Methods (Convenience) - String
 
 extension RFC_4648.Base16.Wrapper where Wrapped: StringProtocol {
-    /// Decodes wrapped hexadecimal string into a buffer
+    /// Decodes wrapped hexadecimal string into a buffer.
+    ///
+    /// Returns `false` if the string contains non-ASCII bytes.
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer,
         skipPrefix: Bool = true
     ) -> Bool where Buffer.Element == Byte {
-        RFC_4648.Base16.decode(Array<ASCII.Code>(wrapped.utf8), into: &buffer, skipPrefix: skipPrefix)
+        let codes: [ASCII.Code]
+        do {
+            codes = try Array<ASCII.Code>(wrapped.utf8)
+        } catch {
+            return false
+        }
+        return RFC_4648.Base16.decode(codes, into: &buffer, skipPrefix: skipPrefix)
     }
 
     /// Decodes wrapped hexadecimal string to bytes
@@ -424,13 +445,21 @@ extension RFC_4648.Base16.Wrapper where Wrapped: StringProtocol {
         RFC_4648.Base16.decode(wrapped, skipPrefix: skipPrefix)
     }
 
-    /// Decodes wrapped hexadecimal string to a FixedWidthInteger
+    /// Decodes wrapped hexadecimal string to a FixedWidthInteger.
+    ///
+    /// Returns `nil` if the string contains non-ASCII bytes.
     @inlinable
     public func decoded<T: FixedWidthInteger>(
         as type: T.Type = T.self,
         skipPrefix: Bool = true
     ) -> T? {
-        RFC_4648.Base16.decode(Array<ASCII.Code>(wrapped.utf8), as: type, skipPrefix: skipPrefix)
+        let codes: [ASCII.Code]
+        do {
+            codes = try Array<ASCII.Code>(wrapped.utf8)
+        } catch {
+            return nil
+        }
+        return RFC_4648.Base16.decode(codes, as: type, skipPrefix: skipPrefix)
     }
 }
 
