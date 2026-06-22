@@ -27,7 +27,7 @@ extension Span where Element == Byte {
     /// ## Usage
     ///
     /// ```swift
-    /// let span: Span<Byte> = ...
+    /// let span: Swift.Span<Byte> = ...
     /// span.hex.encoded()  // "deadbeef"
     /// span.hex.encoded(uppercase: true)  // "DEADBEEF"
     /// ```
@@ -44,7 +44,7 @@ extension Span where Element == Byte {
     /// ## Usage
     ///
     /// ```swift
-    /// let span: Span<Byte> = ...
+    /// let span: Swift.Span<Byte> = ...
     /// span.base64.encoded()  // Standard Base64
     /// span.base64.url.encoded()  // URL-safe Base64
     /// ```
@@ -61,7 +61,7 @@ extension Span where Element == Byte {
     /// ## Usage
     ///
     /// ```swift
-    /// let span: Span<Byte> = ...
+    /// let span: Swift.Span<Byte> = ...
     /// span.base32.encoded()  // Standard Base32
     /// span.base32.hex.encoded()  // Base32-HEX
     /// ```

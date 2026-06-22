@@ -12,11 +12,11 @@ extension RFC_4648.Base64.URL {
     /// Wrapper for Span-based URL-safe Base64 encoding
     public struct SpanWrapper: ~Copyable, ~Escapable {
         @usableFromInline
-        let span: Span<Byte>
+        let span: Swift.Span<Byte>
 
         @inlinable
         @_lifetime(copy span)
-        init(_ span: Span<Byte>) {
+        init(_ span: Swift.Span<Byte>) {
             self.span = span
         }
     }
