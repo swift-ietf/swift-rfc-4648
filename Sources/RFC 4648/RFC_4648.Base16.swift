@@ -39,6 +39,31 @@ extension RFC_4648 {
     }
 }
 
+// MARK: - Encoding Tables
+
+extension RFC_4648.Base16 {
+    /// Base16 lowercase encoding table (RFC 4648 Section 8).
+    ///
+    /// The hex alphabet is derived from the L1 ASCII single-byte primitive
+    /// `ASCII.Serialization.hexDigitLowercase` — L1 is the single source of
+    /// truth — and the decode table is case-insensitive (accepts upper + lower),
+    /// matching the historical shared hex decode table. Kept public for parity
+    /// with the Base32/Base64 `encodingTable` family.
+    public static let encodingTable = RFC_4648.EncodingTable(
+        encode: (0...15).map { ASCII.Serialization.hexDigitLowercase(UInt8($0))! },
+        caseInsensitive: true
+    )
+
+    /// Base16 uppercase encoding table (RFC 4648 Section 8).
+    ///
+    /// Uppercase counterpart of ``encodingTable``; alphabet derived from
+    /// `ASCII.Serialization.hexDigitUppercase`.
+    public static let encodingTableUppercase = RFC_4648.EncodingTable(
+        encode: (0...15).map { ASCII.Serialization.hexDigitUppercase(UInt8($0))! },
+        caseInsensitive: true
+    )
+}
+
 // MARK: - Static Encode Methods (Authoritative)
 
 extension RFC_4648.Base16 {
