@@ -39,51 +39,6 @@ extension RFC_4648 {
     }
 }
 
-// MARK: - Encoding Tables
-
-extension RFC_4648.Base16 {
-    /// Shared decode table for hex (case-insensitive); `nil` = invalid character
-    @usableFromInline
-    static let hexDecodeTable: [UInt8?] = {
-        var table = [UInt8?](repeating: nil, count: 256)
-
-        // 0-9
-        for char in UInt8(ascii: "0")...UInt8(ascii: "9") {
-            table[Int(char)] = char - UInt8(ascii: "0")
-        }
-
-        // a-f
-        for char in UInt8(ascii: "a")...UInt8(ascii: "f") {
-            table[Int(char)] = 10 + (char - UInt8(ascii: "a"))
-        }
-
-        // A-F
-        for char in UInt8(ascii: "A")...UInt8(ascii: "F") {
-            table[Int(char)] = 10 + (char - UInt8(ascii: "A"))
-        }
-
-        return table
-    }()
-
-    /// Base16 encoding table - lowercase (RFC 4648 Section 8)
-    public static let encodingTable = RFC_4648.EncodingTable(
-        encode: [
-            .`0`, .`1`, .`2`, .`3`, .`4`, .`5`, .`6`, .`7`,
-            .`8`, .`9`, .a, .b, .c, .d, .e, .f,
-        ] as [ASCII.Code],
-        decode: hexDecodeTable
-    )
-
-    /// Base16 encoding table - uppercase (RFC 4648 Section 8)
-    public static let encodingTableUppercase = RFC_4648.EncodingTable(
-        encode: [
-            .`0`, .`1`, .`2`, .`3`, .`4`, .`5`, .`6`, .`7`,
-            .`8`, .`9`, .A, .B, .C, .D, .E, .F,
-        ] as [ASCII.Code],
-        decode: hexDecodeTable
-    )
-}
-
 // MARK: - Static Encode Methods (Authoritative)
 
 extension RFC_4648.Base16 {
@@ -104,7 +59,6 @@ extension RFC_4648.Base16 {
         uppercase: Bool = false,
         suppressLeadingZeros: Bool = false
     ) where Buffer.Element == ASCII.Code {
-        let table = uppercase ? encodingTableUppercase.encode : encodingTable.encode
         let nibbleCount = T.bitWidth / 4
 
         var foundNonZero = false
@@ -112,16 +66,23 @@ extension RFC_4648.Base16 {
         for i in (0..<nibbleCount).reversed() {
             let nibble = Int((value >> (i * 4)) & 0x0F)
 
+            // Delegate the nibble → ASCII.Code mapping to the L1 single-byte ASCII
+            // serialization primitives so the hex alphabet has a single source of
+            // truth. The nibble is masked to 0...15, so the force-unwrap is total.
+            let code = uppercase
+                ? ASCII.Serialization.hexDigitUppercase(UInt8(nibble))!
+                : ASCII.Serialization.hexDigitLowercase(UInt8(nibble))!
+
             if suppressLeadingZeros {
                 if nibble != 0 {
                     foundNonZero = true
                 }
                 // Always output if: non-zero found, or last nibble (ensure at least "0")
                 if foundNonZero || i == 0 {
-                    buffer.append(table[nibble])
+                    buffer.append(code)
                 }
             } else {
-                buffer.append(table[nibble])
+                buffer.append(code)
             }
         }
     }
@@ -174,15 +135,17 @@ extension RFC_4648.Base16 {
     /// ```
     @inlinable
     public static func decode(nibble: ASCII.Code) -> UInt8? {
-        encodingTable.decode[Int(nibble.underlying)]
+        // Single source of truth: the L1 single-byte ASCII parsing primitive owns
+        // the hex-digit → nibble mapping (case-insensitive). Every higher decode
+        // overload funnels through this method.
+        ASCII.Parsing.hexDigit(nibble)
     }
 
     /// Decodes a hex pair to a single byte (PRIMITIVE)
     @inlinable
     public static func decode(high: ASCII.Code, low: ASCII.Code) -> UInt8? {
-        let decodeTable = encodingTable.decode
-        guard let highNibble = decodeTable[Int(high.underlying)],
-              let lowNibble = decodeTable[Int(low.underlying)] else { return nil }
+        guard let highNibble = decode(nibble: high),
+              let lowNibble = decode(nibble: low) else { return nil }
         return (highNibble << 4) | lowNibble
     }
 
@@ -202,7 +165,6 @@ extension RFC_4648.Base16 {
     ) -> Bool where Bytes.Element == ASCII.Code, Buffer.Element == Byte {
         guard !bytes.isEmpty else { return true }
 
-        let decodeTable = encodingTable.decode
         var iterator = bytes.makeIterator()
 
         // Check for "0x" or "0X" prefix
@@ -219,8 +181,8 @@ extension RFC_4648.Base16 {
                 if second != ASCII.Code.x && second != ASCII.Code.X {
                     // Not a prefix, these are actual hex digits
                     // Decode this pair
-                    guard let highNibble = decodeTable[Int(first.underlying)],
-                          let lowNibble = decodeTable[Int(second.underlying)] else { return false }
+                    guard let highNibble = decode(nibble: first),
+                          let lowNibble = decode(nibble: second) else { return false }
                     buffer.append(Byte((highNibble << 4) | lowNibble))
                 }
                 // If it was "0x"/"0X", we consumed it and continue
@@ -238,8 +200,8 @@ extension RFC_4648.Base16 {
                     guard let next = iterator.next() else { return false }
                     low = next
                 }
-                guard let highNibble = decodeTable[Int(high.underlying)],
-                      let lowNibble = decodeTable[Int(low.underlying)] else { return false }
+                guard let highNibble = decode(nibble: high),
+                      let lowNibble = decode(nibble: low) else { return false }
                 buffer.append(Byte((highNibble << 4) | lowNibble))
             }
         }
@@ -261,8 +223,8 @@ extension RFC_4648.Base16 {
                 lowCode = next
             }
 
-            guard let highNibble = decodeTable[Int(highCode.underlying)],
-                  let lowNibble = decodeTable[Int(lowCode.underlying)] else { return false }
+            guard let highNibble = decode(nibble: highCode),
+                  let lowNibble = decode(nibble: lowCode) else { return false }
             buffer.append(Byte((highNibble << 4) | lowNibble))
         }
 
@@ -310,7 +272,6 @@ extension RFC_4648.Base16 {
     ) -> T? where Bytes.Element == ASCII.Code {
         guard !bytes.isEmpty else { return 0 }
 
-        let decodeTable = encodingTable.decode
         var iterator = bytes.makeIterator()
         var result: T = 0
         var nibbleCount = 0
@@ -326,13 +287,13 @@ extension RFC_4648.Base16 {
                         // Prefix consumed, continue
                     } else if !second.isWhitespace {
                         // Not a prefix, these are hex digits
-                        guard let highNibble = decodeTable[Int(first.underlying)],
-                              let lowNibble = decodeTable[Int(second.underlying)] else { return nil }
+                        guard let highNibble = decode(nibble: first),
+                              let lowNibble = decode(nibble: second) else { return nil }
                         result = T(highNibble) << 4 | T(lowNibble)
                         nibbleCount = 2
                     } else {
                         // '0' followed by whitespace - just '0'
-                        guard let nibble = decodeTable[Int(first.underlying)] else { return nil }
+                        guard let nibble = decode(nibble: first) else { return nil }
                         result = T(nibble)
                         nibbleCount = 1
                     }
@@ -341,7 +302,7 @@ extension RFC_4648.Base16 {
                     return 0
                 }
             } else if !first.isWhitespace {
-                guard let nibble = decodeTable[Int(first.underlying)] else { return nil }
+                guard let nibble = decode(nibble: first) else { return nil }
                 result = T(nibble)
                 nibbleCount = 1
             }
@@ -351,7 +312,7 @@ extension RFC_4648.Base16 {
         while let code = iterator.next() {
             guard !code.isWhitespace else { continue }
 
-            guard let nibble = decodeTable[Int(code.underlying)] else { return nil }
+            guard let nibble = decode(nibble: code) else { return nil }
 
             nibbleCount += 1
             guard nibbleCount <= maxNibbles else { return nil }  // overflow
