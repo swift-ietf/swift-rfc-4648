@@ -45,21 +45,21 @@ extension RFC_4648.Base16 {
     /// Base16 lowercase encoding table (RFC 4648 Section 8).
     ///
     /// The hex alphabet is derived from the L1 ASCII single-byte primitive
-    /// `ASCII.Serialization.hexDigitLowercase` — L1 is the single source of
+    /// `ASCII.Hexadecimal.code(_:case:)` — L1 is the single source of
     /// truth — and the decode table is case-insensitive (accepts upper + lower),
     /// matching the historical shared hex decode table. Kept public for parity
     /// with the Base32/Base64 `encodingTable` family.
     public static let encodingTable = RFC_4648.EncodingTable(
-        encode: (0...15).map { ASCII.Serialization.hexDigitLowercase(UInt8($0))! },
+        encode: (0...15).map { ASCII.Hexadecimal.code(UInt8($0), case: .lower)! },
         caseInsensitive: true
     )
 
     /// Base16 uppercase encoding table (RFC 4648 Section 8).
     ///
     /// Uppercase counterpart of ``encodingTable``; alphabet derived from
-    /// `ASCII.Serialization.hexDigitUppercase`.
+    /// `ASCII.Hexadecimal.code(_:case:)`.
     public static let encodingTableUppercase = RFC_4648.EncodingTable(
-        encode: (0...15).map { ASCII.Serialization.hexDigitUppercase(UInt8($0))! },
+        encode: (0...15).map { ASCII.Hexadecimal.code(UInt8($0), case: .upper)! },
         caseInsensitive: true
     )
 }
@@ -95,8 +95,8 @@ extension RFC_4648.Base16 {
             // serialization primitives so the hex alphabet has a single source of
             // truth. The nibble is masked to 0...15, so the force-unwrap is total.
             let code = uppercase
-                ? ASCII.Serialization.hexDigitUppercase(UInt8(nibble))!
-                : ASCII.Serialization.hexDigitLowercase(UInt8(nibble))!
+                ? ASCII.Hexadecimal.code(UInt8(nibble), case: .upper)!
+                : ASCII.Hexadecimal.code(UInt8(nibble), case: .lower)!
 
             if suppressLeadingZeros {
                 if nibble != 0 {
@@ -163,7 +163,7 @@ extension RFC_4648.Base16 {
         // Single source of truth: the L1 single-byte ASCII parsing primitive owns
         // the hex-digit → nibble mapping (case-insensitive). Every higher decode
         // overload funnels through this method.
-        ASCII.Parsing.hexDigit(nibble)
+        nibble.hexValue
     }
 
     /// Decodes a hex pair to a single byte (PRIMITIVE)
