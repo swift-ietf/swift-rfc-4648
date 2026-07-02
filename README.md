@@ -1,6 +1,6 @@
 # swift-rfc-4648
 
-[![CI](https://github.com/swift-standards/swift-rfc-4648/workflows/CI/badge.svg)](https://github.com/swift-standards/swift-rfc-4648/actions/workflows/ci.yml)
+[![CI](https://github.com/swift-ietf/swift-rfc-4648/workflows/CI/badge.svg)](https://github.com/swift-ietf/swift-rfc-4648/actions/workflows/ci.yml)
 ![Development Status](https://img.shields.io/badge/status-active--development-blue.svg)
 
 **Pure Swift implementation of RFC 4648: The Base16, Base32, and Base64 Data Encodings**
@@ -215,7 +215,7 @@ Add `swift-rfc-4648` to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/swift-standards/swift-rfc-4648.git", from: "0.1.0")
+    .package(url: "https://github.com/swift-ietf/swift-rfc-4648.git", from: "0.6.0")
 ]
 ```
 
