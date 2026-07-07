@@ -94,7 +94,8 @@ extension RFC_4648.Base16 {
             // Delegate the nibble → ASCII.Code mapping to the L1 single-byte ASCII
             // serialization primitives so the hex alphabet has a single source of
             // truth. The nibble is masked to 0...15, so the force-unwrap is total.
-            let code = uppercase
+            let code =
+                uppercase
                 ? ASCII.Hexadecimal.code(UInt8(nibble), case: .upper)!
                 : ASCII.Hexadecimal.code(UInt8(nibble), case: .lower)!
 
@@ -170,7 +171,8 @@ extension RFC_4648.Base16 {
     @inlinable
     public static func decode(high: ASCII.Code, low: ASCII.Code) -> UInt8? {
         guard let highNibble = decode(nibble: high),
-              let lowNibble = decode(nibble: low) else { return nil }
+            let lowNibble = decode(nibble: low)
+        else { return nil }
         return (highNibble << 4) | lowNibble
     }
 
@@ -207,7 +209,8 @@ extension RFC_4648.Base16 {
                     // Not a prefix, these are actual hex digits
                     // Decode this pair
                     guard let highNibble = decode(nibble: first),
-                          let lowNibble = decode(nibble: second) else { return false }
+                        let lowNibble = decode(nibble: second)
+                    else { return false }
                     buffer.append(Byte((highNibble << 4) | lowNibble))
                 }
                 // If it was "0x"/"0X", we consumed it and continue
@@ -226,7 +229,8 @@ extension RFC_4648.Base16 {
                     low = next
                 }
                 guard let highNibble = decode(nibble: high),
-                      let lowNibble = decode(nibble: low) else { return false }
+                    let lowNibble = decode(nibble: low)
+                else { return false }
                 buffer.append(Byte((highNibble << 4) | lowNibble))
             }
         }
@@ -249,7 +253,8 @@ extension RFC_4648.Base16 {
             }
 
             guard let highNibble = decode(nibble: highCode),
-                  let lowNibble = decode(nibble: lowCode) else { return false }
+                let lowNibble = decode(nibble: lowCode)
+            else { return false }
             buffer.append(Byte((highNibble << 4) | lowNibble))
         }
 
@@ -279,7 +284,7 @@ extension RFC_4648.Base16 {
     ) -> [Byte]? {
         let codes: [ASCII.Code]
         do {
-            codes = try Array<ASCII.Code>(string.utf8)
+            codes = try [ASCII.Code](string.utf8)
         } catch {
             return nil
         }
@@ -313,7 +318,8 @@ extension RFC_4648.Base16 {
                     } else if !second.isWhitespace {
                         // Not a prefix, these are hex digits
                         guard let highNibble = decode(nibble: first),
-                              let lowNibble = decode(nibble: second) else { return nil }
+                            let lowNibble = decode(nibble: second)
+                        else { return nil }
                         result = T(highNibble) << 4 | T(lowNibble)
                         nibbleCount = 2
                     } else {
@@ -418,7 +424,7 @@ extension RFC_4648.Base16.Wrapper where Wrapped: StringProtocol {
     ) -> Bool where Buffer.Element == Byte {
         let codes: [ASCII.Code]
         do {
-            codes = try Array<ASCII.Code>(wrapped.utf8)
+            codes = try [ASCII.Code](wrapped.utf8)
         } catch {
             return false
         }
@@ -441,7 +447,7 @@ extension RFC_4648.Base16.Wrapper where Wrapped: StringProtocol {
     ) -> T? {
         let codes: [ASCII.Code]
         do {
-            codes = try Array<ASCII.Code>(wrapped.utf8)
+            codes = try [ASCII.Code](wrapped.utf8)
         } catch {
             return nil
         }

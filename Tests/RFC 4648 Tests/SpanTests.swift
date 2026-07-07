@@ -5,6 +5,7 @@
 //  Tests for Span-based encoding
 
 import Testing
+
 @testable import RFC_4648
 
 @Suite("Span Encoding")

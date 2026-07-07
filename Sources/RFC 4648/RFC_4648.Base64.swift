@@ -140,7 +140,7 @@ extension RFC_4648.Base64 {
     ///
     /// ```swift
     /// var buffer: [Byte] = []
-    /// let success = RFC_4648.Base64.decode(Array<ASCII.Code>("SGVsbG8=".utf8), into: &buffer)
+    /// let success = RFC_4648.Base64.decode([ASCII.Code]("SGVsbG8=".utf8), into: &buffer)
     /// // buffer == [72, 101, 108, 108, 111] ("Hello")
     /// ```
     @inlinable
@@ -160,7 +160,7 @@ extension RFC_4648.Base64 {
     /// ## Example
     ///
     /// ```swift
-    /// let decoded = RFC_4648.Base64.decode(Array<ASCII.Code>("SGVsbG8=".utf8))
+    /// let decoded = RFC_4648.Base64.decode([ASCII.Code]("SGVsbG8=".utf8))
     /// // decoded == [72, 101, 108, 108, 111] ("Hello")
     /// ```
     @inlinable
@@ -191,7 +191,7 @@ extension RFC_4648.Base64 {
     public static func decode(_ string: some StringProtocol) -> [Byte]? {
         let codes: [ASCII.Code]
         do {
-            codes = try Array<ASCII.Code>(string.utf8)
+            codes = try [ASCII.Code](string.utf8)
         } catch {
             return nil
         }
@@ -208,7 +208,7 @@ extension RFC_4648.Base64 {
     /// ## Example
     ///
     /// ```swift
-    /// let value: UInt32? = RFC_4648.Base64.decode(Array<ASCII.Code>("AQIDBA==".utf8))
+    /// let value: UInt32? = RFC_4648.Base64.decode([ASCII.Code]("AQIDBA==".utf8))
     /// // value == 0x01020304
     /// ```
     @inlinable
@@ -315,7 +315,7 @@ extension RFC_4648.Base64.Wrapper where Wrapped: StringProtocol {
     ) -> Bool where Buffer.Element == Byte {
         let codes: [ASCII.Code]
         do {
-            codes = try Array<ASCII.Code>(wrapped.utf8)
+            codes = try [ASCII.Code](wrapped.utf8)
         } catch {
             return false
         }
@@ -339,7 +339,7 @@ extension RFC_4648.Base64.Wrapper where Wrapped: StringProtocol {
     public func decoded<T: FixedWidthInteger>(as type: T.Type = T.self) -> T? {
         let codes: [ASCII.Code]
         do {
-            codes = try Array<ASCII.Code>(wrapped.utf8)
+            codes = try [ASCII.Code](wrapped.utf8)
         } catch {
             return nil
         }

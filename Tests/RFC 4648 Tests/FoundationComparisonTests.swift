@@ -17,14 +17,14 @@ import Testing
         func `Base64 encoding matches Foundation`() {
             let testCases: [[Byte]] = [
                 [],
-                Array<Byte>("f".utf8),
-                Array<Byte>("fo".utf8),
-                Array<Byte>("foo".utf8),
-                Array<Byte>("foob".utf8),
-                Array<Byte>("fooba".utf8),
-                Array<Byte>("foobar".utf8),
+                [Byte]("f".utf8),
+                [Byte]("fo".utf8),
+                [Byte]("foo".utf8),
+                [Byte]("foob".utf8),
+                [Byte]("fooba".utf8),
+                [Byte]("foobar".utf8),
                 [0x00, 0xFF, 0x80, 0x7F],
-                Array<Byte>("The quick brown fox jumps over the lazy dog".utf8),
+                [Byte]("The quick brown fox jumps over the lazy dog".utf8),
                 (0..<100).map { Byte(UInt8($0 % 256)) },
             ]
 
@@ -66,7 +66,7 @@ import Testing
         @Test
         func `Base64 round-trip matches Foundation`() {
             let testBytes: [[Byte]] = [
-                Array<Byte>("Hello, World!".utf8),
+                [Byte]("Hello, World!".utf8),
                 (0..<255).map { Byte(UInt8($0)) },
                 Array(repeating: 0xFF, count: 100),
                 Array(repeating: 0x00, count: 100),
@@ -167,7 +167,7 @@ import Testing
             // Our implementation: whitespace is ignored (permitted by RFC 4648)
             let ourDecoded = [Byte](base64Encoded: withWhitespace)
             #expect(ourDecoded == [Byte](base64Encoded: withoutWhitespace))
-            #expect(ourDecoded == Array<Byte>("foobar".utf8))
+            #expect(ourDecoded == [Byte]("foobar".utf8))
 
             // Foundation: whitespace causes failure
             let foundationDecoded = Data(base64Encoded: withWhitespace)
@@ -390,7 +390,7 @@ import Testing
             ]
         )
         func uTF8Strings(input: String) {
-            let bytes = Array<Byte>(input.utf8)
+            let bytes = [Byte](input.utf8)
 
             let ourEncoded = String.base64(bytes)
             let foundationEncoded = Data(bytes.underlying).base64EncodedString()
@@ -435,7 +435,7 @@ import Testing
         @Test
         func `Base64 BinaryInteger UInt8 values match Foundation`() {
             for value in [UInt8.min, 1, 127, 128, 255, UInt8.max] {
-                let bytes = withUnsafeBytes(of: value.bigEndian) { Array<Byte>($0) }
+                let bytes = withUnsafeBytes(of: value.bigEndian) { [Byte]($0) }
 
                 let ourEncoded = String.base64(value)
                 let foundationEncoded = Data(bytes.underlying).base64EncodedString()
@@ -452,7 +452,7 @@ import Testing
             let values: [UInt16] = [0, 1, 255, 256, 32767, 32768, 65535, UInt16.max]
 
             for value in values {
-                let bytes = withUnsafeBytes(of: value.bigEndian) { Array<Byte>($0) }
+                let bytes = withUnsafeBytes(of: value.bigEndian) { [Byte]($0) }
 
                 let ourEncoded = String.base64(value)
                 let foundationEncoded = Data(bytes.underlying).base64EncodedString()
@@ -473,7 +473,7 @@ import Testing
             ]
 
             for value in values {
-                let bytes = withUnsafeBytes(of: value.bigEndian) { Array<Byte>($0) }
+                let bytes = withUnsafeBytes(of: value.bigEndian) { [Byte]($0) }
 
                 let ourEncoded = String.base64(value)
                 let foundationEncoded = Data(bytes.underlying).base64EncodedString()
@@ -495,7 +495,7 @@ import Testing
             ]
 
             for value in values {
-                let bytes = withUnsafeBytes(of: value.bigEndian) { Array<Byte>($0) }
+                let bytes = withUnsafeBytes(of: value.bigEndian) { [Byte]($0) }
 
                 let ourEncoded = String.base64(value)
                 let foundationEncoded = Data(bytes.underlying).base64EncodedString()
@@ -589,10 +589,10 @@ import Testing
             // (padding to make the input length a multiple of 4)
 
             let testCases: [(padded: String, expected: [Byte])] = [
-                ("YQ==", Array<Byte>("a".utf8)),  // 1 byte
-                ("YWI=", Array<Byte>("ab".utf8)),  // 2 bytes
-                ("YWJj", Array<Byte>("abc".utf8)),  // 3 bytes (no padding needed)
-                ("YWJjZA==", Array<Byte>("abcd".utf8)),  // 4 bytes
+                ("YQ==", [Byte]("a".utf8)),  // 1 byte
+                ("YWI=", [Byte]("ab".utf8)),  // 2 bytes
+                ("YWJj", [Byte]("abc".utf8)),  // 3 bytes (no padding needed)
+                ("YWJjZA==", [Byte]("abcd".utf8)),  // 4 bytes
             ]
 
             for (padded, expectedBytes) in testCases {

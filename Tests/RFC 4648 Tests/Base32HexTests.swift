@@ -23,7 +23,7 @@ struct Base32HexTests {
         ]
     )
     func rFCVectors(input: String, expected: String) {
-        let bytes = Array<Byte>(input.utf8)
+        let bytes = [Byte](input.utf8)
         let encoded = String.base32.hex(bytes)
         #expect(encoded == expected, "Encoding '\(input)' should produce '\(expected)'")
 
@@ -35,7 +35,7 @@ struct Base32HexTests {
 
     @Test
     func `Base32-HEX uses correct alphabet (0-9, A-V)`() {
-        let input: [Byte] = Array<Byte>("The quick brown fox jumps over the lazy dog".utf8)
+        let input: [Byte] = [Byte]("The quick brown fox jumps over the lazy dog".utf8)
         let encoded = String.base32.hex(input, padding: false)
 
         for char in encoded {
@@ -46,7 +46,7 @@ struct Base32HexTests {
 
     @Test
     func `Base32-HEX differs from Base32`() {
-        let input: [Byte] = Array<Byte>("foo".utf8)
+        let input: [Byte] = [Byte]("foo".utf8)
 
         let base32 = String.base32(input, padding: false)
         let base32hex = String.base32.hex(input, padding: false)
@@ -71,14 +71,14 @@ struct Base32HexTests {
         ]
     )
     func caseInsensitive(encoded: String) {
-        let expected: [Byte] = Array<Byte>("foo".utf8)
+        let expected: [Byte] = [Byte]("foo".utf8)
         let decoded = [Byte](base32HexEncoded: encoded)
         #expect(decoded == expected, "Case-insensitive decoding should work for '\(encoded)'")
     }
 
     @Test
     func `Base32-HEX encoding produces uppercase`() {
-        let input: [Byte] = Array<Byte>("hello".utf8)
+        let input: [Byte] = [Byte]("hello".utf8)
         let encoded = String.base32.hex(input)
 
         // All letters should be uppercase (A-V)
@@ -94,10 +94,10 @@ struct Base32HexTests {
     @Test(
         "Base32-HEX padding variations",
         arguments: [
-            (Array<Byte>("f".utf8), false, "CO", false),  // no padding
-            (Array<Byte>("f".utf8), true, "CO======", true),  // with padding
-            (Array<Byte>("foo".utf8), false, "CPNMU", false),  // no padding
-            (Array<Byte>("foo".utf8), true, "CPNMU===", true),  // with padding
+            ([Byte]("f".utf8), false, "CO", false),  // no padding
+            ([Byte]("f".utf8), true, "CO======", true),  // with padding
+            ([Byte]("foo".utf8), false, "CPNMU", false),  // no padding
+            ([Byte]("foo".utf8), true, "CPNMU===", true),  // with padding
         ]
     )
     func paddingVariations(
@@ -182,7 +182,7 @@ struct Base32HexTests {
     @Test
     func `Base32-HEX round-trip long string`() {
         let longString = String(repeating: "Hello, World! ", count: 100)
-        let input = Array<Byte>(longString.utf8)
+        let input = [Byte](longString.utf8)
         let encoded = String.base32.hex(input)
         let decoded = [Byte](base32HexEncoded: encoded)
         #expect(decoded == input)

@@ -88,7 +88,7 @@ extension Collection where Element == ASCII.Code {
     /// ## Usage
     ///
     /// ```swift
-    /// let encoded: [ASCII.Code] = Array<ASCII.Code>("SGVsbG8=".utf8)
+    /// let encoded: [ASCII.Code] = [ASCII.Code]("SGVsbG8=".utf8)
     /// encoded.base64.decoded()    // [Byte]([72, 101, 108, 108, 111])
     /// ```
     @inlinable

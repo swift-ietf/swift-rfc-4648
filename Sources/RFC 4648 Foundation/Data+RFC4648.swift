@@ -6,7 +6,7 @@
 //
 // Bridges across the byte-domain boundary: Data is Sequence<UInt8> in stdlib;
 // rfc-4648's public surface is Byte-typed per codec-split-design (2026-05-20).
-// Lifting to Byte at encode entry uses Array<Byte>(self) from
+// Lifting to Byte at encode entry uses [Byte](self) from
 // Byte_Primitives_Standard_Library_Integration; lowering at decode exit uses
 // `[Byte].underlying: [UInt8]`.
 
@@ -18,7 +18,7 @@ import RFC_4648
 extension Data {
     /// Creates a Base64URL encoded string from data (RFC 4648 Section 5)
     public func base64URLEncodedString(padding: Bool = false) -> String {
-        String.base64.url(Array<Byte>(self), padding: padding)
+        String.base64.url([Byte](self), padding: padding)
     }
 
     /// Creates data from a Base64URL encoded string (RFC 4648 Section 5)
@@ -33,7 +33,7 @@ extension Data {
 extension Data {
     /// Creates a Base32 encoded string from data (RFC 4648 Section 6)
     public func base32EncodedString(padding: Bool = true) -> String {
-        String.base32(Array<Byte>(self), padding: padding)
+        String.base32([Byte](self), padding: padding)
     }
 
     /// Creates data from a Base32 encoded string (RFC 4648 Section 6)
@@ -48,7 +48,7 @@ extension Data {
 extension Data {
     /// Creates a Base32-HEX encoded string from data (RFC 4648 Section 7)
     public func base32HexEncodedString(padding: Bool = true) -> String {
-        String.base32.hex(Array<Byte>(self), padding: padding)
+        String.base32.hex([Byte](self), padding: padding)
     }
 
     /// Creates data from a Base32-HEX encoded string (RFC 4648 Section 7)
@@ -63,7 +63,7 @@ extension Data {
 extension Data {
     /// Creates a Base16 (hexadecimal) encoded string from data (RFC 4648 Section 8)
     public func hexEncodedString(uppercase: Bool = false) -> String {
-        String.hex(Array<Byte>(self), uppercase: uppercase)
+        String.hex([Byte](self), uppercase: uppercase)
     }
 
     /// Creates data from a Base16 (hexadecimal) encoded string (RFC 4648 Section 8)

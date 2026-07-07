@@ -3,8 +3,8 @@
 //
 // Core implementations for RFC 4648: The Base16, Base32, and Base64 Data Encodings
 
-import Standard_Library_Extensions
 public import ASCII_Primitives
+import Standard_Library_Extensions
 
 /// RFC 4648: The Base16, Base32, and Base64 Data Encodings
 public enum RFC_4648 {

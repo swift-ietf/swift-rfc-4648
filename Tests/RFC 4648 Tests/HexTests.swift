@@ -23,7 +23,7 @@ struct HexTests {
         ]
     )
     func rFCVectors(input: String, expected: String) {
-        let bytes = Array<Byte>(input.utf8)
+        let bytes = [Byte](input.utf8)
         let encoded = String.hex(bytes)
         #expect(encoded == expected, "Encoding '\(input)' should produce '\(expected)'")
 
@@ -216,7 +216,7 @@ struct HexTests {
     @Test
     func `Hex round-trip long string`() {
         let longString = String(repeating: "Hello, World! ", count: 100)
-        let input = Array<Byte>(longString.utf8)
+        let input = [Byte](longString.utf8)
         let encoded = String.hex(input)
         let decoded = [Byte](hexEncoded: encoded)
         #expect(decoded == input)

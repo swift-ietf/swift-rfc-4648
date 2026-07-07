@@ -23,7 +23,7 @@ struct Base64Tests {
         ]
     )
     func rFCVectors(input: String, expected: String) {
-        let bytes = Array<Byte>(input.utf8)
+        let bytes = [Byte](input.utf8)
         let encoded = String.base64(bytes)
         #expect(encoded == expected, "Encoding '\(input)' should produce '\(expected)'")
 
@@ -36,12 +36,12 @@ struct Base64Tests {
     @Test(
         "Base64 padding variations",
         arguments: [
-            (Array<Byte>("f".utf8), false, "Zg", [Byte]?.none),  // no padding - decoding fails
-            (Array<Byte>("f".utf8), true, "Zg==", Array<Byte>("f".utf8)),  // with padding - succeeds
-            (Array<Byte>("fo".utf8), false, "Zm8", [Byte]?.none),  // no padding - fails
-            (Array<Byte>("fo".utf8), true, "Zm8=", Array<Byte>("fo".utf8)),  // with padding - succeeds
-            (Array<Byte>("foo".utf8), false, "Zm9v", Array<Byte>("foo".utf8)),  // no padding needed
-            //            (Array<Byte>("foo".utf8), true, "Zm9v", Array<Byte>("foo".utf8)),  // padding doesn't hurt
+            ([Byte]("f".utf8), false, "Zg", [Byte]?.none),  // no padding - decoding fails
+            ([Byte]("f".utf8), true, "Zg==", [Byte]("f".utf8)),  // with padding - succeeds
+            ([Byte]("fo".utf8), false, "Zm8", [Byte]?.none),  // no padding - fails
+            ([Byte]("fo".utf8), true, "Zm8=", [Byte]("fo".utf8)),  // with padding - succeeds
+            ([Byte]("foo".utf8), false, "Zm9v", [Byte]("foo".utf8)),  // no padding needed
+            //            ([Byte]("foo".utf8), true, "Zm9v", [Byte]("foo".utf8)),  // padding doesn't hurt
         ]
     )
     func paddingVariations(
@@ -70,7 +70,7 @@ struct Base64Tests {
     )
     func whitespaceHandling(input: String) {
         let decoded = [Byte](base64Encoded: input)
-        #expect(decoded == Array<Byte>("foobar".utf8), "Whitespace should be ignored")
+        #expect(decoded == [Byte]("foobar".utf8), "Whitespace should be ignored")
     }
 
     // MARK: - Invalid Input Tests
@@ -115,7 +115,7 @@ struct Base64Tests {
     @Test
     func `Base64 round-trip long string`() {
         let longString = String(repeating: "Hello, World! ", count: 100)
-        let input = Array<Byte>(longString.utf8)
+        let input = [Byte](longString.utf8)
         let encoded = String.base64(input)
         let decoded = [Byte](base64Encoded: encoded)
         #expect(decoded == input)

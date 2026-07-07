@@ -14,7 +14,7 @@ struct Base64URLTests {
         "Base64URL basic patterns",
         arguments: [
             ([], ""),  // empty string
-            (Array<Byte>("hello".utf8), nil),  // simple string - verify round-trip only
+            ([Byte]("hello".utf8), nil),  // simple string - verify round-trip only
         ]
     )
     func basicPatterns(input: [Byte], expectedEncoded: String?) {
@@ -61,11 +61,11 @@ struct Base64URLTests {
     @Test(
         "Base64URL padding variations",
         arguments: [
-            (Array<Byte>("f".utf8), false, "Zg", false),  // default: no padding
-            (Array<Byte>("f".utf8), true, "Zg==", true),  // explicit padding
-            (Array<Byte>("fo".utf8), false, "Zm8", false),  // no padding
-            (Array<Byte>("fo".utf8), true, "Zm8=", true),  // with padding
-            (Array<Byte>("foo".utf8), false, "Zm9v", false),  // no padding needed
+            ([Byte]("f".utf8), false, "Zg", false),  // default: no padding
+            ([Byte]("f".utf8), true, "Zg==", true),  // explicit padding
+            ([Byte]("fo".utf8), false, "Zm8", false),  // no padding
+            ([Byte]("fo".utf8), true, "Zm8=", true),  // with padding
+            ([Byte]("foo".utf8), false, "Zm9v", false),  // no padding needed
         ]
     )
     func paddingVariations(
@@ -86,7 +86,7 @@ struct Base64URLTests {
     func `Base64URL decoding with whitespace`() {
         let input = "Zm9v\nYmFy"
         let decoded = [Byte](base64URLEncoded: input)
-        #expect(decoded == Array<Byte>("foobar".utf8))
+        #expect(decoded == [Byte]("foobar".utf8))
     }
 
     // MARK: - Invalid Input Tests
@@ -110,7 +110,7 @@ struct Base64URLTests {
     @Test
     func `Base64URL JWT header example`() {
         // Typical JWT header: {"alg":"HS256","typ":"JWT"}
-        let headerJSON = Array<Byte>("{\"alg\":\"HS256\",\"typ\":\"JWT\"}".utf8)
+        let headerJSON = [Byte]("{\"alg\":\"HS256\",\"typ\":\"JWT\"}".utf8)
         let encoded = String.base64.url(headerJSON, padding: false)
 
         // Should not contain URL-unsafe characters
@@ -155,7 +155,7 @@ struct Base64URLTests {
     @Test
     func `Base64URL round-trip long string`() {
         let longString = String(repeating: "Hello, World! ", count: 100)
-        let input = Array<Byte>(longString.utf8)
+        let input = [Byte](longString.utf8)
         let encoded = String.base64.url(input, padding: false)
         let decoded = [Byte](base64URLEncoded: encoded)
         #expect(decoded == input)

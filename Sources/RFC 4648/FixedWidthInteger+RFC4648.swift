@@ -7,8 +7,8 @@
 // They delegate to RFC_4648 primitives and use the Standards library
 // for byte-to-integer conversion.
 
-import Standard_Library_Extensions
 public import Binary_Primitives
+import Standard_Library_Extensions
 
 // MARK: - FixedWidthInteger Decoding
 
