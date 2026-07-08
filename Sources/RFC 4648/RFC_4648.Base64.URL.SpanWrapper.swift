@@ -16,7 +16,7 @@ extension RFC_4648.Base64.URL {
 
         @inlinable
         @_lifetime(copy span)
-        init(_ span: Swift.Span<Byte>) {
+        package init(_ span: Swift.Span<Byte>) {
             self.span = span
         }
     }

@@ -121,7 +121,7 @@ extension RFC_4648.Base32.Hex {
     @inlinable
     public static func decode(_ string: some StringProtocol) -> [Byte]? {
         let codes: [ASCII.Code]
-        do {
+        do throws(ASCII.Code.Error) {
             codes = try [ASCII.Code](string.utf8)
         } catch {
             return nil
@@ -201,7 +201,7 @@ extension RFC_4648.Base32.Hex.Wrapper where Wrapped: StringProtocol {
         into buffer: inout Buffer
     ) -> Bool where Buffer.Element == Byte {
         let codes: [ASCII.Code]
-        do {
+        do throws(ASCII.Code.Error) {
             codes = try [ASCII.Code](wrapped.utf8)
         } catch {
             return false
@@ -221,7 +221,7 @@ extension RFC_4648.Base32.Hex.Wrapper where Wrapped: StringProtocol {
     @inlinable
     public func decoded<T: FixedWidthInteger>(as type: T.Type = T.self) -> T? {
         let codes: [ASCII.Code]
-        do {
+        do throws(ASCII.Code.Error) {
             codes = try [ASCII.Code](wrapped.utf8)
         } catch {
             return nil

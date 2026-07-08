@@ -26,7 +26,7 @@ extension RFC_4648 {
     ///   - table: The encoding table to use (64 characters)
     ///   - padding: Whether to include padding characters
     @inlinable
-    static func encodeBase64<Bytes: Collection, Buffer: RangeReplaceableCollection>(
+    package static func encodeBase64<Bytes: Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
         table: [ASCII.Code],
@@ -83,7 +83,7 @@ extension RFC_4648 {
     /// - Returns: `true` if decoding succeeded, `false` if invalid input
     @inlinable
     @discardableResult
-    static func decodeBase64<Bytes: Collection, Buffer: RangeReplaceableCollection>(
+    package static func decodeBase64<Bytes: Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
         decodeTable: [UInt8?],
@@ -158,7 +158,7 @@ extension RFC_4648 {
 
     /// Internal Base64 to integer decoding shared by Base64 and Base64.URL
     @inlinable
-    static func decodeBase64ToInteger<Bytes: Collection, T: FixedWidthInteger>(
+    package static func decodeBase64ToInteger<Bytes: Collection, T: FixedWidthInteger>(
         _ bytes: Bytes,
         decodeTable: [UInt8?]
     ) -> T? where Bytes.Element == ASCII.Code {
@@ -196,7 +196,7 @@ extension RFC_4648 {
     ///   - table: The encoding table to use (32 characters)
     ///   - padding: Whether to include padding characters
     @inlinable
-    static func encodeBase32<Bytes: Collection, Buffer: RangeReplaceableCollection>(
+    package static func encodeBase32<Bytes: Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
         table: [ASCII.Code],
@@ -288,7 +288,7 @@ extension RFC_4648 {
     /// - Returns: `true` if decoding succeeded, `false` if invalid input
     @inlinable
     @discardableResult
-    static func decodeBase32<Bytes: Collection, Buffer: RangeReplaceableCollection>(
+    package static func decodeBase32<Bytes: Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
         decodeTable: [UInt8?]
@@ -353,7 +353,7 @@ extension RFC_4648 {
 
     /// Internal Base32 to integer decoding shared by Base32 and Base32.Hex
     @inlinable
-    static func decodeBase32ToInteger<Bytes: Collection, T: FixedWidthInteger>(
+    package static func decodeBase32ToInteger<Bytes: Collection, T: FixedWidthInteger>(
         _ bytes: Bytes,
         decodeTable: [UInt8?]
     ) -> T? where Bytes.Element == ASCII.Code {

@@ -283,7 +283,7 @@ extension RFC_4648.Base16 {
         skipPrefix: Bool = true
     ) -> [Byte]? {
         let codes: [ASCII.Code]
-        do {
+        do throws(ASCII.Code.Error) {
             codes = try [ASCII.Code](string.utf8)
         } catch {
             return nil
@@ -423,7 +423,7 @@ extension RFC_4648.Base16.Wrapper where Wrapped: StringProtocol {
         skipPrefix: Bool = true
     ) -> Bool where Buffer.Element == Byte {
         let codes: [ASCII.Code]
-        do {
+        do throws(ASCII.Code.Error) {
             codes = try [ASCII.Code](wrapped.utf8)
         } catch {
             return false
@@ -446,7 +446,7 @@ extension RFC_4648.Base16.Wrapper where Wrapped: StringProtocol {
         skipPrefix: Bool = true
     ) -> T? {
         let codes: [ASCII.Code]
-        do {
+        do throws(ASCII.Code.Error) {
             codes = try [ASCII.Code](wrapped.utf8)
         } catch {
             return nil
