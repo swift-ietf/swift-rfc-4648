@@ -669,7 +669,9 @@ import Testing
         init(seed: UInt64) {
             state = seed
         }
+    }
 
+    extension SeededRandomNumberGenerator {
         mutating func next() -> UInt64 {
             // Simple LCG (Linear Congruential Generator)
             state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
