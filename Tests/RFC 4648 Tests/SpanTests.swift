@@ -8,8 +8,8 @@ import Testing
 
 @testable import RFC_4648
 
-@Suite("Span Encoding")
-struct SpanTests {
+@Suite
+struct `Span Tests` {
 
     // MARK: - Base16 (Hex)
 

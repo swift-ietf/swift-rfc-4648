@@ -6,8 +6,9 @@
 import RFC_4648
 import Testing
 
-@Suite("Base32-HEX Encoding Tests")
-struct Base32HexTests {
+extension RFC_4648.Base32.Hex {
+    @Suite("Base32-HEX Encoding Tests")
+    struct Test {
     // MARK: - RFC 4648 Section 10 Test Vectors
 
     @Test(
@@ -198,5 +199,6 @@ struct Base32HexTests {
         // Lexicographic order should be preserved
         #expect(encoded1 < encoded2)
         #expect(encoded2 < encoded3)
+    }
     }
 }

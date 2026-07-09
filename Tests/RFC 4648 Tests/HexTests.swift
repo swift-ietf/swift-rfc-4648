@@ -6,8 +6,9 @@
 import RFC_4648
 import Testing
 
-@Suite("Hex Encoding Tests")
-struct HexTests {
+extension RFC_4648.Base16 {
+    @Suite("Hex Encoding Tests")
+    struct Test {
     // MARK: - RFC 4648 Section 10 Test Vectors
 
     @Test(
@@ -243,5 +244,6 @@ struct HexTests {
         let encoded2 = String.hex(input)
 
         #expect(encoded1 == encoded2)
+    }
     }
 }

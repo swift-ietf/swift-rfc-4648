@@ -7,8 +7,9 @@ import Testing
 
 @testable import RFC_4648
 
-@Suite("RFC 4648 Validation Tests")
-struct ValidationTests {
+extension RFC_4648 {
+    @Suite("RFC 4648 Validation Tests")
+    struct Test {
     // MARK: - Base64 Validation
 
     @Test(
@@ -274,5 +275,6 @@ struct ValidationTests {
         #expect(!RFC_4648.Base64.isValid("Zm9v🚀"))
         #expect(!RFC_4648.Base32.isValid("MZXW6😀"))
         #expect(!RFC_4648.Base16.isValid("dead你好"))
+    }
     }
 }

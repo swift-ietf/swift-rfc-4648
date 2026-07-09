@@ -8,8 +8,9 @@ import Testing
 
 @testable import RFC_4648_Foundation
 
-@Suite("Data Encoding Tests")
-struct DataEncodingTests {
+extension Data {
+    @Suite("Data Encoding Tests")
+    struct Test {
     // Note: Base64 tests omitted - Foundation already provides excellent Base64 support
     // We only test encodings that Foundation doesn't provide
 
@@ -223,5 +224,6 @@ struct DataEncodingTests {
         // Hex
         let hex = largeData.hexEncodedString()
         #expect(Data(hexEncoded: hex) == largeData)
+    }
     }
 }
