@@ -11,7 +11,6 @@ struct HexTests {
     // MARK: - RFC 4648 Section 10 Test Vectors
 
     @Test(
-        "RFC 4648 test vectors",
         arguments: [
             ("", ""),
             ("f", "66"),
@@ -22,7 +21,7 @@ struct HexTests {
             ("foobar", "666f6f626172"),
         ]
     )
-    func rFCVectors(input: String, expected: String) {
+    func `RFC 4648 test vectors`(input: String, expected: String) {
         let bytes = [Byte](input.utf8)
         let encoded = String.hex(bytes)
         #expect(encoded == expected, "Encoding '\(input)' should produce '\(expected)'")
@@ -48,7 +47,6 @@ struct HexTests {
     }
 
     @Test(
-        "Hex decoding is case-insensitive",
         arguments: [
             "ffab",  // lowercase
             "FFAB",  // uppercase
@@ -56,7 +54,7 @@ struct HexTests {
             "fFaB",  // random mixed case
         ]
     )
-    func decodingCaseInsensitive(encoded: String) {
+    func `Hex decoding is case-insensitive`(encoded: String) {
         let expected: [Byte] = [0xFF, 0xAB]
         let decoded = [Byte](hexEncoded: encoded)
         #expect(decoded == expected, "Case-insensitive decoding should work for '\(encoded)'")
@@ -65,7 +63,6 @@ struct HexTests {
     // MARK: - Prefix Tests
 
     @Test(
-        "Hex decoding with various prefix formats",
         arguments: [
             ("0xFF", [0xFF]),
             ("0XFF", [0xFF]),
@@ -74,7 +71,7 @@ struct HexTests {
             ("0Xdeadbeef", [0xDE, 0xAD, 0xBE, 0xEF]),
         ]
     )
-    func prefixHandling(input: String, expected: [Byte]) {
+    func `Hex decoding with various prefix formats`(input: String, expected: [Byte]) {
         let decoded = [Byte](hexEncoded: input)
         #expect(decoded == expected, "'\(input)' should decode to \(expected)")
     }
@@ -82,7 +79,6 @@ struct HexTests {
     // MARK: - Whitespace Handling
 
     @Test(
-        "Hex decoding with whitespace",
         arguments: [
             "DE AD BE EF",  // spaces
             "DE\nAD\nBE\nEF",  // newlines
@@ -91,7 +87,7 @@ struct HexTests {
             "DEADBEEF",  // no whitespace
         ]
     )
-    func whitespaceHandling(input: String) {
+    func `Hex decoding with whitespace`(input: String) {
         let expected: [Byte] = [0xDE, 0xAD, 0xBE, 0xEF]
         let decoded = [Byte](hexEncoded: input)
         #expect(decoded == expected, "Whitespace should be ignored in '\(input)'")
@@ -100,7 +96,6 @@ struct HexTests {
     // MARK: - Invalid Input Tests
 
     @Test(
-        "Hex decoding rejects invalid input",
         arguments: [
             "GGGG",  // invalid hex characters
             "FFF",  // odd length
@@ -108,7 +103,7 @@ struct HexTests {
             "#FF5733",  // hash prefix (not valid)
         ]
     )
-    func invalidInput(input: String) {
+    func `Hex decoding rejects invalid input`(input: String) {
         let decoded = [Byte](hexEncoded: input)
         #expect(decoded == nil, "\(input) should be rejected")
     }
@@ -225,7 +220,6 @@ struct HexTests {
     // MARK: - Format Variations
 
     @Test(
-        "Hex decoding common format variations",
         arguments: [
             "DEAD",  // standard uppercase
             "0xDEAD",  // with 0x prefix
@@ -235,7 +229,7 @@ struct HexTests {
             "0xde ad",  // prefix + lowercase + spaces
         ]
     )
-    func formatVariations(input: String) {
+    func `Hex decoding common format variations`(input: String) {
         let expected: [Byte] = [0xDE, 0xAD]
         let decoded = [Byte](hexEncoded: input)
         #expect(decoded == expected, "'\(input)' should decode to \(expected)")

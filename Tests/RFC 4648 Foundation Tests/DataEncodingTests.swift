@@ -136,7 +136,6 @@ struct DataEncodingTests {
     }
 
     @Test(
-        "Data hexadecimal round-trip",
         arguments: [
             Data([0x00]),
             Data([0xFF]),
@@ -145,7 +144,7 @@ struct DataEncodingTests {
             Data((0...255).map { UInt8($0) }),
         ]
     )
-    func dataHexRoundTrip(input: Data) {
+    func `Data hexadecimal round-trip`(input: Data) {
         let encoded = input.hexEncodedString()
         let decoded = Data(hexEncoded: encoded)
 
@@ -155,12 +154,11 @@ struct DataEncodingTests {
     // MARK: - Empty Data
 
     @Test(
-        "Empty data encoding",
         arguments: [
             "base64URL", "base32", "base32Hex", "hex",
         ]
     )
-    func emptyDataEncoding(encoding: String) {
+    func `Empty data encoding`(encoding: String) {
         let empty = Data()
 
         switch encoding {
@@ -178,12 +176,11 @@ struct DataEncodingTests {
     }
 
     @Test(
-        "Empty string decoding",
         arguments: [
             "base64URL", "base32", "base32Hex", "hex",
         ]
     )
-    func emptyStringDecoding(encoding: String) {
+    func `Empty string decoding`(encoding: String) {
         let empty = ""
 
         switch encoding {

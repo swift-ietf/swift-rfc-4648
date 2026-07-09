@@ -21,7 +21,6 @@ struct BinaryIntegerDecodingTests {
     }
 
     @Test(
-        "UInt32 Base64 round-trip",
         arguments: [
             UInt32(0),
             UInt32(1),
@@ -33,7 +32,7 @@ struct BinaryIntegerDecodingTests {
             UInt32.max,
         ]
     )
-    func uInt32Base64RoundTrip(value: UInt32) {
+    func `UInt32 Base64 round-trip`(value: UInt32) {
         let encoded = String.base64(value)
         let decoded = UInt32(base64Encoded: encoded)
 
@@ -41,12 +40,11 @@ struct BinaryIntegerDecodingTests {
     }
 
     @Test(
-        "UInt8 Base64 round-trip",
         arguments: [
             UInt8(0), UInt8(1), UInt8(127), UInt8(128), UInt8(255),
         ]
     )
-    func uInt8Base64RoundTrip(value: UInt8) {
+    func `UInt8 Base64 round-trip`(value: UInt8) {
         let encoded = String.base64(value)
         let decoded = UInt8(base64Encoded: encoded)
 
@@ -54,12 +52,11 @@ struct BinaryIntegerDecodingTests {
     }
 
     @Test(
-        "UInt16 Base64 round-trip",
         arguments: [
             UInt16(0), UInt16(255), UInt16(256), UInt16(0xABCD), UInt16.max,
         ]
     )
-    func uInt16Base64RoundTrip(value: UInt16) {
+    func `UInt16 Base64 round-trip`(value: UInt16) {
         let encoded = String.base64(value)
         let decoded = UInt16(base64Encoded: encoded)
 
@@ -67,7 +64,6 @@ struct BinaryIntegerDecodingTests {
     }
 
     @Test(
-        "UInt64 Base64 round-trip",
         arguments: [
             UInt64(0),
             UInt64(UInt32.max),
@@ -75,7 +71,7 @@ struct BinaryIntegerDecodingTests {
             UInt64.max,
         ]
     )
-    func uInt64Base64RoundTrip(value: UInt64) {
+    func `UInt64 Base64 round-trip`(value: UInt64) {
         let encoded = String.base64(value)
         let decoded = UInt64(base64Encoded: encoded)
 
@@ -109,12 +105,11 @@ struct BinaryIntegerDecodingTests {
     // MARK: - Base64URL Decoding
 
     @Test(
-        "UInt32 Base64URL round-trip",
         arguments: [
             UInt32(0), UInt32(123_456), UInt32(0xDEAD_BEEF), UInt32.max,
         ]
     )
-    func uInt32Base64URLRoundTrip(value: UInt32) {
+    func `UInt32 Base64URL round-trip`(value: UInt32) {
         let encoded = String.base64.url(value)
         let decoded = UInt32(base64URLEncoded: encoded)
 
@@ -124,12 +119,11 @@ struct BinaryIntegerDecodingTests {
     // MARK: - Base32 Decoding
 
     @Test(
-        "UInt32 Base32 round-trip",
         arguments: [
             UInt32(0), UInt32(123_456), UInt32.max,
         ]
     )
-    func uInt32Base32RoundTrip(value: UInt32) {
+    func `UInt32 Base32 round-trip`(value: UInt32) {
         let encoded = String.base32(value)
         let decoded = UInt32(base32Encoded: encoded)
 
@@ -149,12 +143,11 @@ struct BinaryIntegerDecodingTests {
     // MARK: - Base32-HEX Decoding
 
     @Test(
-        "UInt32 Base32-HEX round-trip",
         arguments: [
             UInt32(0), UInt32(123_456), UInt32.max,
         ]
     )
-    func uInt32Base32HexRoundTrip(value: UInt32) {
+    func `UInt32 Base32-HEX round-trip`(value: UInt32) {
         let encoded = String.base32.hex(value)
         let decoded = UInt32(base32HexEncoded: encoded)
 
@@ -172,12 +165,11 @@ struct BinaryIntegerDecodingTests {
     }
 
     @Test(
-        "UInt8 hexadecimal round-trip",
         arguments: [
             UInt8(0x00), UInt8(0x0F), UInt8(0xFF), UInt8(0xAB),
         ]
     )
-    func uInt8HexRoundTrip(value: UInt8) {
+    func `UInt8 hexadecimal round-trip`(value: UInt8) {
         let encoded = String.hex(value, prefix: "")
         let decoded = UInt8(hexEncoded: encoded)
 
@@ -185,12 +177,11 @@ struct BinaryIntegerDecodingTests {
     }
 
     @Test(
-        "UInt16 hexadecimal round-trip",
         arguments: [
             UInt16(0x0000), UInt16(0xABCD), UInt16(0xFFFF),
         ]
     )
-    func uInt16HexRoundTrip(value: UInt16) {
+    func `UInt16 hexadecimal round-trip`(value: UInt16) {
         let encoded = String.hex(value, prefix: "")
         let decoded = UInt16(hexEncoded: encoded)
 
@@ -198,14 +189,13 @@ struct BinaryIntegerDecodingTests {
     }
 
     @Test(
-        "UInt64 hexadecimal round-trip",
         arguments: [
             UInt64(0),
             UInt64(0x1234_5678_9ABC_DEF0),
             UInt64.max,
         ]
     )
-    func uInt64HexRoundTrip(value: UInt64) {
+    func `UInt64 hexadecimal round-trip`(value: UInt64) {
         let encoded = String.hex(value, prefix: "")
         let decoded = UInt64(hexEncoded: encoded)
 

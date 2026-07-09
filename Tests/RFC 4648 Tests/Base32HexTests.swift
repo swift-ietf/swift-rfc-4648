@@ -11,7 +11,6 @@ struct Base32HexTests {
     // MARK: - RFC 4648 Section 10 Test Vectors
 
     @Test(
-        "RFC 4648 test vectors",
         arguments: [
             ("", ""),
             ("f", "CO======"),
@@ -22,7 +21,7 @@ struct Base32HexTests {
             ("foobar", "CPNMUOJ1E8======"),
         ]
     )
-    func rFCVectors(input: String, expected: String) {
+    func `RFC 4648 test vectors`(input: String, expected: String) {
         let bytes = [Byte](input.utf8)
         let encoded = String.base32.hex(bytes)
         #expect(encoded == expected, "Encoding '\(input)' should produce '\(expected)'")
@@ -62,7 +61,6 @@ struct Base32HexTests {
     // MARK: - Case Insensitivity Tests
 
     @Test(
-        "Base32-HEX decoding is case-insensitive",
         arguments: [
             "CPNMU===",  // uppercase
             "cpnmu===",  // lowercase
@@ -70,7 +68,7 @@ struct Base32HexTests {
             "cPnMu===",  // random mixed case
         ]
     )
-    func caseInsensitive(encoded: String) {
+    func `Base32-HEX decoding is case-insensitive`(encoded: String) {
         let expected: [Byte] = [Byte]("foo".utf8)
         let decoded = [Byte](base32HexEncoded: encoded)
         #expect(decoded == expected, "Case-insensitive decoding should work for '\(encoded)'")
@@ -92,7 +90,6 @@ struct Base32HexTests {
     // MARK: - Padding Tests
 
     @Test(
-        "Base32-HEX padding variations",
         arguments: [
             ([Byte]("f".utf8), false, "CO", false),  // no padding
             ([Byte]("f".utf8), true, "CO======", true),  // with padding
@@ -100,7 +97,7 @@ struct Base32HexTests {
             ([Byte]("foo".utf8), true, "CPNMU===", true),  // with padding
         ]
     )
-    func paddingVariations(
+    func `Base32-HEX padding variations`(
         input: [Byte], padding: Bool, expectedEncoded: String, shouldHavePadding: Bool
     ) {
         let encoded = String.base32.hex(input, padding: padding)
@@ -115,7 +112,6 @@ struct Base32HexTests {
     // MARK: - Whitespace Handling
 
     @Test(
-        "Base32-HEX whitespace handling",
         arguments: [
             "CPNMU===\nCPNG====",  // newline
             "CPNMU===\t\tCPNG====",  // tabs
@@ -123,7 +119,7 @@ struct Base32HexTests {
             "CPNMU=== \t CPNG====",  // mixed
         ]
     )
-    func whitespaceHandling(input: String) {
+    func `Base32-HEX whitespace handling`(input: String) {
         let decoded = [Byte](base32HexEncoded: input)
         #expect(decoded != nil, "Whitespace should be ignored in '\(input)'")
     }
@@ -131,7 +127,6 @@ struct Base32HexTests {
     // MARK: - Invalid Input Tests
 
     @Test(
-        "Base32-HEX decoding rejects invalid input",
         arguments: [
             "CPNMW===",  // Base32-HEX doesn't use W
             "CPNMZ===",  // Base32-HEX doesn't use Z
@@ -140,7 +135,7 @@ struct Base32HexTests {
             "========",  // only padding
         ]
     )
-    func invalidInput(input: String) {
+    func `Base32-HEX decoding rejects invalid input`(input: String) {
         let decoded = [Byte](base32HexEncoded: input)
         #expect(decoded == nil, "\(input) should be rejected")
     }
@@ -148,7 +143,6 @@ struct Base32HexTests {
     // MARK: - Binary Data Tests
 
     @Test(
-        "Base32-HEX binary data patterns",
         arguments: [
             ([0x00, 0xFF, 0x80, 0x7F], nil),  // mixed binary
             ([0x00, 0x00, 0x00, 0x00, 0x00], "00000000"),  // all zeros
@@ -156,7 +150,7 @@ struct Base32HexTests {
             ([0xFF, 0xFF, 0xFF, 0xFF, 0xFF], nil),  // all ones
         ]
     )
-    func binaryDataPatterns(input: [Byte], expectedEncoded: String?) {
+    func `Base32-HEX binary data patterns`(input: [Byte], expectedEncoded: String?) {
         let encoded = String.base32.hex(input)
 
         if let expected = expectedEncoded {

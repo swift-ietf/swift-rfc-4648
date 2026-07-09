@@ -11,13 +11,12 @@ struct Base64URLTests {
     // MARK: - Basic Encoding/Decoding
 
     @Test(
-        "Base64URL basic patterns",
         arguments: [
             ([], ""),  // empty string
             ([Byte]("hello".utf8), nil),  // simple string - verify round-trip only
         ]
     )
-    func basicPatterns(input: [Byte], expectedEncoded: String?) {
+    func `Base64URL basic patterns`(input: [Byte], expectedEncoded: String?) {
         let encoded = String.base64.url(input)
 
         if let expected = expectedEncoded {
@@ -59,7 +58,6 @@ struct Base64URLTests {
     // MARK: - Padding Tests (RFC 7515 recommends no padding)
 
     @Test(
-        "Base64URL padding variations",
         arguments: [
             ([Byte]("f".utf8), false, "Zg", false),  // default: no padding
             ([Byte]("f".utf8), true, "Zg==", true),  // explicit padding
@@ -68,7 +66,7 @@ struct Base64URLTests {
             ([Byte]("foo".utf8), false, "Zm9v", false),  // no padding needed
         ]
     )
-    func paddingVariations(
+    func `Base64URL padding variations`(
         input: [Byte], padding: Bool, expectedEncoded: String, shouldHavePadding: Bool
     ) {
         let encoded = String.base64.url(input, padding: padding)
@@ -92,7 +90,6 @@ struct Base64URLTests {
     // MARK: - Invalid Input Tests
 
     @Test(
-        "Base64URL decoding rejects invalid input",
         arguments: [
             "Zg+A",  // '+' not valid in Base64URL
             "Zg/A",  // '/' not valid in Base64URL
@@ -100,7 +97,7 @@ struct Base64URLTests {
             "Z",  // too short
         ]
     )
-    func invalidInput(input: String) {
+    func `Base64URL decoding rejects invalid input`(input: String) {
         let decoded = [Byte](base64URLEncoded: input)
         #expect(decoded == nil, "\(input) should be rejected")
     }

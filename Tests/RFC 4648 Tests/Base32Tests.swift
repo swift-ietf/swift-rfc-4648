@@ -11,7 +11,6 @@ struct Base32Tests {
     // MARK: - RFC 4648 Section 10 Test Vectors
 
     @Test(
-        "RFC 4648 test vectors",
         arguments: [
             ("", ""),
             ("f", "MY======"),
@@ -22,7 +21,7 @@ struct Base32Tests {
             ("foobar", "MZXW6YTBOI======"),
         ]
     )
-    func rFCVectors(input: String, expected: String) {
+    func `RFC 4648 test vectors`(input: String, expected: String) {
         let bytes = [Byte](input.utf8)
         let encoded = String.base32(bytes)
         #expect(encoded == expected, "Encoding '\(input)' should produce '\(expected)'")
@@ -34,7 +33,6 @@ struct Base32Tests {
     // MARK: - Case Insensitivity Tests
 
     @Test(
-        "Base32 decoding is case-insensitive",
         arguments: [
             "MZXW6===",  // uppercase
             "mzxw6===",  // lowercase
@@ -42,7 +40,7 @@ struct Base32Tests {
             "mZxW6===",  // random mixed case
         ]
     )
-    func caseInsensitive(encoded: String) {
+    func `Base32 decoding is case-insensitive`(encoded: String) {
         let expected: [Byte] = [Byte]("foo".utf8)
         let decoded = [Byte](base32Encoded: encoded)
         #expect(decoded == expected, "Case-insensitive decoding should work for '\(encoded)'")
@@ -64,7 +62,6 @@ struct Base32Tests {
     // MARK: - Padding Tests
 
     @Test(
-        "Base32 padding variations",
         arguments: [
             ([Byte]("f".utf8), false, "MY", false),  // no padding
             ([Byte]("f".utf8), true, "MY======", true),  // with padding
@@ -72,7 +69,7 @@ struct Base32Tests {
             ([Byte]("foo".utf8), true, "MZXW6===", true),  // with padding
         ]
     )
-    func paddingVariations(
+    func `Base32 padding variations`(
         input: [Byte], padding: Bool, expectedEncoded: String, shouldHavePadding: Bool
     ) {
         let encoded = String.base32(input, padding: padding)
@@ -87,7 +84,6 @@ struct Base32Tests {
     // MARK: - Whitespace Handling
 
     @Test(
-        "Base32 whitespace handling",
         arguments: [
             "MZXW6===\nYTBOI===",  // newline
             "MZXW6=== \tMZXQ====",  // space and tab
@@ -95,7 +91,7 @@ struct Base32Tests {
             "MZXW6=== MZXQ====",  // space only
         ]
     )
-    func whitespaceHandling(input: String) {
+    func `Base32 whitespace handling`(input: String) {
         let decoded = [Byte](base32Encoded: input)
         #expect(decoded != nil, "Whitespace should be ignored in '\(input)'")
     }
@@ -103,7 +99,6 @@ struct Base32Tests {
     // MARK: - Invalid Input Tests
 
     @Test(
-        "Base32 decoding rejects invalid input",
         arguments: [
             "MZXW0===",  // Base32 doesn't use 0
             "MZXW1===",  // Base32 doesn't use 1
@@ -114,7 +109,7 @@ struct Base32Tests {
             "========",  // only padding
         ]
     )
-    func invalidInput(input: String) {
+    func `Base32 decoding rejects invalid input`(input: String) {
         let decoded = [Byte](base32Encoded: input)
         #expect(decoded == nil, "\(input) should be rejected")
     }
@@ -136,14 +131,13 @@ struct Base32Tests {
     // MARK: - Binary Data Tests
 
     @Test(
-        "Base32 binary data patterns",
         arguments: [
             ([0x00, 0xFF, 0x80, 0x7F], nil),  // mixed binary
             ([0x00, 0x00, 0x00, 0x00, 0x00], "AAAAAAAA"),  // all zeros
             ([0x00, 0x01, 0x02, 0x03, 0x04], nil),  // sequential bytes
         ]
     )
-    func binaryDataPatterns(input: [Byte], expectedEncoded: String?) {
+    func `Base32 binary data patterns`(input: [Byte], expectedEncoded: String?) {
         let encoded = String.base32(input)
 
         if let expected = expectedEncoded {

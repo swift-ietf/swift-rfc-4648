@@ -12,7 +12,6 @@ struct ValidationTests {
     // MARK: - Base64 Validation
 
     @Test(
-        "Valid Base64 strings",
         arguments: [
             "",
             "Zg==",
@@ -24,12 +23,11 @@ struct ValidationTests {
             "VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw==",
         ]
     )
-    func validBase64(input: String) {
+    func `Valid Base64 strings`(input: String) {
         #expect(RFC_4648.Base64.isValid(input), "\(input) should be valid Base64")
     }
 
     @Test(
-        "Invalid Base64 strings",
         arguments: [
             "!@#$",
             "Zm9",  // Invalid length
@@ -38,7 +36,7 @@ struct ValidationTests {
             "Zm9v===",  // Too much padding
         ]
     )
-    func invalidBase64(input: String) {
+    func `Invalid Base64 strings`(input: String) {
         #expect(!RFC_4648.Base64.isValid(input), "\(input) should be invalid Base64")
     }
 
@@ -53,7 +51,6 @@ struct ValidationTests {
     // MARK: - Base64URL Validation
 
     @Test(
-        "Valid Base64URL strings",
         arguments: [
             "",
             "Zg",
@@ -65,25 +62,23 @@ struct ValidationTests {
             "A-B_",  // Base64URL uses - and _ (length 4 is valid)
         ]
     )
-    func validBase64URL(input: String) {
+    func `Valid Base64URL strings`(input: String) {
         #expect(RFC_4648.Base64.URL.isValid(input), "\(input) should be valid Base64URL")
     }
 
     @Test(
-        "Invalid Base64URL strings",
         arguments: [
             "!@#$",
             "A+B/C",  // Base64URL doesn't use + and /
         ]
     )
-    func invalidBase64URL(input: String) {
+    func `Invalid Base64URL strings`(input: String) {
         #expect(!RFC_4648.Base64.URL.isValid(input), "\(input) should be invalid Base64URL")
     }
 
     // MARK: - Base32 Validation
 
     @Test(
-        "Valid Base32 strings",
         arguments: [
             "",
             "MZXW6===",
@@ -91,7 +86,7 @@ struct ValidationTests {
             "JBSWY3DPEBLW64TMMQ======",
         ]
     )
-    func validBase32(input: String) {
+    func `Valid Base32 strings`(input: String) {
         #expect(RFC_4648.Base32.isValid(input), "\(input) should be valid Base32")
     }
 
@@ -103,21 +98,19 @@ struct ValidationTests {
     }
 
     @Test(
-        "Invalid Base32 strings",
         arguments: [
             "189",  // Base32 doesn't use 0, 1, 8, 9
             "ABC!@#",  // Invalid characters
             "====",  // Only padding
         ]
     )
-    func invalidBase32(input: String) {
+    func `Invalid Base32 strings`(input: String) {
         #expect(!RFC_4648.Base32.isValid(input), "\(input) should be invalid Base32")
     }
 
     // MARK: - Base32-HEX Validation
 
     @Test(
-        "Valid Base32-HEX strings",
         arguments: [
             "",
             "CPNMU===",
@@ -125,7 +118,7 @@ struct ValidationTests {
             "91IMOR3F41BMUSJCCG======",
         ]
     )
-    func validBase32Hex(input: String) {
+    func `Valid Base32-HEX strings`(input: String) {
         #expect(RFC_4648.Base32.Hex.isValid(input), "\(input) should be valid Base32-HEX")
     }
 
@@ -137,21 +130,19 @@ struct ValidationTests {
     }
 
     @Test(
-        "Invalid Base32-HEX strings",
         arguments: [
             "XYZ",  // Base32-HEX doesn't use W-Z
             "ABC!@#",  // Invalid characters
             "====",  // Only padding
         ]
     )
-    func invalidBase32Hex(input: String) {
+    func `Invalid Base32-HEX strings`(input: String) {
         #expect(!RFC_4648.Base32.Hex.isValid(input), "\(input) should be invalid Base32-HEX")
     }
 
     // MARK: - Hexadecimal Validation
 
     @Test(
-        "Valid hexadecimal strings",
         arguments: [
             "",
             "00",
@@ -166,12 +157,11 @@ struct ValidationTests {
             "0123456789ABCDEF",
         ]
     )
-    func validHex(input: String) {
+    func `Valid hexadecimal strings`(input: String) {
         #expect(RFC_4648.Base16.isValid(input), "\(input) should be valid hexadecimal")
     }
 
     @Test(
-        "Invalid hexadecimal strings",
         arguments: [
             "ghijk",  // Invalid characters
             "xyz",  // Invalid characters
@@ -179,7 +169,7 @@ struct ValidationTests {
             "!@#$",  // Invalid characters
         ]
     )
-    func invalidHex(input: String) {
+    func `Invalid hexadecimal strings`(input: String) {
         #expect(!RFC_4648.Base16.isValid(input), "\(input) should be invalid hexadecimal")
         #expect(!input.hex.isValid, "\(input) should be invalid hexadecimal")
     }

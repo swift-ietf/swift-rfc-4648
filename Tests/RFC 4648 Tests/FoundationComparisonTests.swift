@@ -321,7 +321,6 @@ import Testing
         // MARK: - Specific Length Tests
 
         @Test(
-            "Base64 specific lengths match Foundation",
             arguments: [
                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                 15, 16, 17, 31, 32, 33, 63, 64, 65,
@@ -329,7 +328,7 @@ import Testing
                 511, 512, 513, 1000, 1023, 1024, 1025,
             ]
         )
-        func specificLengths(length: Int) {
+        func `Base64 specific lengths match Foundation`(length: Int) {
             let bytes = (0..<length).map { Byte(UInt8($0 % 256)) }
 
             let ourEncoded = String.base64(bytes)
@@ -371,7 +370,6 @@ import Testing
         // MARK: - UTF-8 String Tests
 
         @Test(
-            "Base64 UTF-8 strings match Foundation",
             arguments: [
                 "Hello, World!",
                 "The quick brown fox jumps over the lazy dog",
@@ -389,7 +387,7 @@ import Testing
                 String(repeating: "😀", count: 100),  // Emoji repetition
             ]
         )
-        func uTF8Strings(input: String) {
+        func `Base64 UTF-8 strings match Foundation`(input: String) {
             let bytes = [Byte](input.utf8)
 
             let ourEncoded = String.base64(bytes)
@@ -410,7 +408,6 @@ import Testing
         // MARK: - Padding Variation Tests
 
         @Test(
-            "Base64 padding scenarios match Foundation",
             arguments: [
                 (1, "AA=="),  // 2 padding chars
                 (2, "AAA="),  // 1 padding char
@@ -420,7 +417,7 @@ import Testing
                 (6, "AAAAAAAA"),  // 0 padding chars
             ]
         )
-        func paddingScenarios(length: Int, expectedPattern: String) {
+        func `Base64 padding scenarios match Foundation`(length: Int, expectedPattern: String) {
             let bytes: [Byte] = Array(repeating: 0, count: length)
 
             let ourEncoded = String.base64(bytes)
