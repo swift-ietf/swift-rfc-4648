@@ -6,173 +6,175 @@
 import RFC_4648
 import Testing
 
-@Suite("Base64URL Encoding Tests")
-struct Base64URLTests {
-    // MARK: - Basic Encoding/Decoding
+extension RFC_4648.Base64.URL {
+    @Suite("Base64URL Encoding Tests")
+    struct Test {
+        // MARK: - Basic Encoding/Decoding
 
-    @Test(
-        arguments: [
-            ([], ""),  // empty string
-            ([Byte]("hello".utf8), nil),  // simple string - verify round-trip only
-        ]
-    )
-    func `Base64URL basic patterns`(input: [Byte], expectedEncoded: String?) {
-        let encoded = String.base64.url(input)
+        @Test(
+            arguments: [
+                ([], ""),  // empty string
+                ([Byte]("hello".utf8), nil),  // simple string - verify round-trip only
+            ]
+        )
+        func `Base64URL basic patterns`(input: [Byte], expectedEncoded: String?) {
+            let encoded = String.base64.url(input)
 
-        if let expected = expectedEncoded {
-            #expect(encoded == expected)
+            if let expected = expectedEncoded {
+                #expect(encoded == expected)
+            }
+
+            let decoded = [Byte](base64URLEncoded: encoded)
+            #expect(decoded == input)
         }
 
-        let decoded = [Byte](base64URLEncoded: encoded)
-        #expect(decoded == input)
-    }
+        // MARK: - URL Safety Tests
 
-    // MARK: - URL Safety Tests
+        @Test
+        func `Base64URL uses URL-safe characters`() {
+            // This input would produce '+' and '/' in standard Base64
+            let input: [Byte] = [0xFB, 0xFF, 0xFF]
+            let encoded = String.base64.url(input)
 
-    @Test
-    func `Base64URL uses URL-safe characters`() {
-        // This input would produce '+' and '/' in standard Base64
-        let input: [Byte] = [0xFB, 0xFF, 0xFF]
-        let encoded = String.base64.url(input)
+            // Base64URL should use '-' and '_' instead of '+' and '/'
+            #expect(encoded.contains("-") || encoded.contains("_"))
+            #expect(!encoded.contains("+"))
+            #expect(!encoded.contains("/"))
 
-        // Base64URL should use '-' and '_' instead of '+' and '/'
-        #expect(encoded.contains("-") || encoded.contains("_"))
-        #expect(!encoded.contains("+"))
-        #expect(!encoded.contains("/"))
+            let decoded = [Byte](base64URLEncoded: encoded)
+            #expect(decoded == input)
+        }
 
-        let decoded = [Byte](base64URLEncoded: encoded)
-        #expect(decoded == input)
-    }
+        @Test
+        func `Base64URL with special chars`() {
+            // Input that produces all special chars in Base64URL
+            let input: [Byte] = [0xFF, 0xFF]
+            let encoded = String.base64.url(input)
 
-    @Test
-    func `Base64URL with special chars`() {
-        // Input that produces all special chars in Base64URL
-        let input: [Byte] = [0xFF, 0xFF]
-        let encoded = String.base64.url(input)
-
-        // Should contain '_' (not '/')
-        #expect(encoded.contains("_"))
-        #expect(!encoded.contains("/"))
-    }
-
-    // MARK: - Padding Tests (RFC 7515 recommends no padding)
-
-    @Test(
-        arguments: [
-            ([Byte]("f".utf8), false, "Zg", false),  // default: no padding
-            ([Byte]("f".utf8), true, "Zg==", true),  // explicit padding
-            ([Byte]("fo".utf8), false, "Zm8", false),  // no padding
-            ([Byte]("fo".utf8), true, "Zm8=", true),  // with padding
-            ([Byte]("foo".utf8), false, "Zm9v", false),  // no padding needed
-        ]
-    )
-    func `Base64URL padding variations`(
-        input: [Byte], padding: Bool, expectedEncoded: String, shouldHavePadding: Bool
-    ) {
-        let encoded = String.base64.url(input, padding: padding)
-        #expect(encoded == expectedEncoded)
-        #expect(encoded.contains("=") == shouldHavePadding)
-
-        // Decoding should work both with and without padding
-        let decoded = [Byte](base64URLEncoded: encoded)
-        #expect(decoded == input)
-    }
-
-    // MARK: - Whitespace Handling
-
-    @Test
-    func `Base64URL decoding with whitespace`() {
-        let input = "Zm9v\nYmFy"
-        let decoded = [Byte](base64URLEncoded: input)
-        #expect(decoded == [Byte]("foobar".utf8))
-    }
-
-    // MARK: - Invalid Input Tests
-
-    @Test(
-        arguments: [
-            "Zg+A",  // '+' not valid in Base64URL
-            "Zg/A",  // '/' not valid in Base64URL
-            "Zm9v!!!!",  // special characters
-            "Z",  // too short
-        ]
-    )
-    func `Base64URL decoding rejects invalid input`(input: String) {
-        let decoded = [Byte](base64URLEncoded: input)
-        #expect(decoded == nil, "\(input) should be rejected")
-    }
-
-    // MARK: - JWT Use Case
-
-    @Test
-    func `Base64URL JWT header example`() {
-        // Typical JWT header: {"alg":"HS256","typ":"JWT"}
-        let headerJSON = [Byte]("{\"alg\":\"HS256\",\"typ\":\"JWT\"}".utf8)
-        let encoded = String.base64.url(headerJSON, padding: false)
-
-        // Should not contain URL-unsafe characters
-        #expect(!encoded.contains("+"))
-        #expect(!encoded.contains("/"))
-        #expect(!encoded.contains("="))
-
-        let decoded = [Byte](base64URLEncoded: encoded)
-        #expect(decoded == headerJSON)
-    }
-
-    // MARK: - Binary Data Tests
-
-    @Test
-    func `Base64URL binary data`() {
-        let input: [Byte] = [0x00, 0xFF, 0x80, 0x7F, 0x3E, 0x3F]
-        let encoded = String.base64.url(input)
-        let decoded = [Byte](base64URLEncoded: encoded)
-        #expect(decoded == input)
-    }
-
-    @Test
-    func `Base64URL all special characters`() {
-        // Input that generates maximum special chars
-        let input: [Byte] = [0xFF, 0xEF, 0xFF, 0xEF]
-        let encoded = String.base64.url(input)
-
-        // Should use '_' and '-' not '/' and '+'
-        if encoded.contains("_") {
+            // Should contain '_' (not '/')
+            #expect(encoded.contains("_"))
             #expect(!encoded.contains("/"))
         }
-        if encoded.contains("-") {
-            #expect(!encoded.contains("+"))
+
+        // MARK: - Padding Tests (RFC 7515 recommends no padding)
+
+        @Test(
+            arguments: [
+                ([Byte]("f".utf8), false, "Zg", false),  // default: no padding
+                ([Byte]("f".utf8), true, "Zg==", true),  // explicit padding
+                ([Byte]("fo".utf8), false, "Zm8", false),  // no padding
+                ([Byte]("fo".utf8), true, "Zm8=", true),  // with padding
+                ([Byte]("foo".utf8), false, "Zm9v", false),  // no padding needed
+            ]
+        )
+        func `Base64URL padding variations`(
+            input: [Byte], padding: Bool, expectedEncoded: String, shouldHavePadding: Bool
+        ) {
+            let encoded = String.base64.url(input, padding: padding)
+            #expect(encoded == expectedEncoded)
+            #expect(encoded.contains("=") == shouldHavePadding)
+
+            // Decoding should work both with and without padding
+            let decoded = [Byte](base64URLEncoded: encoded)
+            #expect(decoded == input)
         }
 
-        let decoded = [Byte](base64URLEncoded: encoded)
-        #expect(decoded == input)
-    }
+        // MARK: - Whitespace Handling
 
-    // MARK: - Edge Cases
+        @Test
+        func `Base64URL decoding with whitespace`() {
+            let input = "Zm9v\nYmFy"
+            let decoded = [Byte](base64URLEncoded: input)
+            #expect(decoded == [Byte]("foobar".utf8))
+        }
 
-    @Test
-    func `Base64URL round-trip long string`() {
-        let longString = String(repeating: "Hello, World! ", count: 100)
-        let input = [Byte](longString.utf8)
-        let encoded = String.base64.url(input, padding: false)
-        let decoded = [Byte](base64URLEncoded: encoded)
-        #expect(decoded == input)
-    }
+        // MARK: - Invalid Input Tests
 
-    // MARK: - Comparison with Standard Base64
+        @Test(
+            arguments: [
+                "Zg+A",  // '+' not valid in Base64URL
+                "Zg/A",  // '/' not valid in Base64URL
+                "Zm9v!!!!",  // special characters
+                "Z",  // too short
+            ]
+        )
+        func `Base64URL decoding rejects invalid input`(input: String) {
+            let decoded = [Byte](base64URLEncoded: input)
+            #expect(decoded == nil, "\(input) should be rejected")
+        }
 
-    @Test
-    func `Base64URL produces different output than Base64 for special chars`() {
-        let input: [Byte] = [0xFF, 0xFF]
+        // MARK: - JWT Use Case
 
-        // Use padding for Base64 (standard Base64 requires it for decoding)
-        let base64 = String.base64(input, padding: true)
-        let base64url = String.base64.url(input, padding: false)
+        @Test
+        func `Base64URL JWT header example`() {
+            // Typical JWT header: {"alg":"HS256","typ":"JWT"}
+            let headerJSON = [Byte]("{\"alg\":\"HS256\",\"typ\":\"JWT\"}".utf8)
+            let encoded = String.base64.url(headerJSON, padding: false)
 
-        // They should differ when special chars are present
-        #expect(base64 != base64url)
+            // Should not contain URL-unsafe characters
+            #expect(!encoded.contains("+"))
+            #expect(!encoded.contains("/"))
+            #expect(!encoded.contains("="))
 
-        // Both should decode correctly with their respective decoders
-        #expect([Byte](base64Encoded: base64) == input)
-        #expect([Byte](base64URLEncoded: base64url) == input)
+            let decoded = [Byte](base64URLEncoded: encoded)
+            #expect(decoded == headerJSON)
+        }
+
+        // MARK: - Binary Data Tests
+
+        @Test
+        func `Base64URL binary data`() {
+            let input: [Byte] = [0x00, 0xFF, 0x80, 0x7F, 0x3E, 0x3F]
+            let encoded = String.base64.url(input)
+            let decoded = [Byte](base64URLEncoded: encoded)
+            #expect(decoded == input)
+        }
+
+        @Test
+        func `Base64URL all special characters`() {
+            // Input that generates maximum special chars
+            let input: [Byte] = [0xFF, 0xEF, 0xFF, 0xEF]
+            let encoded = String.base64.url(input)
+
+            // Should use '_' and '-' not '/' and '+'
+            if encoded.contains("_") {
+                #expect(!encoded.contains("/"))
+            }
+            if encoded.contains("-") {
+                #expect(!encoded.contains("+"))
+            }
+
+            let decoded = [Byte](base64URLEncoded: encoded)
+            #expect(decoded == input)
+        }
+
+        // MARK: - Edge Cases
+
+        @Test
+        func `Base64URL round-trip long string`() {
+            let longString = String(repeating: "Hello, World! ", count: 100)
+            let input = [Byte](longString.utf8)
+            let encoded = String.base64.url(input, padding: false)
+            let decoded = [Byte](base64URLEncoded: encoded)
+            #expect(decoded == input)
+        }
+
+        // MARK: - Comparison with Standard Base64
+
+        @Test
+        func `Base64URL produces different output than Base64 for special chars`() {
+            let input: [Byte] = [0xFF, 0xFF]
+
+            // Use padding for Base64 (standard Base64 requires it for decoding)
+            let base64 = String.base64(input, padding: true)
+            let base64url = String.base64.url(input, padding: false)
+
+            // They should differ when special chars are present
+            #expect(base64 != base64url)
+
+            // Both should decode correctly with their respective decoders
+            #expect([Byte](base64Encoded: base64) == input)
+            #expect([Byte](base64URLEncoded: base64url) == input)
+        }
     }
 }
