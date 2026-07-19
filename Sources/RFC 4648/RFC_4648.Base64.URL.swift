@@ -144,9 +144,11 @@ extension RFC_4648.Base64.URL {
     @discardableResult
     public static func decode<Bytes: Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
-        into buffer: inout Buffer
+        into buffer: inout Buffer,
+        strictness: RFC_4648.Strictness = .lenient
     ) -> Bool where Bytes.Element == ASCII.Code, Buffer.Element == Byte {
-        RFC_4648.decodeBase64(bytes, into: &buffer, decodeTable: encodingTable.decode, requirePadding: false)
+        RFC_4648.decodeBase64(
+            bytes, into: &buffer, decodeTable: encodingTable.decode, requirePadding: false, strictness: strictness)
     }
 
     /// Decodes Base64URL encoded ASCII codes to a new byte array
@@ -162,11 +164,12 @@ extension RFC_4648.Base64.URL {
     /// ```
     @inlinable
     public static func decode<Bytes: Collection>(
-        _ bytes: Bytes
+        _ bytes: Bytes,
+        strictness: RFC_4648.Strictness = .lenient
     ) -> [Byte]? where Bytes.Element == ASCII.Code {
         var result: [Byte] = []
         result.reserveCapacity((bytes.count * 3) / 4)
-        guard decode(bytes, into: &result) else { return nil }
+        guard decode(bytes, into: &result, strictness: strictness) else { return nil }
         return result
     }
 
@@ -184,14 +187,14 @@ extension RFC_4648.Base64.URL {
     /// // decoded == [72, 101, 108, 108, 111] ("Hello")
     /// ```
     @inlinable
-    public static func decode(_ string: some StringProtocol) -> [Byte]? {
+    public static func decode(_ string: some StringProtocol, strictness: RFC_4648.Strictness = .lenient) -> [Byte]? {
         let codes: [ASCII.Code]
         do throws(ASCII.Code.Error) {
             codes = try [ASCII.Code](string.utf8)
         } catch {
             return nil
         }
-        return decode(codes)
+        return decode(codes, strictness: strictness)
     }
 
     /// Decodes Base64URL to a FixedWidthInteger (PRIMITIVE)
@@ -248,15 +251,16 @@ extension RFC_4648.Base64.URL.Wrapper where Wrapped: Collection, Wrapped.Element
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
-        into buffer: inout Buffer
+        into buffer: inout Buffer,
+        strictness: RFC_4648.Strictness = .lenient
     ) -> Bool where Buffer.Element == Byte {
-        RFC_4648.Base64.URL.decode(wrapped, into: &buffer)
+        RFC_4648.Base64.URL.decode(wrapped, into: &buffer, strictness: strictness)
     }
 
     /// Decodes wrapped Base64URL-encoded ASCII codes to raw bytes
     @inlinable
-    public func decoded() -> [Byte]? {
-        RFC_4648.Base64.URL.decode(wrapped)
+    public func decoded(strictness: RFC_4648.Strictness = .lenient) -> [Byte]? {
+        RFC_4648.Base64.URL.decode(wrapped, strictness: strictness)
     }
 
     /// Decodes wrapped Base64URL-encoded ASCII codes to a FixedWidthInteger
@@ -275,7 +279,8 @@ extension RFC_4648.Base64.URL.Wrapper where Wrapped: StringProtocol {
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
-        into buffer: inout Buffer
+        into buffer: inout Buffer,
+        strictness: RFC_4648.Strictness = .lenient
     ) -> Bool where Buffer.Element == Byte {
         let codes: [ASCII.Code]
         do throws(ASCII.Code.Error) {
@@ -283,13 +288,13 @@ extension RFC_4648.Base64.URL.Wrapper where Wrapped: StringProtocol {
         } catch {
             return false
         }
-        return RFC_4648.Base64.URL.decode(codes, into: &buffer)
+        return RFC_4648.Base64.URL.decode(codes, into: &buffer, strictness: strictness)
     }
 
     /// Decodes wrapped Base64URL string to bytes
     @inlinable
-    public func decoded() -> [Byte]? {
-        RFC_4648.Base64.URL.decode(wrapped)
+    public func decoded(strictness: RFC_4648.Strictness = .lenient) -> [Byte]? {
+        RFC_4648.Base64.URL.decode(wrapped, strictness: strictness)
     }
 
     /// Decodes wrapped Base64URL string to a FixedWidthInteger.

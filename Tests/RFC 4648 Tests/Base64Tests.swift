@@ -149,3 +149,31 @@ extension RFC_4648.Base64.Test {
         }
     }
 }
+
+// MARK: - F-004 Regression Tests (opt-in strictness)
+
+extension RFC_4648.Base64.Test.`Edge Case` {
+    @Test
+    func `lenient strictness is the default and matches unqualified decode`() {
+        #expect(RFC_4648.Base64.decode("Zm9v YmFy") == RFC_4648.Base64.decode("Zm9v YmFy", strictness: .lenient))
+    }
+
+    @Test
+    func `strict strictness rejects whitespace that lenient accepts`() {
+        #expect(RFC_4648.Base64.decode("Zm9v YmFy", strictness: .lenient) != nil)
+        #expect(RFC_4648.Base64.decode("Zm9v YmFy", strictness: .strict) == nil)
+    }
+
+    @Test
+    func `strict strictness rejects nonzero trailing padding bits`() {
+        // "AB==": sextets A(0), B(1) — the low 4 bits of B's sextet don't map
+        // onto the single decoded byte and are nonzero (canonical encoders
+        // always emit 0 there), so this is a non-canonical encoding of 0x00.
+        #expect(RFC_4648.Base64.decode("AB==", strictness: .lenient) == [0x00])
+        #expect(RFC_4648.Base64.decode("AB==", strictness: .strict) == nil)
+
+        // "AA==" is the canonical encoding of the same byte and must still
+        // succeed under strict.
+        #expect(RFC_4648.Base64.decode("AA==", strictness: .strict) == [0x00])
+    }
+}

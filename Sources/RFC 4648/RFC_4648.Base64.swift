@@ -134,6 +134,7 @@ extension RFC_4648.Base64 {
     /// - Parameters:
     ///   - bytes: Base64 encoded ASCII codes
     ///   - buffer: The buffer to append decoded bytes to
+    ///   - strictness: Whitespace/non-canonical-padding posture (default ``RFC_4648/Strictness/lenient``)
     /// - Returns: `true` if decoding succeeded, `false` if invalid input
     ///
     /// ## Example
@@ -147,14 +148,18 @@ extension RFC_4648.Base64 {
     @discardableResult
     public static func decode<Bytes: Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
-        into buffer: inout Buffer
+        into buffer: inout Buffer,
+        strictness: RFC_4648.Strictness = .lenient
     ) -> Bool where Bytes.Element == ASCII.Code, Buffer.Element == Byte {
-        RFC_4648.decodeBase64(bytes, into: &buffer, decodeTable: encodingTable.decode, requirePadding: true)
+        RFC_4648.decodeBase64(
+            bytes, into: &buffer, decodeTable: encodingTable.decode, requirePadding: true, strictness: strictness)
     }
 
     /// Decodes Base64 encoded ASCII codes to a new byte array
     ///
-    /// - Parameter bytes: Base64 encoded ASCII codes
+    /// - Parameters:
+    ///   - bytes: Base64 encoded ASCII codes
+    ///   - strictness: Whitespace/non-canonical-padding posture (default ``RFC_4648/Strictness/lenient``)
     /// - Returns: Decoded bytes, or nil if invalid
     ///
     /// ## Example
@@ -165,11 +170,12 @@ extension RFC_4648.Base64 {
     /// ```
     @inlinable
     public static func decode<Bytes: Collection>(
-        _ bytes: Bytes
+        _ bytes: Bytes,
+        strictness: RFC_4648.Strictness = .lenient
     ) -> [Byte]? where Bytes.Element == ASCII.Code {
         var result: [Byte] = []
         result.reserveCapacity((bytes.count * 3) / 4)
-        guard decode(bytes, into: &result) else { return nil }
+        guard decode(bytes, into: &result, strictness: strictness) else { return nil }
         return result
     }
 
@@ -178,7 +184,9 @@ extension RFC_4648.Base64 {
     /// Convenience overload that delegates to the ASCII-code-based version,
     /// lifting `string.utf8` to the `ASCII.Code` substrate at entry.
     ///
-    /// - Parameter string: Base64 encoded string
+    /// - Parameters:
+    ///   - string: Base64 encoded string
+    ///   - strictness: Whitespace/non-canonical-padding posture (default ``RFC_4648/Strictness/lenient``)
     /// - Returns: Decoded bytes, or nil if invalid
     ///
     /// ## Example
@@ -188,14 +196,14 @@ extension RFC_4648.Base64 {
     /// // decoded == [72, 101, 108, 108, 111] ("Hello")
     /// ```
     @inlinable
-    public static func decode(_ string: some StringProtocol) -> [Byte]? {
+    public static func decode(_ string: some StringProtocol, strictness: RFC_4648.Strictness = .lenient) -> [Byte]? {
         let codes: [ASCII.Code]
         do throws(ASCII.Code.Error) {
             codes = try [ASCII.Code](string.utf8)
         } catch {
             return nil
         }
-        return decode(codes)
+        return decode(codes, strictness: strictness)
     }
 
     /// Decodes Base64 to a FixedWidthInteger (PRIMITIVE)
@@ -274,21 +282,22 @@ extension RFC_4648.Base64.Wrapper where Wrapped: Collection, Wrapped.Element == 
 extension RFC_4648.Base64.Wrapper where Wrapped: Collection, Wrapped.Element == ASCII.Code {
     /// Decodes wrapped Base64-encoded ASCII codes into a buffer
     ///
-    /// Delegates to static `RFC_4648.Base64.decode(_:into:)`.
+    /// Delegates to static `RFC_4648.Base64.decode(_:into:strictness:)`.
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
-        into buffer: inout Buffer
+        into buffer: inout Buffer,
+        strictness: RFC_4648.Strictness = .lenient
     ) -> Bool where Buffer.Element == Byte {
-        RFC_4648.Base64.decode(wrapped, into: &buffer)
+        RFC_4648.Base64.decode(wrapped, into: &buffer, strictness: strictness)
     }
 
     /// Decodes wrapped Base64-encoded ASCII codes to raw bytes
     ///
-    /// Delegates to static `RFC_4648.Base64.decode(_:)`.
+    /// Delegates to static `RFC_4648.Base64.decode(_:strictness:)`.
     @inlinable
-    public func decoded() -> [Byte]? {
-        RFC_4648.Base64.decode(wrapped)
+    public func decoded(strictness: RFC_4648.Strictness = .lenient) -> [Byte]? {
+        RFC_4648.Base64.decode(wrapped, strictness: strictness)
     }
 
     /// Decodes wrapped Base64-encoded ASCII codes to a FixedWidthInteger
@@ -307,11 +316,12 @@ extension RFC_4648.Base64.Wrapper where Wrapped: StringProtocol {
     ///
     /// Lifts `wrapped.utf8` to the `ASCII.Code` substrate at entry.
     /// Returns `false` if the string contains non-ASCII bytes.
-    /// Delegates to static `RFC_4648.Base64.decode(_:into:)`.
+    /// Delegates to static `RFC_4648.Base64.decode(_:into:strictness:)`.
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
-        into buffer: inout Buffer
+        into buffer: inout Buffer,
+        strictness: RFC_4648.Strictness = .lenient
     ) -> Bool where Buffer.Element == Byte {
         let codes: [ASCII.Code]
         do throws(ASCII.Code.Error) {
@@ -319,15 +329,15 @@ extension RFC_4648.Base64.Wrapper where Wrapped: StringProtocol {
         } catch {
             return false
         }
-        return RFC_4648.Base64.decode(codes, into: &buffer)
+        return RFC_4648.Base64.decode(codes, into: &buffer, strictness: strictness)
     }
 
     /// Decodes wrapped Base64 string to bytes
     ///
-    /// Delegates to static `RFC_4648.Base64.decode(_:)`.
+    /// Delegates to static `RFC_4648.Base64.decode(_:strictness:)`.
     @inlinable
-    public func decoded() -> [Byte]? {
-        RFC_4648.Base64.decode(wrapped)
+    public func decoded(strictness: RFC_4648.Strictness = .lenient) -> [Byte]? {
+        RFC_4648.Base64.decode(wrapped, strictness: strictness)
     }
 
     /// Decodes wrapped Base64 string to a FixedWidthInteger

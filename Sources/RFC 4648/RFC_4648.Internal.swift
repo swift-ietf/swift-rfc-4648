@@ -80,6 +80,7 @@ extension RFC_4648 {
     ///   - buffer: The buffer to append decoded bytes to
     ///   - decodeTable: The decoding table (256 entries, 255 = invalid)
     ///   - requirePadding: Whether to require complete groups of 4
+    ///   - strictness: Whitespace/non-canonical-padding posture (default ``RFC_4648/Strictness/lenient``)
     /// - Returns: `true` if decoding succeeded, `false` if invalid input
     @inlinable
     @discardableResult
@@ -87,7 +88,8 @@ extension RFC_4648 {
         _ bytes: Bytes,
         into buffer: inout Buffer,
         decodeTable: [UInt8?],
-        requirePadding: Bool
+        requirePadding: Bool,
+        strictness: RFC_4648.Strictness = .lenient
     ) -> Bool where Bytes.Element == ASCII.Code, Buffer.Element == Byte {
         guard !bytes.isEmpty else { return true }
 
@@ -103,7 +105,7 @@ extension RFC_4648 {
         // isn't valid Base64. [F-001]
         func onlyTrailingWhitespaceRemains() -> Bool {
             while let code = iterator.next() {
-                if !code.isWhitespace { return false }
+                if strictness.rejectWhitespace || !code.isWhitespace { return false }
             }
             return true
         }
@@ -119,7 +121,10 @@ extension RFC_4648 {
                     paddingCount += 1
                     continue
                 }
-                if code.isWhitespace { continue }
+                if code.isWhitespace {
+                    if strictness.rejectWhitespace { return false }
+                    continue
+                }
                 // Padding in the middle is invalid
                 if paddingCount > 0 { return false }
                 guard let value = decodeTable[Int(code.underlying)] else { return false }
@@ -146,6 +151,18 @@ extension RFC_4648 {
             // Need at least 2 data characters
             guard values.count >= 2 else { return false }
             hasDecodedAny = true
+
+            // A short final group leaves some low bits of its last sextet
+            // unused (they don't map onto a whole output byte). Canonical
+            // encoders always emit zero there; a nonzero value means this
+            // input isn't the unique canonical encoding of its decoded bytes.
+            if strictness.rejectNonzeroTrailingBits {
+                switch values.count {
+                case 2 where (values[1] & 0x0F) != 0: return false
+                case 3 where (values[2] & 0x03) != 0: return false
+                default: break
+                }
+            }
 
             // First byte: 6 bits from v1 + high 2 bits from v2
             buffer.append(Byte((values[0] << 2) | (values[1] >> 4)))
@@ -298,13 +315,15 @@ extension RFC_4648 {
     ///   - bytes: The encoded bytes to decode
     ///   - buffer: The buffer to append decoded bytes to
     ///   - decodeTable: The decoding table (256 entries, 255 = invalid)
+    ///   - strictness: Whitespace/non-canonical-padding posture (default ``RFC_4648/Strictness/lenient``)
     /// - Returns: `true` if decoding succeeded, `false` if invalid input
     @inlinable
     @discardableResult
     package static func decodeBase32<Bytes: Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
-        decodeTable: [UInt8?]
+        decodeTable: [UInt8?],
+        strictness: RFC_4648.Strictness = .lenient
     ) -> Bool where Bytes.Element == ASCII.Code, Buffer.Element == Byte {
         guard !bytes.isEmpty else { return true }
 
@@ -318,7 +337,7 @@ extension RFC_4648 {
         // [F-001]
         func onlyTrailingWhitespaceRemains() -> Bool {
             while let code = iterator.next() {
-                if !code.isWhitespace { return false }
+                if strictness.rejectWhitespace || !code.isWhitespace { return false }
             }
             return true
         }
@@ -337,7 +356,10 @@ extension RFC_4648 {
                     paddingCount += 1
                     continue
                 }
-                if code.isWhitespace { continue }
+                if code.isWhitespace {
+                    if strictness.rejectWhitespace { return false }
+                    continue
+                }
                 // Padding in the middle is invalid
                 if paddingCount > 0 { return false }
                 guard let value = decodeTable[Int(code.underlying)] else { return false }
@@ -360,6 +382,19 @@ extension RFC_4648 {
                     || values.count == 7 || values.count == 8
             else { return false }
             hasDecodedAny = true
+
+            // A short final group leaves some low bits of its last quintet
+            // unused. Canonical encoders always emit zero there; see the
+            // matching check in decodeBase64.
+            if strictness.rejectNonzeroTrailingBits {
+                switch values.count {
+                case 2 where (values[1] & 0x03) != 0: return false
+                case 4 where (values[3] & 0x0F) != 0: return false
+                case 5 where (values[4] & 0x01) != 0: return false
+                case 7 where (values[6] & 0x07) != 0: return false
+                default: break
+                }
+            }
 
             // First byte: 5 bits from v1 + high 3 bits from v2
             buffer.append(Byte((values[0] << 3) | (values[1] >> 2)))

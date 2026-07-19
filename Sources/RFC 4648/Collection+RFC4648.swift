@@ -14,31 +14,31 @@ import ASCII_Primitives
 extension Array where Element == Byte {
     /// Creates an array from a Base64 encoded string (RFC 4648 Section 4)
     ///
-    /// Delegates to `RFC_4648.Base64.decode(_:)`.
+    /// Delegates to `RFC_4648.Base64.decode(_:strictness:)`.
     @inlinable
-    public init?(base64Encoded string: some StringProtocol) {
-        guard let decoded = RFC_4648.Base64.decode(string) else { return nil }
+    public init?(base64Encoded string: some StringProtocol, strictness: RFC_4648.Strictness = .lenient) {
+        guard let decoded = RFC_4648.Base64.decode(string, strictness: strictness) else { return nil }
         self = decoded
     }
 
     /// Creates an array from a Base64URL encoded string (RFC 4648 Section 5)
     @inlinable
-    public init?(base64URLEncoded string: some StringProtocol) {
-        guard let decoded = RFC_4648.Base64.URL.decode(string) else { return nil }
+    public init?(base64URLEncoded string: some StringProtocol, strictness: RFC_4648.Strictness = .lenient) {
+        guard let decoded = RFC_4648.Base64.URL.decode(string, strictness: strictness) else { return nil }
         self = decoded
     }
 
     /// Creates an array from a Base32 encoded string (RFC 4648 Section 6)
     @inlinable
-    public init?(base32Encoded string: some StringProtocol) {
-        guard let decoded = RFC_4648.Base32.decode(string) else { return nil }
+    public init?(base32Encoded string: some StringProtocol, strictness: RFC_4648.Strictness = .lenient) {
+        guard let decoded = RFC_4648.Base32.decode(string, strictness: strictness) else { return nil }
         self = decoded
     }
 
     /// Creates an array from a Base32-HEX encoded string (RFC 4648 Section 7)
     @inlinable
-    public init?(base32HexEncoded string: some StringProtocol) {
-        guard let decoded = RFC_4648.Base32.Hex.decode(string) else { return nil }
+    public init?(base32HexEncoded string: some StringProtocol, strictness: RFC_4648.Strictness = .lenient) {
+        guard let decoded = RFC_4648.Base32.Hex.decode(string, strictness: strictness) else { return nil }
         self = decoded
     }
 

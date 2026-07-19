@@ -212,5 +212,40 @@ extension RFC_4648.Base32.Test {
             let decoded = [Byte](base32Encoded: input)
             #expect(decoded == nil, "'\(input)' should be rejected, not silently truncated")
         }
+
+        // Quintet remainders of 1, 3, or 6 never land on a whole-byte
+        // boundary and can never appear as a properly-padded group.
+        @Test(
+            arguments: [
+                "M",  // 1 quintet, unpadded
+                "MZX",  // 3 quintets, unpadded
+                "MZXW6Y",  // 6 quintets, unpadded
+            ]
+        )
+        func `rejects quintet remainders that never land on a byte boundary`(input: String) {
+            let decoded = [Byte](base32Encoded: input)
+            #expect(decoded == nil, "'\(input)' has an invalid quintet remainder")
+        }
+    }
+}
+
+// MARK: - F-004 Regression Tests (opt-in strictness)
+
+extension RFC_4648.Base32.Test.`Edge Case` {
+    @Test
+    func `strict strictness rejects whitespace that lenient accepts`() {
+        #expect(RFC_4648.Base32.decode("MZXW6YTB OI======", strictness: .lenient) != nil)
+        #expect(RFC_4648.Base32.decode("MZXW6YTB OI======", strictness: .strict) == nil)
+    }
+
+    @Test
+    func `strict strictness rejects nonzero trailing padding bits`() {
+        // "AB======": quintets A(0), B(1) — the low 2 bits of B's quintet
+        // don't map onto the single decoded byte and are nonzero.
+        #expect(RFC_4648.Base32.decode("AB======", strictness: .lenient) == [0x00])
+        #expect(RFC_4648.Base32.decode("AB======", strictness: .strict) == nil)
+
+        // "AA======" is the canonical encoding of the same byte.
+        #expect(RFC_4648.Base32.decode("AA======", strictness: .strict) == [0x00])
     }
 }
