@@ -194,68 +194,51 @@ extension RFC_4648.Base16 {
 
         var iterator = bytes.makeIterator()
 
-        // Check for "0x" or "0X" prefix
-        if skipPrefix {
-            // Peek at first two ASCII codes
-            guard let first = iterator.next() else { return true }
+        // Every nibble — whether it's part of a possible "0x" prefix or an
+        // ordinary pair — is drawn through this single whitespace-skipping
+        // cursor. [F-002]: the previous implementation skipped whitespace
+        // for the first pair through a *second*, separately-advanced cursor
+        // that had already consumed the pair's second character before the
+        // skip loop ran, so leading whitespace silently swapped the two
+        // nibbles of the first byte (" DEAD" decoded as 0xED 0xAD instead of
+        // 0xDE 0xAD). One cursor for every nibble makes that class of bug
+        // structurally impossible.
+        func nextSignificant() -> ASCII.Code? {
+            while let code = iterator.next() {
+                if !code.isWhitespace { return code }
+            }
+            return nil
+        }
 
-            if first == ASCII.Code.`0` {
-                guard let second = iterator.next() else {
-                    // Just "0" - decode as single zero nibble? No, need pairs.
-                    // Single '0' is invalid for byte decoding
+        var pending = nextSignificant()
+
+        // Check for a "0x"/"0X" prefix, consuming from the same cursor.
+        if skipPrefix, let first = pending, first == ASCII.Code.`0` {
+            guard let second = nextSignificant() else {
+                // Just "0" (possibly followed only by whitespace) - invalid,
+                // byte decoding needs pairs.
+                return false
+            }
+            if second == ASCII.Code.x || second == ASCII.Code.X {
+                // Prefix consumed; the next significant code starts the
+                // first ordinary pair.
+                pending = nextSignificant()
+            } else {
+                // Not a prefix: '0' pairs with `second` as an ordinary pair.
+                guard let highNibble = decode(nibble: first), let lowNibble = decode(nibble: second) else {
                     return false
                 }
-                if second != ASCII.Code.x && second != ASCII.Code.X {
-                    // Not a prefix, these are actual hex digits
-                    // Decode this pair
-                    guard let highNibble = decode(nibble: first),
-                        let lowNibble = decode(nibble: second)
-                    else { return false }
-                    buffer.append(Byte((highNibble << 4) | lowNibble))
-                }
-                // If it was "0x"/"0X", we consumed it and continue
-            } else {
-                // First code is not '0', need to pair it with next
-                guard let second = iterator.next() else { return false }
-                // Skip whitespace for first code
-                var high = first
-                while high.isWhitespace {
-                    guard let next = iterator.next() else { return false }
-                    high = next
-                }
-                var low = second
-                while low.isWhitespace {
-                    guard let next = iterator.next() else { return false }
-                    low = next
-                }
-                guard let highNibble = decode(nibble: high),
-                    let lowNibble = decode(nibble: low)
-                else { return false }
                 buffer.append(Byte((highNibble << 4) | lowNibble))
+                pending = nextSignificant()
             }
         }
 
-        // Process remaining pairs
-        while let high = iterator.next() {
-            // Skip whitespace
-            var highCode = high
-            while highCode.isWhitespace {
-                guard let next = iterator.next() else { return true }  // trailing whitespace ok
-                highCode = next
-            }
-
-            guard let low = iterator.next() else { return false }  // odd number of hex chars
-
-            var lowCode = low
-            while lowCode.isWhitespace {
-                guard let next = iterator.next() else { return false }
-                lowCode = next
-            }
-
-            guard let highNibble = decode(nibble: highCode),
-                let lowNibble = decode(nibble: lowCode)
-            else { return false }
+        // Process remaining pairs.
+        while let high = pending {
+            guard let low = nextSignificant() else { return false }  // odd number of hex chars
+            guard let highNibble = decode(nibble: high), let lowNibble = decode(nibble: low) else { return false }
             buffer.append(Byte((highNibble << 4) | lowNibble))
+            pending = nextSignificant()
         }
 
         return true

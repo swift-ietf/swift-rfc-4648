@@ -247,3 +247,36 @@ extension RFC_4648.Base16 {
         }
     }
 }
+
+// MARK: - F-002 Regression Tests
+
+extension RFC_4648.Base16.Test {
+    @Suite
+    struct `Edge Case` {
+        @Test
+        func `leading whitespace before a pair does not swap its nibbles`() {
+            // Pre-fix, " DEAD" decoded to 0xED 0xAD (the first pair's
+            // nibbles swapped) instead of the correct 0xDE 0xAD.
+            #expect([Byte](hexEncoded: " DEAD") == [0xDE, 0xAD])
+        }
+
+        @Test
+        func `whitespace between prefix-shaped digits and following digits leaves an odd count invalid`() {
+            // "0 12": with whitespace removed this is "012" — 3 hex digits,
+            // an odd count that can never form whole bytes.
+            #expect([Byte](hexEncoded: "0 12") == nil)
+        }
+
+        @Test
+        func `whitespace adjacent to the 0x prefix is skipped like any other whitespace`() {
+            #expect([Byte](hexEncoded: "0x DEAD") == [0xDE, 0xAD])
+            #expect([Byte](hexEncoded: "0 xDEAD") == [0xDE, 0xAD])
+        }
+
+        @Test
+        func `0-prefixed and non-0-prefixed input behave identically around whitespace`() {
+            #expect([Byte](hexEncoded: " 0123") == [Byte](hexEncoded: "0123"))
+            #expect([Byte](hexEncoded: " 1234") == [Byte](hexEncoded: "1234"))
+        }
+    }
+}
