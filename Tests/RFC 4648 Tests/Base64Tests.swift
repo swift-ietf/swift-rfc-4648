@@ -177,3 +177,44 @@ extension RFC_4648.Base64.Test.`Edge Case` {
         #expect(RFC_4648.Base64.decode("AA==", strictness: .strict) == [0x00])
     }
 }
+
+// MARK: - F-003 Regression Tests (decode(as:) octet semantics)
+
+extension RFC_4648.Base64.Test.`Edge Case` {
+    @Test
+    func `decode(as:) matches the documented doc-example value`() {
+        // The doc comment on decode(as:) claims "AQIDBA==" decodes to
+        // 0x01020304 — pre-fix, the positional-sextet accumulator returned
+        // nil for this input (6 sextets * 6 bits = 36 bits > UInt32's 32).
+        let value: UInt32? = RFC_4648.Base64.decode(try! [ASCII.Code]("AQIDBA==".utf8))
+        #expect(value == 0x0102_0304)
+    }
+
+    @Test
+    func `decode(as:) matches octet semantics of the FixedWidthInteger init family`() {
+        let value = UInt32(123_456)
+        let encoded = String.base64(value)
+        let codes = try! [ASCII.Code](encoded.utf8)
+
+        #expect(RFC_4648.Base64.decode(codes, as: UInt32.self) == value)
+        #expect(RFC_4648.Base64.decode(codes, as: UInt32.self) == UInt32(base64Encoded: encoded))
+    }
+
+    @Test
+    func `decode(as:) rejects a byte count that does not match the target width`() {
+        let encoded = String.base64(UInt32(123_456))  // 4 bytes
+        let codes = try! [ASCII.Code](encoded.utf8)
+        #expect(RFC_4648.Base64.decode(codes, as: UInt8.self) == nil)
+        #expect(RFC_4648.Base64.decode(codes, as: UInt64.self) == nil)
+    }
+
+    @Test
+    func `decode(as:) on empty input returns nil like the FixedWidthInteger init family`() {
+        // Pre-fix, decode(as:) returned 0 for empty input regardless of T,
+        // while `UInt32(base64Encoded: "")` already returned nil (0 decoded
+        // bytes never matches T's width) — an unqualified inconsistency.
+        let value: UInt32? = RFC_4648.Base64.decode([ASCII.Code]())
+        #expect(value == nil)
+        #expect(value == UInt32(base64Encoded: ""))
+    }
+}

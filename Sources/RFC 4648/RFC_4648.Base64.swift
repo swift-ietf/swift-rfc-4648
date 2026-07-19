@@ -208,10 +208,16 @@ extension RFC_4648.Base64 {
 
     /// Decodes Base64 to a FixedWidthInteger (PRIMITIVE)
     ///
-    /// Decodes Base64 ASCII codes directly to an integer value without intermediate array allocation.
+    /// Decodes the Base64 string to bytes and interprets them as a big-endian
+    /// integer — octet semantics matching the `FixedWidthInteger.init?(base64Encoded:)`
+    /// family (`self.init(bytes:endianness:)`), not a positional accumulation
+    /// of raw sextets. Returns `nil` unless the decoded byte count is exactly
+    /// `T`'s width — including for empty input, which decodes to zero bytes,
+    /// never `T`'s width.
     ///
     /// - Parameter bytes: Base64 encoded ASCII codes
-    /// - Returns: Decoded integer value, or nil if invalid or overflow
+    /// - Returns: Decoded integer value, or nil if invalid, empty, or the
+    ///   decoded byte count doesn't match `T`'s width
     ///
     /// ## Example
     ///
@@ -224,7 +230,8 @@ extension RFC_4648.Base64 {
         _ bytes: Bytes,
         as type: T.Type = T.self
     ) -> T? where Bytes.Element == ASCII.Code {
-        RFC_4648.decodeBase64ToInteger(bytes, decodeTable: encodingTable.decode)
+        guard let decodedBytes = decode(bytes) else { return nil }
+        return T(bytes: decodedBytes, endianness: .big)
     }
 }
 

@@ -199,10 +199,15 @@ extension RFC_4648.Base64.URL {
 
     /// Decodes Base64URL to a FixedWidthInteger (PRIMITIVE)
     ///
-    /// Decodes Base64URL ASCII codes directly to an integer value without intermediate array allocation.
+    /// Decodes the Base64URL string to bytes and interprets them as a
+    /// big-endian integer — octet semantics matching
+    /// `FixedWidthInteger.init?(base64URLEncoded:)`. Returns `nil` unless the
+    /// decoded byte count is exactly `T`'s width (empty input decodes to
+    /// zero bytes, never `T`'s width).
     ///
     /// - Parameter bytes: Base64URL encoded ASCII codes
-    /// - Returns: Decoded integer value, or nil if invalid or overflow
+    /// - Returns: Decoded integer value, or nil if invalid, empty, or the
+    ///   decoded byte count doesn't match `T`'s width
     ///
     /// ## Example
     ///
@@ -215,7 +220,8 @@ extension RFC_4648.Base64.URL {
         _ bytes: Bytes,
         as type: T.Type = T.self
     ) -> T? where Bytes.Element == ASCII.Code {
-        RFC_4648.decodeBase64ToInteger(bytes, decodeTable: encodingTable.decode)
+        guard let decodedBytes = decode(bytes) else { return nil }
+        return T(bytes: decodedBytes, endianness: .big)
     }
 }
 

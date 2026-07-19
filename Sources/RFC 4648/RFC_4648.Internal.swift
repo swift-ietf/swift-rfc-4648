@@ -185,34 +185,6 @@ extension RFC_4648 {
 
         return hasDecodedAny || true
     }
-
-    /// Internal Base64 to integer decoding shared by Base64 and Base64.URL
-    @inlinable
-    package static func decodeBase64ToInteger<Bytes: Collection, T: FixedWidthInteger>(
-        _ bytes: Bytes,
-        decodeTable: [UInt8?]
-    ) -> T? where Bytes.Element == ASCII.Code {
-        guard !bytes.isEmpty else { return 0 }
-
-        var iterator = bytes.makeIterator()
-        var result: T = 0
-        var bitCount = 0
-        let maxBits = T.bitWidth
-
-        while let code = iterator.next() {
-            if code == RFC_4648.padding { break }
-            guard !code.isWhitespace else { continue }
-
-            guard let value = decodeTable[Int(code.underlying)] else { return nil }
-
-            bitCount += 6
-            guard bitCount <= maxBits else { return nil }
-
-            result = (result << 6) | T(value)
-        }
-
-        return result
-    }
 }
 
 // MARK: - Base32 Shared Implementation
@@ -426,33 +398,5 @@ extension RFC_4648 {
         }
 
         return hasDecodedAny || true
-    }
-
-    /// Internal Base32 to integer decoding shared by Base32 and Base32.Hex
-    @inlinable
-    package static func decodeBase32ToInteger<Bytes: Collection, T: FixedWidthInteger>(
-        _ bytes: Bytes,
-        decodeTable: [UInt8?]
-    ) -> T? where Bytes.Element == ASCII.Code {
-        guard !bytes.isEmpty else { return 0 }
-
-        var iterator = bytes.makeIterator()
-        var result: T = 0
-        var bitCount = 0
-        let maxBits = T.bitWidth
-
-        while let code = iterator.next() {
-            if code == RFC_4648.padding { break }
-            guard !code.isWhitespace else { continue }
-
-            guard let value = decodeTable[Int(code.underlying)] else { return nil }
-
-            bitCount += 5
-            guard bitCount <= maxBits else { return nil }
-
-            result = (result << 5) | T(value)
-        }
-
-        return result
     }
 }

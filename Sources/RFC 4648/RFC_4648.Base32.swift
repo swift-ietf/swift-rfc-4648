@@ -135,12 +135,19 @@ extension RFC_4648.Base32 {
     }
 
     /// Decodes Base32 to a FixedWidthInteger (PRIMITIVE)
+    ///
+    /// Decodes the Base32 string to bytes and interprets them as a
+    /// big-endian integer — octet semantics matching
+    /// `FixedWidthInteger.init?(base32Encoded:)`. Returns `nil` unless the
+    /// decoded byte count is exactly `T`'s width (empty input decodes to
+    /// zero bytes, never `T`'s width).
     @inlinable
     public static func decode<Bytes: Collection, T: FixedWidthInteger>(
         _ bytes: Bytes,
         as type: T.Type = T.self
     ) -> T? where Bytes.Element == ASCII.Code {
-        RFC_4648.decodeBase32ToInteger(bytes, decodeTable: encodingTable.decode)
+        guard let decodedBytes = decode(bytes) else { return nil }
+        return T(bytes: decodedBytes, endianness: .big)
     }
 }
 

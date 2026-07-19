@@ -206,3 +206,35 @@ extension RFC_4648.Base32.Hex {
         }
     }
 }
+
+// MARK: - F-003 Regression Tests (decode(as:) octet semantics)
+
+extension RFC_4648.Base32.Hex.Test {
+    @Suite
+    struct `Edge Case` {
+        @Test
+        func `decode(as:) matches octet semantics of the FixedWidthInteger init family`() {
+            let value = UInt32(123_456)
+            let encoded = String.base32.hex(value)
+            let codes = try! [ASCII.Code](encoded.utf8)
+
+            #expect(RFC_4648.Base32.Hex.decode(codes, as: UInt32.self) == value)
+            #expect(RFC_4648.Base32.Hex.decode(codes, as: UInt32.self) == UInt32(base32HexEncoded: encoded))
+        }
+
+        @Test
+        func `decode(as:) rejects a byte count that does not match the target width`() {
+            let encoded = String.base32.hex(UInt32(123_456))  // 4 bytes
+            let codes = try! [ASCII.Code](encoded.utf8)
+            #expect(RFC_4648.Base32.Hex.decode(codes, as: UInt8.self) == nil)
+            #expect(RFC_4648.Base32.Hex.decode(codes, as: UInt64.self) == nil)
+        }
+
+        @Test
+        func `decode(as:) on empty input returns nil like the FixedWidthInteger init family`() {
+            let value: UInt32? = RFC_4648.Base32.Hex.decode([ASCII.Code]())
+            #expect(value == nil)
+            #expect(value == UInt32(base32HexEncoded: ""))
+        }
+    }
+}
