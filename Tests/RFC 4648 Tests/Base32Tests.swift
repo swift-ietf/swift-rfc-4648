@@ -84,17 +84,21 @@ extension RFC_4648.Base32 {
 
         // MARK: - Whitespace Handling
 
+        // Each vector is a single "foobar" payload ("MZXW6YTBOI======") with
+        // whitespace inserted between its two quintet groups — not two
+        // independently-padded groups concatenated (a padded group must
+        // terminate the stream; see the F-001 Edge Case suite below).
         @Test(
             arguments: [
-                "MZXW6===\nYTBOI===",  // newline
-                "MZXW6=== \tMZXQ====",  // space and tab
-                "MZXW6===\t\tMZXQ====",  // multiple tabs
-                "MZXW6=== MZXQ====",  // space only
+                "MZXW6YTB\nOI======",  // newline
+                "MZXW6YTB \tOI======",  // space and tab
+                "MZXW6YTB\t\tOI======",  // multiple tabs
+                "MZXW6YTB OI======",  // space only
             ]
         )
         func `Base32 whitespace handling`(input: String) {
             let decoded = [Byte](base32Encoded: input)
-            #expect(decoded != nil, "Whitespace should be ignored in '\(input)'")
+            #expect(decoded == [Byte]("foobar".utf8), "Whitespace should be ignored in '\(input)'")
         }
 
         // MARK: - Invalid Input Tests
@@ -186,6 +190,27 @@ extension RFC_4648.Base32 {
             let encoded = String.base32(input)
             let decoded = [Byte](base32Encoded: encoded)
             #expect(decoded == input)
+        }
+    }
+}
+
+// MARK: - F-001 Regression Tests
+
+extension RFC_4648.Base32.Test {
+    @Suite
+    struct `Edge Case` {
+        // A short or padded group must be the last thing in the input — the
+        // decoder must not silently discard whatever follows it.
+        @Test(
+            arguments: [
+                "MY======X",  // garbage immediately after a padded group
+                "MY======MZXQ====",  // a second, independently-padded group after the first
+                "MZXW6YTB========",  // trailing all-padding group after a complete group
+            ]
+        )
+        func `rejects input trailing a padded or short group`(input: String) {
+            let decoded = [Byte](base32Encoded: input)
+            #expect(decoded == nil, "'\(input)' should be rejected, not silently truncated")
         }
     }
 }

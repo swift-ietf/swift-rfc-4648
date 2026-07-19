@@ -118,3 +118,34 @@ extension RFC_4648.Base64 {
         }
     }
 }
+
+// MARK: - F-001 Regression Tests
+
+extension RFC_4648.Base64.Test {
+    @Suite
+    struct `Edge Case` {
+        // A short or padded group must be the last thing in the input — the
+        // decoder must not silently discard whatever follows it.
+        @Test(
+            arguments: [
+                "Zg==X",  // garbage immediately after a padded group
+                "Zg==Zm8=",  // a second, independently-padded group after the first
+                "AAAA====",  // trailing all-padding group after a complete group
+                "MY=X",  // non-whitespace character mid-padding
+            ]
+        )
+        func `rejects input trailing a padded or short group`(input: String) {
+            let decoded = [Byte](base64Encoded: input)
+            #expect(decoded == nil, "'\(input)' should be rejected, not silently truncated")
+        }
+
+        // Regression guard for F-001: earlier whitespace coverage only asserted
+        // `decoded != nil`, which the pre-fix silent-truncation bug could
+        // satisfy with a wrong (truncated) value just as easily as a correct one.
+        @Test
+        func `whitespace decoding produces the exact expected bytes`() {
+            #expect([Byte](base64Encoded: "Zm9v\nYmFy") == [Byte]("foobar".utf8))
+            #expect([Byte](base64Encoded: "Zm9v YmFy") == [Byte]("foobar".utf8))
+        }
+    }
+}

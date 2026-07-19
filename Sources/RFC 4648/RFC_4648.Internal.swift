@@ -96,17 +96,27 @@ extension RFC_4648 {
         values.reserveCapacity(4)
         var hasDecodedAny = false
 
+        // Once a short/padded (terminal) group has been processed, nothing but
+        // whitespace may follow it in the iterator. RFC 4648 padding marks the
+        // end of the encoded stream — silently discarding whatever comes next
+        // (more padding, a second group, arbitrary garbage) accepts input that
+        // isn't valid Base64. [F-001]
+        func onlyTrailingWhitespaceRemains() -> Bool {
+            while let code = iterator.next() {
+                if !code.isWhitespace { return false }
+            }
+            return true
+        }
+
         while true {
             values.removeAll(keepingCapacity: true)
             var paddingCount = 0
-            var hitPadding = false
 
             // Collect up to 4 characters for this group
             while values.count + paddingCount < 4 {
                 guard let code = iterator.next() else { break }
                 if code == RFC_4648.padding {
                     paddingCount += 1
-                    hitPadding = true
                     continue
                 }
                 if code.isWhitespace { continue }
@@ -127,11 +137,11 @@ extension RFC_4648 {
                 if totalChars != 4 { return false }
             }
 
-            // All-padding without data is invalid
-            if values.isEmpty {
-                if hitPadding && !hasDecodedAny { return false }
-                break
-            }
+            // A group made entirely of padding is never legal on its own —
+            // padding only ever fills out the tail of a data-bearing group.
+            // (This is also what rejects a trailing all-padding group after a
+            // complete prior group, e.g. "AAAA====".)
+            if values.isEmpty { return false }
 
             // Need at least 2 data characters
             guard values.count >= 2 else { return false }
@@ -150,7 +160,10 @@ extension RFC_4648 {
                 }
             }
 
-            if values.count < 4 { break }
+            if values.count < 4 {
+                // Short/padded group: it must be the last thing in the input.
+                return onlyTrailingWhitespaceRemains()
+            }
         }
 
         return hasDecodedAny || true
@@ -300,26 +313,52 @@ extension RFC_4648 {
         values.reserveCapacity(8)
         var hasDecodedAny = false
 
+        // Once a short/padded (terminal) group has been processed, nothing but
+        // whitespace may follow it — see decodeBase64's twin of this helper.
+        // [F-001]
+        func onlyTrailingWhitespaceRemains() -> Bool {
+            while let code = iterator.next() {
+                if !code.isWhitespace { return false }
+            }
+            return true
+        }
+
         while true {
             values.removeAll(keepingCapacity: true)
-            var hitPadding = false
+            var paddingCount = 0
 
-            // Collect quintets for this group
-            while values.count < 8 {
+            // Collect up to 8 quintets/padding characters for this group. Every
+            // padding character is consumed here (not just the first one) so a
+            // short data-bearing group can be validated against the *whole*
+            // trailing padding run, not just its first character.
+            while values.count + paddingCount < 8 {
                 guard let code = iterator.next() else { break }
                 if code == RFC_4648.padding {
-                    hitPadding = true
-                    break
+                    paddingCount += 1
+                    continue
                 }
                 if code.isWhitespace { continue }
+                // Padding in the middle is invalid
+                if paddingCount > 0 { return false }
                 guard let value = decodeTable[Int(code.underlying)] else { return false }
                 values.append(value)
             }
 
-            // All-padding without data is invalid
-            if values.isEmpty && hitPadding && !hasDecodedAny { return false }
-            if values.isEmpty { break }
-            guard values.count >= 2 else { return false }
+            let totalChars = values.count + paddingCount
+
+            // Handle end of input
+            if totalChars == 0 { break }
+
+            // A group made entirely of padding is never legal on its own —
+            // padding only ever fills out the tail of a data-bearing group.
+            if values.isEmpty { return false }
+
+            // Only these quintet counts land on a whole-byte boundary; the
+            // encoder never emits a remainder of 1, 3, or 6 quintets.
+            guard
+                values.count == 2 || values.count == 4 || values.count == 5
+                    || values.count == 7 || values.count == 8
+            else { return false }
             hasDecodedAny = true
 
             // First byte: 5 bits from v1 + high 3 bits from v2
@@ -345,10 +384,13 @@ extension RFC_4648 {
                 buffer.append(Byte((values[6] << 5) | values[7]))
             }
 
-            if values.count < 8 { break }
+            if values.count < 8 {
+                // Short/padded group: it must be the last thing in the input.
+                return onlyTrailingWhitespaceRemains()
+            }
         }
 
-        return true
+        return hasDecodedAny || true
     }
 
     /// Internal Base32 to integer decoding shared by Base32 and Base32.Hex

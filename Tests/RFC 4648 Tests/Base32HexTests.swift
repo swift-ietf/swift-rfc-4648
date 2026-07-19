@@ -112,17 +112,21 @@ extension RFC_4648.Base32.Hex {
 
         // MARK: - Whitespace Handling
 
+        // Each vector is a single "foobar" payload ("CPNMUOJ1E8======") with
+        // whitespace inserted between its two quintet groups — not two
+        // independently-padded groups concatenated (a padded group must
+        // terminate the stream; see swift-rfc-4648's F-001 fix).
         @Test(
             arguments: [
-                "CPNMU===\nCPNG====",  // newline
-                "CPNMU===\t\tCPNG====",  // tabs
-                "CPNMU=== CPNG====",  // space
-                "CPNMU=== \t CPNG====",  // mixed
+                "CPNMUOJ1\nE8======",  // newline
+                "CPNMUOJ1\t\tE8======",  // tabs
+                "CPNMUOJ1 E8======",  // space
+                "CPNMUOJ1 \t E8======",  // mixed
             ]
         )
         func `Base32-HEX whitespace handling`(input: String) {
             let decoded = [Byte](base32HexEncoded: input)
-            #expect(decoded != nil, "Whitespace should be ignored in '\(input)'")
+            #expect(decoded == [Byte]("foobar".utf8), "Whitespace should be ignored in '\(input)'")
         }
 
         // MARK: - Invalid Input Tests
