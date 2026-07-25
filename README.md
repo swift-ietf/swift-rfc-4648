@@ -1,7 +1,7 @@
 # swift-rfc-4648
 
-[![CI](https://github.com/swift-ietf/swift-rfc-4648/workflows/CI/badge.svg)](https://github.com/swift-ietf/swift-rfc-4648/actions/workflows/ci.yml)
 ![Development Status](https://img.shields.io/badge/status-active--development-blue.svg)
+[![CI](https://github.com/swift-ietf/swift-rfc-4648/workflows/CI/badge.svg)](https://github.com/swift-ietf/swift-rfc-4648/actions/workflows/ci.yml)
 
 **Pure Swift implementation of RFC 4648: The Base16, Base32, and Base64 Data Encodings**
 
@@ -49,7 +49,7 @@ Hexadecimal encoding (base 16).
 ### Basic Base64 Encoding
 
 ```swift
-import RFC4648
+import RFC_4648
 
 // Encode bytes to Base64
 let bytes: [UInt8] = [72, 101, 108, 108, 111]
@@ -193,22 +193,6 @@ let encoded = String(hexEncoding: [72, 101, 108, 108, 111])  // "48656c6c6f"
 let decoded = [UInt8](hexEncoded: "48656c6c6f")  // [72, 101, 108, 108, 111]
 ```
 
-## Architecture
-
-This package is part of the swift-standards ecosystem:
-
-**Tier 0: swift-standards** (Foundation)
-- Truly generic, standard-agnostic utilities
-- Collection safety, clamping, byte serialization, etc.
-
-**Tier 1: swift-rfc-4648** (This package - Standard implementation)
-- Implements RFC 4648 data encodings
-- Depends only on swift-standards
-
-**Tier 2+: Other RFC packages**
-- Use RFC 4648 encodings as needed
-- Examples: JWT (RFC 7519) uses Base64URL, TOTP (RFC 6238) uses Base32
-
 ## Installation
 
 Add `swift-rfc-4648` to your `Package.swift`:
@@ -237,7 +221,7 @@ Then add it to your target:
 JSON Web Tokens (RFC 7519) use Base64URL encoding for token components:
 
 ```swift
-import RFC4648
+import RFC_4648
 
 // Encode JWT header and payload
 let header = String(base64URLEncoding: headerBytes)
@@ -314,6 +298,5 @@ This library is released under the Apache License 2.0. See [LICENSE.md](LICENSE.
 
 ## Related Packages
 
-- [swift-standards](../swift-standards) - Foundation utilities
-- [swift-incits-4-1986](../swift-incits-4-1986) - ASCII standard
-- [swift-rfc-3986](../swift-rfc-3986) - URI parsing
+- [swift-incits-4-1986](https://github.com/swift-incits/swift-incits-4-1986) — The ASCII character encoding.
+- [swift-rfc-3986](https://github.com/swift-ietf/swift-rfc-3986) — URI syntax.
