@@ -1,0 +1,6 @@
+version: 1
+builder:
+  configs:
+  - documentation_targets:
+    - RFC 4648
+    - RFC 4648 Foundation
