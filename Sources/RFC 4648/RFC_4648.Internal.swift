@@ -49,7 +49,7 @@ extension RFC_4648 {
             let c2 = ((b1 << 4) | ((b2 ?? 0) >> 4)) & 0x3F
             buffer.append(table[Int(c2)])
 
-            guard let b2 = b2 else {
+            guard let b2 else {
                 if padding {
                     buffer.append(RFC_4648.padding)
                     buffer.append(RFC_4648.padding)
@@ -61,7 +61,7 @@ extension RFC_4648 {
             let c3 = ((b2 << 2) | ((b3 ?? 0) >> 6)) & 0x3F
             buffer.append(table[Int(c3)])
 
-            guard let b3 = b3 else {
+            guard let b3 else {
                 if padding {
                     buffer.append(RFC_4648.padding)
                 }
@@ -223,7 +223,7 @@ extension RFC_4648 {
             let c2 = ((b1 << 2) | ((b2 ?? 0) >> 6)) & 0x1F
             buffer.append(table[Int(c2)])
 
-            guard let b2 = b2 else {
+            guard let b2 else {
                 if padding {
                     buffer.append(contentsOf: [
                         RFC_4648.padding, RFC_4648.padding,
@@ -241,7 +241,7 @@ extension RFC_4648 {
             let c4 = ((b2 << 4) | ((b3 ?? 0) >> 4)) & 0x1F
             buffer.append(table[Int(c4)])
 
-            guard let b3 = b3 else {
+            guard let b3 else {
                 if padding {
                     buffer.append(contentsOf: [
                         RFC_4648.padding, RFC_4648.padding,
@@ -255,7 +255,7 @@ extension RFC_4648 {
             let c5 = ((b3 << 1) | ((b4 ?? 0) >> 7)) & 0x1F
             buffer.append(table[Int(c5)])
 
-            guard let b4 = b4 else {
+            guard let b4 else {
                 if padding {
                     buffer.append(contentsOf: [RFC_4648.padding, RFC_4648.padding, RFC_4648.padding])
                 }
@@ -269,7 +269,7 @@ extension RFC_4648 {
             let c7 = ((b4 << 3) | ((b5 ?? 0) >> 5)) & 0x1F
             buffer.append(table[Int(c7)])
 
-            guard let b5 = b5 else {
+            guard let b5 else {
                 if padding {
                     buffer.append(RFC_4648.padding)
                 }
