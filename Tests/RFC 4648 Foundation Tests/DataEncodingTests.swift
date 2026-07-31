@@ -165,12 +165,16 @@ extension Data {
             switch encoding {
             case "base64URL":
                 #expect(empty.base64URLEncodedString().isEmpty)
+
             case "base32":
                 #expect(empty.base32EncodedString().isEmpty)
+
             case "base32Hex":
                 #expect(empty.base32HexEncodedString().isEmpty)
+
             case "hex":
                 #expect(empty.hexEncodedString().isEmpty)
+
             default:
                 break
             }
@@ -187,12 +191,16 @@ extension Data {
             switch encoding {
             case "base64URL":
                 #expect(Data(base64URLEncoded: empty) == Data())
+
             case "base32":
                 #expect(Data(base32Encoded: empty) == Data())
+
             case "base32Hex":
                 #expect(Data(base32HexEncoded: empty) == Data())
+
             case "hex":
                 #expect(Data(hexEncoded: empty) == Data())
+
             default:
                 break
             }

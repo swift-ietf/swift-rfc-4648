@@ -185,19 +185,19 @@ extension RFC_4648.Base64.URL.Test {
     @Suite
     struct `Edge Case` {
         @Test
-        func `decode(as:) matches octet semantics of the FixedWidthInteger init family`() {
+        func `decode(as:) matches octet semantics of the FixedWidthInteger init family`() throws {
             let value = UInt32(123_456)
             let encoded = String.base64.url(value)
-            let codes = try! [ASCII.Code](encoded.utf8)
+            let codes = try [ASCII.Code](encoded.utf8)
 
             #expect(RFC_4648.Base64.URL.decode(codes, as: UInt32.self) == value)
             #expect(RFC_4648.Base64.URL.decode(codes, as: UInt32.self) == UInt32(base64URLEncoded: encoded))
         }
 
         @Test
-        func `decode(as:) rejects a byte count that does not match the target width`() {
+        func `decode(as:) rejects a byte count that does not match the target width`() throws {
             let encoded = String.base64.url(UInt32(123_456))  // 4 bytes
-            let codes = try! [ASCII.Code](encoded.utf8)
+            let codes = try [ASCII.Code](encoded.utf8)
             #expect(RFC_4648.Base64.URL.decode(codes, as: UInt8.self) == nil)
             #expect(RFC_4648.Base64.URL.decode(codes, as: UInt64.self) == nil)
         }
