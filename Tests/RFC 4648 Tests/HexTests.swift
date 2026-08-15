@@ -261,7 +261,9 @@ extension RFC_4648.Base16.Test {
         }
 
         @Test
-        func `whitespace between prefix-shaped digits and following digits leaves an odd count invalid`() {
+        func
+            `whitespace between prefix-shaped digits and following digits leaves an odd count invalid`()
+        {
             // "0 12": with whitespace removed this is "012" — 3 hex digits,
             // an odd count that can never form whole bytes.
             #expect([Byte](hexEncoded: "0 12") == nil)

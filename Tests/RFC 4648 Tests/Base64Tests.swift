@@ -155,7 +155,10 @@ extension RFC_4648.Base64.Test {
 extension RFC_4648.Base64.Test.`Edge Case` {
     @Test
     func `lenient strictness is the default and matches unqualified decode`() {
-        #expect(RFC_4648.Base64.decode("Zm9v YmFy") == RFC_4648.Base64.decode("Zm9v YmFy", strictness: .lenient))
+        #expect(
+            RFC_4648.Base64.decode("Zm9v YmFy")
+                == RFC_4648.Base64.decode("Zm9v YmFy", strictness: .lenient)
+        )
     }
 
     @Test

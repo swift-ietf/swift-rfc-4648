@@ -148,7 +148,12 @@ extension RFC_4648.Base64.URL {
         strictness: RFC_4648.Strictness = .lenient
     ) -> Bool where Bytes.Element == ASCII.Code, Buffer.Element == Byte {
         RFC_4648.decodeBase64(
-            bytes, into: &buffer, decodeTable: encodingTable.decode, requirePadding: false, strictness: strictness)
+            bytes,
+            into: &buffer,
+            decodeTable: encodingTable.decode,
+            requirePadding: false,
+            strictness: strictness
+        )
     }
 
     /// Decodes Base64URL encoded ASCII codes to a new byte array
@@ -187,7 +192,10 @@ extension RFC_4648.Base64.URL {
     /// // decoded == [72, 101, 108, 108, 111] ("Hello")
     /// ```
     @inlinable
-    public static func decode(_ string: some StringProtocol, strictness: RFC_4648.Strictness = .lenient) -> [Byte]? {
+    public static func decode(
+        _ string: some StringProtocol,
+        strictness: RFC_4648.Strictness = .lenient
+    ) -> [Byte]? {
         let codes: [ASCII.Code]
         do throws(ASCII.Code.Error) {
             codes = try [ASCII.Code](string.utf8)

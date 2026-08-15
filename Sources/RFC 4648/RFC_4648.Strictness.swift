@@ -39,10 +39,16 @@ extension RFC_4648 {
         /// Historical default: whitespace is skipped, non-canonical trailing
         /// padding bits are accepted. Every decode entry point in this
         /// package defaults to this posture.
-        public static let lenient = Strictness(rejectWhitespace: false, rejectNonzeroTrailingBits: false)
+        public static let lenient = Strictness(
+            rejectWhitespace: false,
+            rejectNonzeroTrailingBits: false
+        )
 
         /// A validating-implementation posture: whitespace and non-canonical
         /// padding bits are both rejected.
-        public static let strict = Strictness(rejectWhitespace: true, rejectNonzeroTrailingBits: true)
+        public static let strict = Strictness(
+            rejectWhitespace: true,
+            rejectNonzeroTrailingBits: true
+        )
     }
 }

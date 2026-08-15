@@ -257,7 +257,9 @@ extension RFC_4648 {
 
             guard let b4 else {
                 if padding {
-                    buffer.append(contentsOf: [RFC_4648.padding, RFC_4648.padding, RFC_4648.padding])
+                    buffer.append(contentsOf: [
+                        RFC_4648.padding, RFC_4648.padding, RFC_4648.padding,
+                    ])
                 }
                 break
             }
