@@ -104,7 +104,12 @@ extension RFC_4648.Base32 {
         into buffer: inout Buffer,
         strictness: RFC_4648.Strictness = .lenient
     ) -> Bool where Bytes.Element == ASCII.Code, Buffer.Element == Byte {
-        RFC_4648.decodeBase32(bytes, into: &buffer, decodeTable: encodingTable.decode, strictness: strictness)
+        RFC_4648.decodeBase32(
+            bytes,
+            into: &buffer,
+            decodeTable: encodingTable.decode,
+            strictness: strictness
+        )
     }
 
     /// Decodes Base32 encoded ASCII codes to a new byte array
@@ -124,7 +129,10 @@ extension RFC_4648.Base32 {
     /// Lifts `string.utf8` to the `ASCII.Code` substrate at entry.
     /// Returns `nil` if the string contains non-ASCII bytes.
     @inlinable
-    public static func decode(_ string: some StringProtocol, strictness: RFC_4648.Strictness = .lenient) -> [Byte]? {
+    public static func decode(
+        _ string: some StringProtocol,
+        strictness: RFC_4648.Strictness = .lenient
+    ) -> [Byte]? {
         let codes: [ASCII.Code]
         do throws(ASCII.Code.Error) {
             codes = try [ASCII.Code](string.utf8)

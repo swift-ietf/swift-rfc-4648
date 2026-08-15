@@ -99,7 +99,10 @@ extension RFC_4648.Base32.Hex {
             ]
         )
         func `Base32-HEX padding variations`(
-            input: [Byte], padding: Bool, expectedEncoded: String, shouldHavePadding: Bool
+            input: [Byte],
+            padding: Bool,
+            expectedEncoded: String,
+            shouldHavePadding: Bool
         ) {
             let encoded = String.base32.hex(input, padding: padding)
             #expect(encoded == expectedEncoded)
@@ -219,7 +222,10 @@ extension RFC_4648.Base32.Hex.Test {
             let codes = try [ASCII.Code](encoded.utf8)
 
             #expect(RFC_4648.Base32.Hex.decode(codes, as: UInt32.self) == value)
-            #expect(RFC_4648.Base32.Hex.decode(codes, as: UInt32.self) == UInt32(base32HexEncoded: encoded))
+            #expect(
+                RFC_4648.Base32.Hex.decode(codes, as: UInt32.self)
+                    == UInt32(base32HexEncoded: encoded)
+            )
         }
 
         @Test

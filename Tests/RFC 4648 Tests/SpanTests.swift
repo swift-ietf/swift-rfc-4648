@@ -60,7 +60,9 @@ struct `Span Tests` {
         bytes.withUnsafeBufferPointer { buffer in
             let span = Span(_unsafeElements: buffer)
             #expect(span.base64.url.encoded() == bytes.base64.url.encoded())
-            #expect(span.base64.url.encoded(padding: true) == bytes.base64.url.encoded(padding: true))
+            #expect(
+                span.base64.url.encoded(padding: true) == bytes.base64.url.encoded(padding: true)
+            )
         }
     }
 
@@ -91,7 +93,9 @@ struct `Span Tests` {
         bytes.withUnsafeBufferPointer { buffer in
             let span = Span(_unsafeElements: buffer)
             #expect(span.base32.hex.encoded() == bytes.base32.hex.encoded())
-            #expect(span.base32.hex.encoded(padding: false) == bytes.base32.hex.encoded(padding: false))
+            #expect(
+                span.base32.hex.encoded(padding: false) == bytes.base32.hex.encoded(padding: false)
+            )
         }
     }
 

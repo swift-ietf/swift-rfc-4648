@@ -71,7 +71,10 @@ extension RFC_4648.Base32 {
             ]
         )
         func `Base32 padding variations`(
-            input: [Byte], padding: Bool, expectedEncoded: String, shouldHavePadding: Bool
+            input: [Byte],
+            padding: Bool,
+            expectedEncoded: String,
+            shouldHavePadding: Bool
         ) {
             let encoded = String.base32(input, padding: padding)
             #expect(encoded == expectedEncoded)

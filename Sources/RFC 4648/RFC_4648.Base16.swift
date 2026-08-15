@@ -125,7 +125,12 @@ extension RFC_4648.Base16 {
         for byte in bytes {
             // Bridge Byte → UInt8 at the iterator boundary so the integer
             // overload's arithmetic shifts operate in the arithmetic domain.
-            encode(byte.underlying, into: &buffer, uppercase: uppercase, suppressLeadingZeros: false)
+            encode(
+                byte.underlying,
+                into: &buffer,
+                uppercase: uppercase,
+                suppressLeadingZeros: false
+            )
         }
     }
 
@@ -225,7 +230,8 @@ extension RFC_4648.Base16 {
                 pending = nextSignificant()
             } else {
                 // Not a prefix: '0' pairs with `second` as an ordinary pair.
-                guard let highNibble = decode(nibble: first), let lowNibble = decode(nibble: second) else {
+                guard let highNibble = decode(nibble: first), let lowNibble = decode(nibble: second)
+                else {
                     return false
                 }
                 buffer.append(Byte((highNibble << 4) | lowNibble))
@@ -236,7 +242,9 @@ extension RFC_4648.Base16 {
         // Process remaining pairs.
         while let high = pending {
             guard let low = nextSignificant() else { return false }  // odd number of hex chars
-            guard let highNibble = decode(nibble: high), let lowNibble = decode(nibble: low) else { return false }
+            guard let highNibble = decode(nibble: high), let lowNibble = decode(nibble: low) else {
+                return false
+            }
             buffer.append(Byte((highNibble << 4) | lowNibble))
             pending = nextSignificant()
         }

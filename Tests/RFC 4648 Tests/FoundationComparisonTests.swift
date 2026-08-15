@@ -355,7 +355,9 @@ import Testing
 
             for _ in 0..<100 {
                 let length = Int.random(in: 1...500, using: &generator)
-                let bytes: [Byte] = (0..<length).map { _ in Byte(UInt8.random(in: 0...255, using: &generator)) }
+                let bytes: [Byte] = (0..<length).map { _ in
+                    Byte(UInt8.random(in: 0...255, using: &generator))
+                }
 
                 let ourEncoded = String.base64(bytes)
                 let foundationEncoded = Data(bytes.underlying).base64EncodedString()

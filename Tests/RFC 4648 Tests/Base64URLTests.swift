@@ -68,7 +68,10 @@ extension RFC_4648.Base64.URL {
             ]
         )
         func `Base64URL padding variations`(
-            input: [Byte], padding: Bool, expectedEncoded: String, shouldHavePadding: Bool
+            input: [Byte],
+            padding: Bool,
+            expectedEncoded: String,
+            shouldHavePadding: Bool
         ) {
             let encoded = String.base64.url(input, padding: padding)
             #expect(encoded == expectedEncoded)
@@ -191,7 +194,10 @@ extension RFC_4648.Base64.URL.Test {
             let codes = try [ASCII.Code](encoded.utf8)
 
             #expect(RFC_4648.Base64.URL.decode(codes, as: UInt32.self) == value)
-            #expect(RFC_4648.Base64.URL.decode(codes, as: UInt32.self) == UInt32(base64URLEncoded: encoded))
+            #expect(
+                RFC_4648.Base64.URL.decode(codes, as: UInt32.self)
+                    == UInt32(base64URLEncoded: encoded)
+            )
         }
 
         @Test
