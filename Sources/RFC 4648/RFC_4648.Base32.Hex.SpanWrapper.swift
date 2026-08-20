@@ -29,7 +29,7 @@ extension RFC_4648.Base32.Hex.SpanWrapper {
     /// - Returns: Base32-HEX encoded string
     @inlinable
     public func encoded(padding: Bool = true) -> String {
-        unsafe span.withUnsafeBufferPointer { buffer in
+        span.withUnsafeBufferPointer { buffer in
             unsafe String(
                 decoding: RFC_4648.Base32.Hex.encode(buffer, padding: padding) as [ASCII.Code],
                 as: UTF8.self

@@ -29,7 +29,7 @@ extension RFC_4648.Base64.SpanWrapper {
     /// - Returns: Base64 encoded string
     @inlinable
     public func encoded(padding: Bool = true) -> String {
-        unsafe span.withUnsafeBufferPointer { buffer in
+        span.withUnsafeBufferPointer { buffer in
             unsafe String(
                 decoding: RFC_4648.Base64.encode(buffer, padding: padding) as [ASCII.Code],
                 as: UTF8.self

@@ -29,7 +29,7 @@ extension RFC_4648.Base16.SpanWrapper {
     /// - Returns: Hexadecimal encoded string
     @inlinable
     public func encoded(uppercase: Bool = false) -> String {
-        unsafe span.withUnsafeBufferPointer { buffer in
+        span.withUnsafeBufferPointer { buffer in
             unsafe String(
                 decoding: RFC_4648.Base16.encode(buffer, uppercase: uppercase) as [ASCII.Code],
                 as: UTF8.self
