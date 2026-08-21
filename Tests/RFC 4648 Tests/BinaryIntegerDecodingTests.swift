@@ -1,15 +1,9 @@
-// BinaryIntegerDecodingTests.swift
-// swift-rfc-4648
-//
-// Tests for BinaryInteger decoding and round-trip encoding
-
 import Testing
 
 @testable import RFC_4648
 
 @Suite("BinaryInteger Decoding Tests")
 struct BinaryIntegerDecodingTests {
-    // MARK: - Base64 Decoding
 
     @Test
     func `UInt32 Base64 decoding`() {
@@ -95,14 +89,10 @@ struct BinaryIntegerDecodingTests {
         let uint32Value = UInt32(123_456)
         let encoded = String.base64(uint32Value)
 
-        // Try to decode 4 bytes as UInt8 (should fail)
         #expect(UInt8(base64Encoded: encoded) == nil)
 
-        // Try to decode 4 bytes as UInt64 (should fail)
         #expect(UInt64(base64Encoded: encoded) == nil)
     }
-
-    // MARK: - Base64URL Decoding
 
     @Test(
         arguments: [
@@ -115,8 +105,6 @@ struct BinaryIntegerDecodingTests {
 
         #expect(decoded == value)
     }
-
-    // MARK: - Base32 Decoding
 
     @Test(
         arguments: [
@@ -133,14 +121,12 @@ struct BinaryIntegerDecodingTests {
     @Test
     func `Base32 case insensitive decoding`() {
         let value = UInt32(123_456)
-        let upper = String.base32(value)  // Default uppercase
+        let upper = String.base32(value)
         let lower = upper.lowercased()
 
         #expect(UInt32(base32Encoded: upper) == value)
         #expect(UInt32(base32Encoded: lower) == value)
     }
-
-    // MARK: - Base32-HEX Decoding
 
     @Test(
         arguments: [
@@ -153,8 +139,6 @@ struct BinaryIntegerDecodingTests {
 
         #expect(decoded == value)
     }
-
-    // MARK: - Hexadecimal Decoding
 
     @Test
     func `UInt32 hexadecimal decoding`() {
@@ -209,8 +193,6 @@ struct BinaryIntegerDecodingTests {
         #expect(UInt32(hexEncoded: "deadbeef") == 0xDEAD_BEEF)
     }
 
-    // MARK: - Invalid Input
-
     @Test
     func `Invalid Base64 returns nil`() {
         #expect(UInt32(base64Encoded: "invalid!@#$") == nil)
@@ -227,8 +209,6 @@ struct BinaryIntegerDecodingTests {
         #expect(UInt32(hexEncoded: "GHIJK") == nil)
         #expect(UInt32(hexEncoded: "xyz") == nil)
     }
-
-    // MARK: - Edge Cases
 
     @Test
     func `Zero value across all encodings`() {
@@ -251,8 +231,6 @@ struct BinaryIntegerDecodingTests {
         #expect(UInt32(base32HexEncoded: String.base32.hex(max)) == max)
         #expect(UInt32(hexEncoded: String.hex(max, prefix: "")) == max)
     }
-
-    // MARK: - All Integer Types
 
     @Test
     func `All unsigned integer types supported`() {

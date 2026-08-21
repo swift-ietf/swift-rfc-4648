@@ -1,20 +1,14 @@
-// Base64URLTests.swift
-// swift-rfc-4648
-//
-// Tests for RFC 4648 Section 5: Base64URL Encoding (URL and filename safe)
-
 import RFC_4648
 import Testing
 
 extension RFC_4648.Base64.URL {
     @Suite("Base64URL Encoding Tests")
     struct Test {
-        // MARK: - Basic Encoding/Decoding
 
         @Test(
             arguments: [
-                ([], ""),  // empty string
-                ([Byte]("hello".utf8), nil),  // simple string - verify round-trip only
+                ([], ""),
+                ([Byte]("hello".utf8), nil),
             ]
         )
         func `Base64URL basic patterns`(input: [Byte], expectedEncoded: String?) {
@@ -28,15 +22,12 @@ extension RFC_4648.Base64.URL {
             #expect(decoded == input)
         }
 
-        // MARK: - URL Safety Tests
-
         @Test
         func `Base64URL uses URL-safe characters`() {
-            // This input would produce '+' and '/' in standard Base64
+
             let input: [Byte] = [0xFB, 0xFF, 0xFF]
             let encoded = String.base64.url(input)
 
-            // Base64URL should use '-' and '_' instead of '+' and '/'
             #expect(encoded.contains("-") || encoded.contains("_"))
             #expect(!encoded.contains("+"))
             #expect(!encoded.contains("/"))
@@ -47,24 +38,21 @@ extension RFC_4648.Base64.URL {
 
         @Test
         func `Base64URL with special chars`() {
-            // Input that produces all special chars in Base64URL
+
             let input: [Byte] = [0xFF, 0xFF]
             let encoded = String.base64.url(input)
 
-            // Should contain '_' (not '/')
             #expect(encoded.contains("_"))
             #expect(!encoded.contains("/"))
         }
 
-        // MARK: - Padding Tests (RFC 7515 recommends no padding)
-
         @Test(
             arguments: [
-                ([Byte]("f".utf8), false, "Zg", false),  // default: no padding
-                ([Byte]("f".utf8), true, "Zg==", true),  // explicit padding
-                ([Byte]("fo".utf8), false, "Zm8", false),  // no padding
-                ([Byte]("fo".utf8), true, "Zm8=", true),  // with padding
-                ([Byte]("foo".utf8), false, "Zm9v", false),  // no padding needed
+                ([Byte]("f".utf8), false, "Zg", false),
+                ([Byte]("f".utf8), true, "Zg==", true),
+                ([Byte]("fo".utf8), false, "Zm8", false),
+                ([Byte]("fo".utf8), true, "Zm8=", true),
+                ([Byte]("foo".utf8), false, "Zm9v", false),
             ]
         )
         func `Base64URL padding variations`(
@@ -77,12 +65,9 @@ extension RFC_4648.Base64.URL {
             #expect(encoded == expectedEncoded)
             #expect(encoded.contains("=") == shouldHavePadding)
 
-            // Decoding should work both with and without padding
             let decoded = [Byte](base64URLEncoded: encoded)
             #expect(decoded == input)
         }
-
-        // MARK: - Whitespace Handling
 
         @Test
         func `Base64URL decoding with whitespace`() {
@@ -91,14 +76,12 @@ extension RFC_4648.Base64.URL {
             #expect(decoded == [Byte]("foobar".utf8))
         }
 
-        // MARK: - Invalid Input Tests
-
         @Test(
             arguments: [
-                "Zg+A",  // '+' not valid in Base64URL
-                "Zg/A",  // '/' not valid in Base64URL
-                "Zm9v!!!!",  // special characters
-                "Z",  // too short
+                "Zg+A",
+                "Zg/A",
+                "Zm9v!!!!",
+                "Z",
             ]
         )
         func `Base64URL decoding rejects invalid input`(input: String) {
@@ -106,15 +89,12 @@ extension RFC_4648.Base64.URL {
             #expect(decoded == nil, "\(input) should be rejected")
         }
 
-        // MARK: - JWT Use Case
-
         @Test
         func `Base64URL JWT header example`() {
-            // Typical JWT header: {"alg":"HS256","typ":"JWT"}
+
             let headerJSON = [Byte]("{\"alg\":\"HS256\",\"typ\":\"JWT\"}".utf8)
             let encoded = String.base64.url(headerJSON, padding: false)
 
-            // Should not contain URL-unsafe characters
             #expect(!encoded.contains("+"))
             #expect(!encoded.contains("/"))
             #expect(!encoded.contains("="))
@@ -122,8 +102,6 @@ extension RFC_4648.Base64.URL {
             let decoded = [Byte](base64URLEncoded: encoded)
             #expect(decoded == headerJSON)
         }
-
-        // MARK: - Binary Data Tests
 
         @Test
         func `Base64URL binary data`() {
@@ -135,11 +113,10 @@ extension RFC_4648.Base64.URL {
 
         @Test
         func `Base64URL all special characters`() {
-            // Input that generates maximum special chars
+
             let input: [Byte] = [0xFF, 0xEF, 0xFF, 0xEF]
             let encoded = String.base64.url(input)
 
-            // Should use '_' and '-' not '/' and '+'
             if encoded.contains("_") {
                 #expect(!encoded.contains("/"))
             }
@@ -151,8 +128,6 @@ extension RFC_4648.Base64.URL {
             #expect(decoded == input)
         }
 
-        // MARK: - Edge Cases
-
         @Test
         func `Base64URL round-trip long string`() {
             let longString = String(repeating: "Hello, World! ", count: 100)
@@ -162,27 +137,20 @@ extension RFC_4648.Base64.URL {
             #expect(decoded == input)
         }
 
-        // MARK: - Comparison with Standard Base64
-
         @Test
         func `Base64URL produces different output than Base64 for special chars`() {
             let input: [Byte] = [0xFF, 0xFF]
 
-            // Use padding for Base64 (standard Base64 requires it for decoding)
             let base64 = String.base64(input, padding: true)
             let base64url = String.base64.url(input, padding: false)
 
-            // They should differ when special chars are present
             #expect(base64 != base64url)
 
-            // Both should decode correctly with their respective decoders
             #expect([Byte](base64Encoded: base64) == input)
             #expect([Byte](base64URLEncoded: base64url) == input)
         }
     }
 }
-
-// MARK: - F-003 Regression Tests (decode(as:) octet semantics)
 
 extension RFC_4648.Base64.URL.Test {
     @Suite
@@ -202,7 +170,7 @@ extension RFC_4648.Base64.URL.Test {
 
         @Test
         func `decode(as:) rejects a byte count that does not match the target width`() throws {
-            let encoded = String.base64.url(UInt32(123_456))  // 4 bytes
+            let encoded = String.base64.url(UInt32(123_456))
             let codes = try [ASCII.Code](encoded.utf8)
             #expect(RFC_4648.Base64.URL.decode(codes, as: UInt8.self) == nil)
             #expect(RFC_4648.Base64.URL.decode(codes, as: UInt64.self) == nil)

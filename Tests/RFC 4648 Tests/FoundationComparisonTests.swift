@@ -1,8 +1,3 @@
-// FoundationComparisonTests.swift
-// swift-rfc-4648
-//
-// Tests comparing RFC_4648 implementations against Foundation's implementations
-
 import RFC_4648
 import Testing
 
@@ -11,7 +6,6 @@ import Testing
 
     @Suite("Foundation Comparison Tests")
     struct FoundationComparisonTests {
-        // MARK: - Base64 Comparison
 
         @Test
         func `Base64 encoding matches Foundation`() {
@@ -73,11 +67,10 @@ import Testing
             ]
 
             for bytes in testBytes {
-                // Our implementation
+
                 let ourEncoded = String.base64(bytes)
                 let ourDecoded = [Byte](base64Encoded: ourEncoded)
 
-                // Foundation implementation
                 let foundationEncoded = Data(bytes.underlying).base64EncodedString()
                 let foundationDecoded = Data(base64Encoded: foundationEncoded).map { [Byte]($0) }
 
@@ -87,16 +80,12 @@ import Testing
             }
         }
 
-        // MARK: - Base64 with Options
-
         @Test
         func `Base64 encoding with line length matches Foundation`() {
             let longBytes = (0..<200).map { Byte(UInt8($0 % 256)) }
 
-            // Our implementation (single line, no line breaks)
             let ourEncoded = String.base64(longBytes)
 
-            // Foundation implementation without line length
             let foundationEncoded = Data(longBytes.underlying).base64EncodedString()
 
             #expect(ourEncoded == foundationEncoded)
@@ -104,76 +93,53 @@ import Testing
             #expect(!ourEncoded.contains("\r"))
         }
 
-        // MARK: - Invalid Base64
-
         @Test
         func `Base64 invalid characters rejected by both`() {
-            let invalidChars = "!!!!"  // Invalid characters
+            let invalidChars = "!!!!"
 
             let ourResult = [Byte](base64Encoded: invalidChars)
             let foundationResult = Data(base64Encoded: invalidChars)
 
-            // Both should reject invalid characters
             #expect(ourResult == nil)
             #expect(foundationResult == nil)
         }
 
         @Test
         func `Base64 invalid length rejected by both`() {
-            let invalidLength = "Zm9"  // Not multiple of 4
+            let invalidLength = "Zm9"
 
             let ourResult = [Byte](base64Encoded: invalidLength)
             let foundationResult = Data(base64Encoded: invalidLength)
 
-            // Both should reject invalid length
             #expect(ourResult == nil)
             #expect(foundationResult == nil)
         }
 
         @Test
         func `Base64 edge case padding differences`() {
-            // Note: Foundation is more lenient with some padding edge cases
-            // Our implementation strictly follows RFC 4648
 
-            // Case 1: Only padding - Foundation accepts, we reject (strict RFC compliance)
             let onlyPadding = "===="
             let ourResult1 = [Byte](base64Encoded: onlyPadding)
             #expect(ourResult1 == nil, "RFC 4648: Only padding is invalid")
 
-            // Case 2: Too much padding - Foundation may accept, we reject
             let tooMuchPadding = "Zm9v==="
             let ourResult2 = [Byte](base64Encoded: tooMuchPadding)
             #expect(ourResult2 == nil, "RFC 4648: Too much padding is invalid")
         }
 
-        // MARK: - Edge Cases
-
         @Test
         func `Base64 whitespace handling - RFC 4648 compliance`() {
-            // RFC 4648 Section 3.3: "Implementations MUST reject the encoded data if it
-            // contains characters outside the base alphabet when interpreting base-encoded
-            // data, unless the specification referring to this document explicitly states
-            // otherwise."
-            //
-            // However, Section 3.3 also states: "Implementations MAY choose to ignore
-            // white space (SP, HTAB, CR, LF)."
-            //
-            // Our implementation chooses to ignore whitespace (common practice).
-            // Foundation does NOT ignore whitespace in base64 (stricter interpretation).
 
             let withWhitespace = "Zm9v\nYmFy"
             let withoutWhitespace = "Zm9vYmFy"
 
-            // Our implementation: whitespace is ignored (permitted by RFC 4648)
             let ourDecoded = [Byte](base64Encoded: withWhitespace)
             #expect(ourDecoded == [Byte](base64Encoded: withoutWhitespace))
             #expect(ourDecoded == [Byte]("foobar".utf8))
 
-            // Foundation: whitespace causes failure
             let foundationDecoded = Data(base64Encoded: withWhitespace)
             #expect(foundationDecoded == nil, "Foundation rejects whitespace in base64")
 
-            // Both succeed without whitespace
             let ourClean = [Byte](base64Encoded: withoutWhitespace)
             let foundationClean = Data(base64Encoded: withoutWhitespace).map { [Byte]($0) }
             #expect(ourClean == foundationClean)
@@ -196,11 +162,9 @@ import Testing
             #expect(ourDecoded == [])
         }
 
-        // MARK: - Performance Parity
-
         @Test
         func `Base64 large data matches Foundation`() {
-            // Test with 1MB of data
+
             let largeBytes = (0..<(1024 * 1024)).map { Byte(UInt8($0 % 256)) }
 
             let ourEncoded = String.base64(largeBytes)
@@ -214,8 +178,6 @@ import Testing
             #expect(ourDecoded == foundationDecoded)
             #expect(ourDecoded == largeBytes)
         }
-
-        // MARK: - Binary Data
 
         @Test
         func `Base64 all byte values match Foundation`() {
@@ -233,18 +195,14 @@ import Testing
             #expect(ourDecoded == allBytes)
         }
 
-        // MARK: - Hex Comparison (if Foundation provides hex encoding)
-
         @Test
         func `Hex encoding produces valid output`() {
             let testBytes: [Byte] = [0x00, 0x0F, 0xFF, 0xAB, 0xCD, 0xEF]
 
             let ourHex = String.hex(testBytes)
 
-            // Verify format is correct (lowercase hex by default)
             #expect(ourHex == "000fffabcdef")
 
-            // Verify round-trip
             let decoded = [Byte](hexEncoded: ourHex)
             #expect(decoded == testBytes)
         }
@@ -255,15 +213,11 @@ import Testing
 
             let ourHexUpper = String.hex(testBytes, uppercase: true)
 
-            // Verify format is correct (uppercase hex)
             #expect(ourHexUpper == "000FFFABCDEF")
 
-            // Verify round-trip (decoding is case-insensitive)
             let decoded = [Byte](hexEncoded: ourHexUpper)
             #expect(decoded == testBytes)
         }
-
-        // MARK: - Exhaustive Byte Pattern Tests
 
         @Test
         func `Base64 all single-byte values match Foundation`() {
@@ -285,7 +239,7 @@ import Testing
 
         @Test
         func `Base64 all two-byte combinations (sampled)`() {
-            // Test representative two-byte patterns (every 17th to keep test fast)
+
             for i in stride(from: 0, through: 255, by: 17) {
                 for j in stride(from: 0, through: 255, by: 17) {
                     let bytes: [Byte] = [Byte(UInt8(i)), Byte(UInt8(j))]
@@ -303,7 +257,7 @@ import Testing
 
         @Test
         func `Base64 all three-byte combinations (sampled)`() {
-            // Test representative three-byte patterns
+
             for i in stride(from: 0, through: 255, by: 51) {
                 for j in stride(from: 0, through: 255, by: 51) {
                     for k in stride(from: 0, through: 255, by: 51) {
@@ -317,8 +271,6 @@ import Testing
                 }
             }
         }
-
-        // MARK: - Specific Length Tests
 
         @Test(
             arguments: [
@@ -346,11 +298,9 @@ import Testing
             #expect(ourDecoded == bytes)
         }
 
-        // MARK: - Random Data Tests
-
         @Test
         func `Base64 random data patterns match Foundation`() {
-            // Use seeded random for reproducibility
+
             var generator = SeededRandomNumberGenerator(seed: 42)
 
             for _ in 0..<100 {
@@ -369,24 +319,22 @@ import Testing
             }
         }
 
-        // MARK: - UTF-8 String Tests
-
         @Test(
             arguments: [
                 "Hello, World!",
                 "The quick brown fox jumps over the lazy dog",
                 "1234567890",
                 "!@#$%^&*()_+-=[]{}|;':\",./<>?",
-                "αβγδεζηθικλμνξοπρστυφχψω",  // Greek
-                "你好世界",  // Chinese
-                "こんにちは世界",  // Japanese
-                "🚀🌟💻🎉🔥",  // Emojis
-                "Iñtërnâtiônàlizætiøn",  // Accented characters
-                "",  // Empty
-                " ",  // Single space
-                "\n\r\t",  // Whitespace characters
-                String(repeating: "A", count: 1000),  // Long repetitive
-                String(repeating: "😀", count: 100),  // Emoji repetition
+                "αβγδεζηθικλμνξοπρστυφχψω",
+                "你好世界",
+                "こんにちは世界",
+                "🚀🌟💻🎉🔥",
+                "Iñtërnâtiônàlizætiøn",
+                "",
+                " ",
+                "\n\r\t",
+                String(repeating: "A", count: 1000),
+                String(repeating: "😀", count: 100),
             ]
         )
         func `Base64 UTF-8 strings match Foundation`(input: String) {
@@ -407,16 +355,14 @@ import Testing
             #expect(ourDecoded == bytes)
         }
 
-        // MARK: - Padding Variation Tests
-
         @Test(
             arguments: [
-                (1, "AA=="),  // 2 padding chars
-                (2, "AAA="),  // 1 padding char
-                (3, "AAAA"),  // 0 padding chars
-                (4, "AAAAAA=="),  // 2 padding chars
-                (5, "AAAAAAA="),  // 1 padding char
-                (6, "AAAAAAAA"),  // 0 padding chars
+                (1, "AA=="),
+                (2, "AAA="),
+                (3, "AAAA"),
+                (4, "AAAAAA=="),
+                (5, "AAAAAAA="),
+                (6, "AAAAAAAA"),
             ]
         )
         func `Base64 padding scenarios match Foundation`(length: Int, expectedPattern: String) {
@@ -428,8 +374,6 @@ import Testing
             #expect(ourEncoded == foundationEncoded)
             #expect(ourEncoded == expectedPattern)
         }
-
-        // MARK: - BinaryInteger Encoding Tests
 
         @Test
         func `Base64 BinaryInteger UInt8 values match Foundation`() {
@@ -506,8 +450,6 @@ import Testing
             }
         }
 
-        // MARK: - Boundary and Edge Cases
-
         @Test
         func `Base64 consecutive byte values match Foundation`() {
             for start in stride(from: 0, through: 200, by: 50) {
@@ -541,7 +483,7 @@ import Testing
         @Test
         func `Base64 powers of two lengths match Foundation`() {
             for power in 0...10 {
-                let length = 1 << power  // 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024
+                let length = 1 << power
                 let bytes = (0..<length).map { Byte(UInt8($0 % 256)) }
 
                 let ourEncoded = String.base64(bytes)
@@ -554,21 +496,19 @@ import Testing
             }
         }
 
-        // MARK: - Decoding Edge Cases
-
         @Test
         func `Base64 decode various valid inputs match Foundation`() {
             let validInputs = [
-                "YQ==",  // "a"
-                "YWI=",  // "ab"
-                "YWJj",  // "abc"
-                "YWJjZA==",  // "abcd"
-                "dGVzdA==",  // "test"
-                "SGVsbG8gV29ybGQh",  // "Hello World!"
-                "AAAA",  // zeros
-                "////",  // all 1s in certain bits
-                "++++",  // plus signs
-                "MDEyMzQ1Njc4OQ==",  // "0123456789"
+                "YQ==",
+                "YWI=",
+                "YWJj",
+                "YWJjZA==",
+                "dGVzdA==",
+                "SGVsbG8gV29ybGQh",
+                "AAAA",
+                "////",
+                "++++",
+                "MDEyMzQ1Njc4OQ==",
             ]
 
             for encoded in validInputs {
@@ -584,34 +524,28 @@ import Testing
 
         @Test
         func `Base64 decode with padding matches Foundation`() {
-            // Both our implementation and Foundation require proper 4-byte alignment
-            // (padding to make the input length a multiple of 4)
 
             let testCases: [(padded: String, expected: [Byte])] = [
-                ("YQ==", [Byte]("a".utf8)),  // 1 byte
-                ("YWI=", [Byte]("ab".utf8)),  // 2 bytes
-                ("YWJj", [Byte]("abc".utf8)),  // 3 bytes (no padding needed)
-                ("YWJjZA==", [Byte]("abcd".utf8)),  // 4 bytes
+                ("YQ==", [Byte]("a".utf8)),
+                ("YWI=", [Byte]("ab".utf8)),
+                ("YWJj", [Byte]("abc".utf8)),
+                ("YWJjZA==", [Byte]("abcd".utf8)),
             ]
 
             for (padded, expectedBytes) in testCases {
-                // Our implementation
+
                 let ourDecoded = [Byte](base64Encoded: padded)
 
-                // Foundation implementation
                 let foundationDecoded = Data(base64Encoded: padded).map { [Byte]($0) }
 
-                // Both should succeed with properly padded input
                 #expect(ourDecoded != nil, "Our implementation should decode '\(padded)'")
                 #expect(foundationDecoded != nil, "Foundation should decode '\(padded)'")
 
-                // Both should produce the same result
                 #expect(
                     ourDecoded == foundationDecoded,
                     "Results should match for '\(padded)'"
                 )
 
-                // Both should match expected output
                 #expect(
                     ourDecoded == expectedBytes,
                     "Should decode to expected bytes"
@@ -619,11 +553,9 @@ import Testing
             }
         }
 
-        // MARK: - Stress Tests
-
         @Test
         func `Base64 very large data matches Foundation`() {
-            // Test with 10MB of data
+
             let largeSize = 10 * 1024 * 1024
             let largeBytes = (0..<largeSize).map { Byte(UInt8($0 % 256)) }
 
@@ -635,7 +567,6 @@ import Testing
                 "10MB encoding should match"
             )
 
-            // Verify length is correct
             let expectedLength = ((largeSize + 2) / 3) * 4
             #expect(ourEncoded.count == expectedLength)
             #expect(foundationEncoded.count == expectedLength)
@@ -659,9 +590,6 @@ import Testing
         }
     }
 
-    // MARK: - Helper Types
-
-    /// Seeded random number generator for reproducible tests
     struct SeededRandomNumberGenerator: RandomNumberGenerator {
         private var state: UInt64
 
@@ -672,7 +600,7 @@ import Testing
 
     extension SeededRandomNumberGenerator {
         mutating func next() -> UInt64 {
-            // Simple LCG (Linear Congruential Generator)
+
             state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
             return state
         }

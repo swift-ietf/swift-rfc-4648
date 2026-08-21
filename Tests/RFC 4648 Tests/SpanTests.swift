@@ -1,17 +1,9 @@
-//
-//  SpanTests.swift
-//  swift-rfc-4648
-//
-//  Tests for Span-based encoding
-
 import Testing
 
 @testable import RFC_4648
 
 @Suite
 struct `Span Tests` {
-
-    // MARK: - Base16 (Hex)
 
     @Test
     func `Span hex encoding matches Array encoding`() {
@@ -42,11 +34,9 @@ struct `Span Tests` {
         }
     }
 
-    // MARK: - Base64
-
     @Test
     func `Span base64 encoding matches Array encoding`() {
-        let bytes: [Byte] = [72, 101, 108, 108, 111]  // "Hello"
+        let bytes: [Byte] = [72, 101, 108, 108, 111]
         bytes.withUnsafeBufferPointer { buffer in
             let span = Span(_unsafeElements: buffer)
             #expect(span.base64.encoded() == bytes.base64.encoded())
@@ -56,7 +46,7 @@ struct `Span Tests` {
 
     @Test
     func `Span base64 URL encoding matches Array encoding`() {
-        let bytes: [Byte] = [0xFB, 0xFF, 0xBF]  // Bytes that produce +/ in standard Base64
+        let bytes: [Byte] = [0xFB, 0xFF, 0xBF]
         bytes.withUnsafeBufferPointer { buffer in
             let span = Span(_unsafeElements: buffer)
             #expect(span.base64.url.encoded() == bytes.base64.url.encoded())
@@ -75,11 +65,9 @@ struct `Span Tests` {
         }
     }
 
-    // MARK: - Base32
-
     @Test
     func `Span base32 encoding matches Array encoding`() {
-        let bytes: [Byte] = [72, 101, 108, 108, 111]  // "Hello"
+        let bytes: [Byte] = [72, 101, 108, 108, 111]
         bytes.withUnsafeBufferPointer { buffer in
             let span = Span(_unsafeElements: buffer)
             #expect(span.base32.encoded() == bytes.base32.encoded())
@@ -108,8 +96,6 @@ struct `Span Tests` {
         }
     }
 
-    // MARK: - Temporary Allocation
-
     @Test
     func `Span encoding from temporary allocation`() {
         let result = withUnsafeTemporaryAllocation(of: Byte.self, capacity: 4) { buffer in
@@ -126,9 +112,9 @@ struct `Span Tests` {
     @Test
     func `Span base64 from temporary allocation`() {
         let result = withUnsafeTemporaryAllocation(of: Byte.self, capacity: 3) { buffer in
-            buffer[0] = 0x48  // H
-            buffer[1] = 0x69  // i
-            buffer[2] = 0x21  // !
+            buffer[0] = 0x48
+            buffer[1] = 0x69
+            buffer[2] = 0x21
             let span = Span(_unsafeElements: UnsafeBufferPointer(buffer))
             return span.base64.encoded()
         }

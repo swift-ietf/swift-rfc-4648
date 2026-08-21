@@ -1,15 +1,7 @@
-//
-//  RFC_4648.Base64.SpanWrapper.swift
-//  swift-rfc-4648
-//
-//  Span-based Base64 encoding wrapper for zero-copy encoding.
-
-// MARK: - Base64 Span Support
-
 import ASCII_Primitives
 
 extension RFC_4648.Base64 {
-    /// Wrapper for Span-based Base64 encoding
+
     public struct SpanWrapper: ~Copyable, ~Escapable {
         @usableFromInline
         let span: Swift.Span<Byte>
@@ -23,10 +15,7 @@ extension RFC_4648.Base64 {
 }
 
 extension RFC_4648.Base64.SpanWrapper {
-    /// Encodes span bytes to Base64 string
-    ///
-    /// - Parameter padding: Whether to include padding characters (default: true)
-    /// - Returns: Base64 encoded string
+
     @inlinable
     public func encoded(padding: Bool = true) -> String {
         span.withUnsafeBufferPointer { buffer in
@@ -37,7 +26,6 @@ extension RFC_4648.Base64.SpanWrapper {
         }
     }
 
-    /// Access to URL-safe Base64 encoding
     @inlinable
     public var url: RFC_4648.Base64.URL.SpanWrapper {
         @_lifetime(copy self)

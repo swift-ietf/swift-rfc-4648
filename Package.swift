@@ -1,7 +1,6 @@
 // swift-tools-version: 6.4
 import PackageDescription
 
-// RFC 4648: The Base16, Base32, and Base64 Data Encodings
 let package = Package(
     name: "swift-rfc-4648",
     platforms: [

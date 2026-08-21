@@ -1,15 +1,7 @@
-//
-//  RFC_4648.Base32.SpanWrapper.swift
-//  swift-rfc-4648
-//
-//  Span-based Base32 encoding wrapper for zero-copy encoding.
-
-// MARK: - Base32 Span Support
-
 import ASCII_Primitives
 
 extension RFC_4648.Base32 {
-    /// Wrapper for Span-based Base32 encoding
+
     public struct SpanWrapper: ~Copyable, ~Escapable {
         @usableFromInline
         let span: Swift.Span<Byte>
@@ -23,10 +15,7 @@ extension RFC_4648.Base32 {
 }
 
 extension RFC_4648.Base32.SpanWrapper {
-    /// Encodes span bytes to Base32 string
-    ///
-    /// - Parameter padding: Whether to include padding characters (default: true)
-    /// - Returns: Base32 encoded string
+
     @inlinable
     public func encoded(padding: Bool = true) -> String {
         span.withUnsafeBufferPointer { buffer in
@@ -37,7 +26,6 @@ extension RFC_4648.Base32.SpanWrapper {
         }
     }
 
-    /// Access to Base32-HEX encoding
     @inlinable
     public var hex: RFC_4648.Base32.Hex.SpanWrapper {
         @_lifetime(copy self)

@@ -1,15 +1,9 @@
-// HexTests.swift
-// swift-rfc-4648
-//
-// Tests for RFC 4648 Section 8: Base16 (Hexadecimal) Encoding
-
 import RFC_4648
 import Testing
 
 extension RFC_4648.Base16 {
     @Suite("Hex Encoding Tests")
     struct Test {
-        // MARK: - RFC 4648 Section 10 Test Vectors
 
         @Test(
             arguments: [
@@ -31,8 +25,6 @@ extension RFC_4648.Base16 {
             #expect(decoded == bytes, "Round-trip failed for '\(input)'")
         }
 
-        // MARK: - Case Tests
-
         @Test
         func `Hex encoding lowercase by default`() {
             let input: [Byte] = [0xFF, 0xAB, 0xCD]
@@ -49,10 +41,10 @@ extension RFC_4648.Base16 {
 
         @Test(
             arguments: [
-                "ffab",  // lowercase
-                "FFAB",  // uppercase
-                "FfAb",  // mixed case
-                "fFaB",  // random mixed case
+                "ffab",
+                "FFAB",
+                "FfAb",
+                "fFaB",
             ]
         )
         func `Hex decoding is case-insensitive`(encoded: String) {
@@ -60,8 +52,6 @@ extension RFC_4648.Base16 {
             let decoded = [Byte](hexEncoded: encoded)
             #expect(decoded == expected, "Case-insensitive decoding should work for '\(encoded)'")
         }
-
-        // MARK: - Prefix Tests
 
         @Test(
             arguments: [
@@ -77,15 +67,13 @@ extension RFC_4648.Base16 {
             #expect(decoded == expected, "'\(input)' should decode to \(expected)")
         }
 
-        // MARK: - Whitespace Handling
-
         @Test(
             arguments: [
-                "DE AD BE EF",  // spaces
-                "DE\nAD\nBE\nEF",  // newlines
-                "DE\tAD\tBE\tEF",  // tabs
-                "DE AD\nBE\tEF",  // mixed whitespace
-                "DEADBEEF",  // no whitespace
+                "DE AD BE EF",
+                "DE\nAD\nBE\nEF",
+                "DE\tAD\tBE\tEF",
+                "DE AD\nBE\tEF",
+                "DEADBEEF",
             ]
         )
         func `Hex decoding with whitespace`(input: String) {
@@ -94,22 +82,18 @@ extension RFC_4648.Base16 {
             #expect(decoded == expected, "Whitespace should be ignored in '\(input)'")
         }
 
-        // MARK: - Invalid Input Tests
-
         @Test(
             arguments: [
-                "GGGG",  // invalid hex characters
-                "FFF",  // odd length
-                "FF!!",  // special characters
-                "#FF5733",  // hash prefix (not valid)
+                "GGGG",
+                "FFF",
+                "FF!!",
+                "#FF5733",
             ]
         )
         func `Hex decoding rejects invalid input`(input: String) {
             let decoded = [Byte](hexEncoded: input)
             #expect(decoded == nil, "\(input) should be rejected")
         }
-
-        // MARK: - Binary Data Tests
 
         @Test
         func `Hex encoding all byte values`() {
@@ -151,11 +135,9 @@ extension RFC_4648.Base16 {
             #expect(decoded == input)
         }
 
-        // MARK: - Common Use Cases
-
         @Test
         func `Hex encoding SHA-256 hash`() {
-            // Typical SHA-256 hash: 32 bytes
+
             let hash: [Byte] = [
                 0xE3, 0xB0, 0xC4, 0x42, 0x98, 0xFC, 0x1C, 0x14,
                 0x9A, 0xFB, 0xF4, 0xC8, 0x99, 0x6F, 0xB9, 0x24,
@@ -164,7 +146,7 @@ extension RFC_4648.Base16 {
             ]
 
             let encoded = String.hex(hash)
-            #expect(encoded.count == 64)  // 32 bytes * 2 chars per byte
+            #expect(encoded.count == 64)
 
             let decoded = [Byte](hexEncoded: encoded)
             #expect(decoded == hash)
@@ -172,7 +154,7 @@ extension RFC_4648.Base16 {
 
         @Test
         func `Hex encoding UUID bytes`() {
-            // Typical UUID: 16 bytes
+
             let uuid: [Byte] = [
                 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0,
                 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0,
@@ -185,19 +167,17 @@ extension RFC_4648.Base16 {
 
         @Test
         func `Hex encoding color values`() {
-            // RGB color: #FF5733
+
             let color: [Byte] = [0xFF, 0x57, 0x33]
             let encoded = String.hex(color, uppercase: true)
             #expect(encoded == "FF5733")
 
             let decoded = [Byte](hexEncoded: "#FF5733")
-            #expect(decoded == nil)  // # is not valid hex
+            #expect(decoded == nil)
 
             let decoded2 = [Byte](hexEncoded: "FF5733")
             #expect(decoded2 == color)
         }
-
-        // MARK: - Edge Cases
 
         @Test
         func `Hex round-trip various sizes`() {
@@ -218,16 +198,14 @@ extension RFC_4648.Base16 {
             #expect(decoded == input)
         }
 
-        // MARK: - Format Variations
-
         @Test(
             arguments: [
-                "DEAD",  // standard uppercase
-                "0xDEAD",  // with 0x prefix
-                "DE AD",  // with spaces
-                "dead",  // lowercase
-                "DeAd",  // mixed case
-                "0xde ad",  // prefix + lowercase + spaces
+                "DEAD",
+                "0xDEAD",
+                "DE AD",
+                "dead",
+                "DeAd",
+                "0xde ad",
             ]
         )
         func `Hex decoding common format variations`(input: String) {
@@ -248,15 +226,12 @@ extension RFC_4648.Base16 {
     }
 }
 
-// MARK: - F-002 Regression Tests
-
 extension RFC_4648.Base16.Test {
     @Suite
     struct `Edge Case` {
         @Test
         func `leading whitespace before a pair does not swap its nibbles`() {
-            // Pre-fix, " DEAD" decoded to 0xED 0xAD (the first pair's
-            // nibbles swapped) instead of the correct 0xDE 0xAD.
+
             #expect([Byte](hexEncoded: " DEAD") == [0xDE, 0xAD])
         }
 
@@ -264,8 +239,7 @@ extension RFC_4648.Base16.Test {
         func
             `whitespace between prefix-shaped digits and following digits leaves an odd count invalid`()
         {
-            // "0 12": with whitespace removed this is "012" — 3 hex digits,
-            // an odd count that can never form whole bytes.
+
             #expect([Byte](hexEncoded: "0 12") == nil)
         }
 

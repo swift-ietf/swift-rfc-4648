@@ -1,8 +1,3 @@
-// DataEncodingTests.swift
-// swift-rfc-4648
-//
-// Tests for Data encoding/decoding extensions
-
 import Foundation
 import Testing
 
@@ -11,16 +6,11 @@ import Testing
 extension Data {
     @Suite("Data Encoding Tests")
     struct Test {
-        // Note: Base64 tests omitted - Foundation already provides excellent Base64 support
-        // We only test encodings that Foundation doesn't provide
-
-        // MARK: - Base64URL
 
         @Test
         func `Data Base64URL encoding`() {
             let data = Data("foobar".utf8)
 
-            // Base64URL defaults to no padding per RFC 7515
             #expect(data.base64URLEncodedString() == "Zm9vYmFy")
             #expect(data.base64URLEncodedString(padding: false) == "Zm9vYmFy")
             #expect(data.base64URLEncodedString(padding: true) == "Zm9vYmFy")
@@ -37,21 +27,17 @@ extension Data {
 
         @Test
         func `Data Base64URL handles URL-safe characters`() {
-            // Value that would produce '+' or '/' in standard Base64
+
             let data = Data([0xFF, 0xFF, 0xFF])
 
             let base64URL = data.base64URLEncodedString()
 
-            // Base64URL should use '-' and '_' instead of '+' and '/'
             #expect(!base64URL.contains("+"))
             #expect(!base64URL.contains("/"))
 
-            // Should round-trip correctly
             let decoded = Data(base64URLEncoded: base64URL)
             #expect(decoded == data)
         }
-
-        // MARK: - Base32
 
         @Test
         func `Data Base32 encoding`() {
@@ -81,8 +67,6 @@ extension Data {
             #expect(String(data: upper!, encoding: .utf8) == "foo")
         }
 
-        // MARK: - Base32-HEX
-
         @Test
         func `Data Base32-HEX encoding`() {
             let data = Data("foo".utf8)
@@ -109,12 +93,9 @@ extension Data {
 
             #expect(base32 != base32Hex)
 
-            // But both decode correctly
             #expect(Data(base32Encoded: base32) == data)
             #expect(Data(base32HexEncoded: base32Hex) == data)
         }
-
-        // MARK: - Hexadecimal
 
         @Test
         func `Data hexadecimal encoding`() {
@@ -151,8 +132,6 @@ extension Data {
 
             #expect(decoded == input)
         }
-
-        // MARK: - Empty Data
 
         @Test(
             arguments: [
@@ -206,30 +185,24 @@ extension Data {
             }
         }
 
-        // MARK: - Invalid Input
-
         @Test
         func `Invalid Base32 decoding`() {
-            #expect(Data(base32Encoded: "189") == nil)  // Base32 doesn't use 1, 8, 9
+            #expect(Data(base32Encoded: "189") == nil)
         }
 
         @Test
         func `Invalid hexadecimal decoding`() {
             #expect(Data(hexEncoded: "GHIJK") == nil)
-            #expect(Data(hexEncoded: "fff") == nil)  // Odd length
+            #expect(Data(hexEncoded: "fff") == nil)
         }
-
-        // MARK: - Large Data
 
         @Test
         func `Large data encoding and decoding`() {
             let largeData = Data((0..<10000).map { UInt8($0 % 256) })
 
-            // Base64URL
             let base64url = largeData.base64URLEncodedString()
             #expect(Data(base64URLEncoded: base64url) == largeData)
 
-            // Hex
             let hex = largeData.hexEncodedString()
             #expect(Data(hexEncoded: hex) == largeData)
         }

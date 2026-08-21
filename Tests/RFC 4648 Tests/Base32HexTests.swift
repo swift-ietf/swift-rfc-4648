@@ -1,15 +1,9 @@
-// Base32HexTests.swift
-// swift-rfc-4648
-//
-// Tests for RFC 4648 Section 7: Base32-HEX Encoding (Extended Hex Alphabet)
-
 import RFC_4648
 import Testing
 
 extension RFC_4648.Base32.Hex {
     @Suite("Base32-HEX Encoding Tests")
     struct Test {
-        // MARK: - RFC 4648 Section 10 Test Vectors
 
         @Test(
             arguments: [
@@ -31,8 +25,6 @@ extension RFC_4648.Base32.Hex {
             #expect(decoded == bytes, "Round-trip failed for '\(input)'")
         }
 
-        // MARK: - Alphabet Tests
-
         @Test
         func `Base32-HEX uses correct alphabet (0-9, A-V)`() {
             let input: [Byte] = [Byte]("The quick brown fox jumps over the lazy dog".utf8)
@@ -51,22 +43,18 @@ extension RFC_4648.Base32.Hex {
             let base32 = String.base32(input, padding: false)
             let base32hex = String.base32.hex(input, padding: false)
 
-            // Different encodings
             #expect(base32 != base32hex)
 
-            // But both decode correctly
             #expect([Byte](base32Encoded: base32) == input)
             #expect([Byte](base32HexEncoded: base32hex) == input)
         }
 
-        // MARK: - Case Insensitivity Tests
-
         @Test(
             arguments: [
-                "CPNMU===",  // uppercase
-                "cpnmu===",  // lowercase
-                "CpNmU===",  // mixed case
-                "cPnMu===",  // random mixed case
+                "CPNMU===",
+                "cpnmu===",
+                "CpNmU===",
+                "cPnMu===",
             ]
         )
         func `Base32-HEX decoding is case-insensitive`(encoded: String) {
@@ -80,7 +68,6 @@ extension RFC_4648.Base32.Hex {
             let input: [Byte] = [Byte]("hello".utf8)
             let encoded = String.base32.hex(input)
 
-            // All letters should be uppercase (A-V)
             for char in encoded {
                 if char.isLetter {
                     #expect(char.isUppercase)
@@ -88,14 +75,12 @@ extension RFC_4648.Base32.Hex {
             }
         }
 
-        // MARK: - Padding Tests
-
         @Test(
             arguments: [
-                ([Byte]("f".utf8), false, "CO", false),  // no padding
-                ([Byte]("f".utf8), true, "CO======", true),  // with padding
-                ([Byte]("foo".utf8), false, "CPNMU", false),  // no padding
-                ([Byte]("foo".utf8), true, "CPNMU===", true),  // with padding
+                ([Byte]("f".utf8), false, "CO", false),
+                ([Byte]("f".utf8), true, "CO======", true),
+                ([Byte]("foo".utf8), false, "CPNMU", false),
+                ([Byte]("foo".utf8), true, "CPNMU===", true),
             ]
         )
         func `Base32-HEX padding variations`(
@@ -108,23 +93,16 @@ extension RFC_4648.Base32.Hex {
             #expect(encoded == expectedEncoded)
             #expect(encoded.contains("=") == shouldHavePadding)
 
-            // Decoding should work both with and without padding
             let decoded = [Byte](base32HexEncoded: encoded)
             #expect(decoded == input)
         }
 
-        // MARK: - Whitespace Handling
-
-        // Each vector is a single "foobar" payload ("CPNMUOJ1E8======") with
-        // whitespace inserted between its two quintet groups — not two
-        // independently-padded groups concatenated (a padded group must
-        // terminate the stream; see swift-rfc-4648's F-001 fix).
         @Test(
             arguments: [
-                "CPNMUOJ1\nE8======",  // newline
-                "CPNMUOJ1\t\tE8======",  // tabs
-                "CPNMUOJ1 E8======",  // space
-                "CPNMUOJ1 \t E8======",  // mixed
+                "CPNMUOJ1\nE8======",
+                "CPNMUOJ1\t\tE8======",
+                "CPNMUOJ1 E8======",
+                "CPNMUOJ1 \t E8======",
             ]
         )
         func `Base32-HEX whitespace handling`(input: String) {
@@ -132,15 +110,13 @@ extension RFC_4648.Base32.Hex {
             #expect(decoded == [Byte]("foobar".utf8), "Whitespace should be ignored in '\(input)'")
         }
 
-        // MARK: - Invalid Input Tests
-
         @Test(
             arguments: [
-                "CPNMW===",  // Base32-HEX doesn't use W
-                "CPNMZ===",  // Base32-HEX doesn't use Z
-                "C",  // invalid length (too short)
-                "CPNM!@#$",  // special characters
-                "========",  // only padding
+                "CPNMW===",
+                "CPNMZ===",
+                "C",
+                "CPNM!@#$",
+                "========",
             ]
         )
         func `Base32-HEX decoding rejects invalid input`(input: String) {
@@ -148,14 +124,12 @@ extension RFC_4648.Base32.Hex {
             #expect(decoded == nil, "\(input) should be rejected")
         }
 
-        // MARK: - Binary Data Tests
-
         @Test(
             arguments: [
-                ([0x00, 0xFF, 0x80, 0x7F], nil),  // mixed binary
-                ([0x00, 0x00, 0x00, 0x00, 0x00], "00000000"),  // all zeros
-                ([0x00, 0x01, 0x02, 0x03, 0x04], nil),  // sequential
-                ([0xFF, 0xFF, 0xFF, 0xFF, 0xFF], nil),  // all ones
+                ([0x00, 0xFF, 0x80, 0x7F], nil),
+                ([0x00, 0x00, 0x00, 0x00, 0x00], "00000000"),
+                ([0x00, 0x01, 0x02, 0x03, 0x04], nil),
+                ([0xFF, 0xFF, 0xFF, 0xFF, 0xFF], nil),
             ]
         )
         func `Base32-HEX binary data patterns`(input: [Byte], expectedEncoded: String?) {
@@ -168,8 +142,6 @@ extension RFC_4648.Base32.Hex {
             let decoded = [Byte](base32HexEncoded: encoded)
             #expect(decoded == input)
         }
-
-        // MARK: - Edge Cases
 
         @Test
         func `Base32-HEX round-trip various sizes`() {
@@ -190,11 +162,9 @@ extension RFC_4648.Base32.Hex {
             #expect(decoded == input)
         }
 
-        // MARK: - Lexicographic Ordering
-
         @Test
         func `Base32-HEX maintains lexicographic order`() {
-            // Base32-HEX is designed so encoded values maintain the same order as input
+
             let input1: [Byte] = [0x00]
             let input2: [Byte] = [0x01]
             let input3: [Byte] = [0xFF]
@@ -203,14 +173,11 @@ extension RFC_4648.Base32.Hex {
             let encoded2 = String.base32.hex(input2, padding: false)
             let encoded3 = String.base32.hex(input3, padding: false)
 
-            // Lexicographic order should be preserved
             #expect(encoded1 < encoded2)
             #expect(encoded2 < encoded3)
         }
     }
 }
-
-// MARK: - F-003 Regression Tests (decode(as:) octet semantics)
 
 extension RFC_4648.Base32.Hex.Test {
     @Suite
@@ -230,7 +197,7 @@ extension RFC_4648.Base32.Hex.Test {
 
         @Test
         func `decode(as:) rejects a byte count that does not match the target width`() throws {
-            let encoded = String.base32.hex(UInt32(123_456))  // 4 bytes
+            let encoded = String.base32.hex(UInt32(123_456))
             let codes = try [ASCII.Code](encoded.utf8)
             #expect(RFC_4648.Base32.Hex.decode(codes, as: UInt8.self) == nil)
             #expect(RFC_4648.Base32.Hex.decode(codes, as: UInt64.self) == nil)

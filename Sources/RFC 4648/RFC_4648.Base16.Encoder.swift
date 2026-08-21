@@ -1,23 +1,8 @@
-//
-//  RFC_4648.Base16.Encoder.swift
-//  swift-rfc-4648
-//
-//  Base16 Encoder for String.hex(bytes) syntax
-
 import ASCII_Primitives
 public import Binary_Primitives
 
-// MARK: - Encoder (for String.hex(...) syntax)
-
 extension RFC_4648.Base16 {
-    /// Encoder for `String.hex(bytes)` syntax
-    ///
-    /// ## Usage
-    ///
-    /// ```swift
-    /// let encoded = String.hex([0xde, 0xad, 0xbe, 0xef])  // "deadbeef"
-    /// let encoded = String.hex([0xde, 0xad], uppercase: true)  // "DEAD"
-    /// ```
+
     public struct Encoder: Sendable {
         @inlinable
         public init() {}
@@ -25,7 +10,7 @@ extension RFC_4648.Base16 {
 }
 
 extension RFC_4648.Base16.Encoder {
-    /// Encodes bytes to hexadecimal string
+
     @inlinable
     public func callAsFunction<Bytes: Collection>(
         _ bytes: Bytes,
@@ -35,13 +20,6 @@ extension RFC_4648.Base16.Encoder {
         return String(decoding: encoded, as: UTF8.self)
     }
 
-    /// Encodes an integer to hexadecimal string (big-endian byte order)
-    ///
-    /// - Parameters:
-    ///   - value: The integer to encode
-    ///   - prefix: Optional prefix (default: "0x")
-    ///   - uppercase: Whether to use uppercase hex digits (default: false)
-    /// - Returns: Prefixed hexadecimal string
     @inlinable
     public func callAsFunction<T: FixedWidthInteger>(
         _ value: T,
