@@ -1,4 +1,4 @@
-public import ASCII_Primitives
+public import ASCII
 import Standard_Library_Extensions
 
 public enum RFC_4648 {}

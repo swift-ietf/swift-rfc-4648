@@ -1,4 +1,4 @@
-public import Binary_Primitives
+public import Binary
 import Standard_Library_Extensions
 
 extension FixedWidthInteger {

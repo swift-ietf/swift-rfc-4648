@@ -1,5 +1,5 @@
-import ASCII_Primitives
-public import Binary_Primitives
+import ASCII
+public import Binary
 
 extension RFC_4648 {
 

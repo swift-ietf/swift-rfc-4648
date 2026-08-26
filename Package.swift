@@ -16,15 +16,15 @@ let package = Package(
     ],
     dependencies: [
         .package(
-            url: "https://github.com/swift-primitives/swift-standard-library-extensions.git",
+            url: "https://github.com/swift-molecules/swift-standard-library-extensions.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-binary-primitives.git",
+            url: "https://github.com/swift-molecules/swift-binary.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-ascii-primitives.git",
+            url: "https://github.com/swift-molecules/swift-ascii.git",
             branch: "main"
         ),
     ],
@@ -36,8 +36,8 @@ let package = Package(
                     name: "Standard Library Extensions",
                     package: "swift-standard-library-extensions"
                 ),
-                .product(name: "Binary Primitives", package: "swift-binary-primitives"),
-                .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
+                .product(name: "Binary", package: "swift-binary"),
+                .product(name: "ASCII", package: "swift-ascii"),
             ],
             swiftSettings: [
                 .enableExperimentalFeature("Lifetimes")

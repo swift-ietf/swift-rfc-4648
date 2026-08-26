@@ -1,4 +1,4 @@
-import ASCII_Primitives
+import ASCII
 
 extension Span where Element == Byte {
 
