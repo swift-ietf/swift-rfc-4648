@@ -195,7 +195,7 @@ struct BinaryIntegerEncodingTests {
     func `Big-endian byte order across all encodings`() {
         let value = UInt32(0x1234_5678)
 
-        let expectedBytes: [Byte] = [0x12, 0x34, 0x56, 0x78]
+        let expectedBytes: [Byte] = ([0x12, 0x34, 0x56, 0x78] as [UInt8]).map(Byte.init(bitPattern:))
 
         let hex = String.hex(value, prefix: "")
         #expect(hex == "12345678")

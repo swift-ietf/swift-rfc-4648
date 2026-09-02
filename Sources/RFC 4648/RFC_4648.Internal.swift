@@ -15,9 +15,9 @@ extension RFC_4648 {
 
         while let b1Byte = iterator.next() {
 
-            let b1 = b1Byte.underlying
-            let b2 = iterator.next()?.underlying
-            let b3 = iterator.next()?.underlying
+            let b1 = b1Byte.bitPattern
+            let b2 = iterator.next()?.bitPattern
+            let b3 = iterator.next()?.bitPattern
 
             buffer.append(table[Int((b1 >> 2) & 0x3F)])
 
@@ -111,15 +111,15 @@ extension RFC_4648 {
                 }
             }
 
-            buffer.append(Byte((values[0] << 2) | (values[1] >> 4)))
+            buffer.append(Byte(bitPattern: (values[0] << 2) | (values[1] >> 4)))
 
             if values.count >= 3 {
 
-                buffer.append(Byte((values[1] << 4) | (values[2] >> 2)))
+                buffer.append(Byte(bitPattern: (values[1] << 4) | (values[2] >> 2)))
 
                 if values.count >= 4 {
 
-                    buffer.append(Byte((values[2] << 6) | values[3]))
+                    buffer.append(Byte(bitPattern: (values[2] << 6) | values[3]))
                 }
             }
 
@@ -148,11 +148,11 @@ extension RFC_4648 {
 
         while let b1Byte = iterator.next() {
 
-            let b1 = b1Byte.underlying
-            let b2 = iterator.next()?.underlying
-            let b3 = iterator.next()?.underlying
-            let b4 = iterator.next()?.underlying
-            let b5 = iterator.next()?.underlying
+            let b1 = b1Byte.bitPattern
+            let b2 = iterator.next()?.bitPattern
+            let b3 = iterator.next()?.bitPattern
+            let b4 = iterator.next()?.bitPattern
+            let b5 = iterator.next()?.bitPattern
 
             buffer.append(table[Int((b1 >> 3) & 0x1F)])
 
@@ -277,26 +277,30 @@ extension RFC_4648 {
                 }
             }
 
-            buffer.append(Byte((values[0] << 3) | (values[1] >> 2)))
+            buffer.append(Byte(bitPattern: (values[0] << 3) | (values[1] >> 2)))
 
             if values.count >= 4 {
 
-                buffer.append(Byte((values[1] << 6) | (values[2] << 1) | (values[3] >> 4)))
+                buffer.append(
+                    Byte(bitPattern: (values[1] << 6) | (values[2] << 1) | (values[3] >> 4))
+                )
             }
 
             if values.count >= 5 {
 
-                buffer.append(Byte((values[3] << 4) | (values[4] >> 1)))
+                buffer.append(Byte(bitPattern: (values[3] << 4) | (values[4] >> 1)))
             }
 
             if values.count >= 7 {
 
-                buffer.append(Byte((values[4] << 7) | (values[5] << 2) | (values[6] >> 3)))
+                buffer.append(
+                    Byte(bitPattern: (values[4] << 7) | (values[5] << 2) | (values[6] >> 3))
+                )
             }
 
             if values.count >= 8 {
 
-                buffer.append(Byte((values[6] << 5) | values[7]))
+                buffer.append(Byte(bitPattern: (values[6] << 5) | values[7]))
             }
 
             if values.count < 8 {

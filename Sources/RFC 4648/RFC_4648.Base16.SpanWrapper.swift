@@ -20,7 +20,8 @@ extension RFC_4648.Base16.SpanWrapper {
     public func encoded(uppercase: Bool = false) -> String {
         span.withUnsafeBufferPointer { buffer in
             unsafe String(
-                decoding: RFC_4648.Base16.encode(buffer, uppercase: uppercase) as [ASCII.Code],
+                decoding: (RFC_4648.Base16.encode(buffer, uppercase: uppercase) as [ASCII.Code])
+                    .map(\.underlying),
                 as: UTF8.self
             )
         }

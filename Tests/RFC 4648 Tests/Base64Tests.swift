@@ -17,7 +17,7 @@ extension RFC_4648.Base64 {
             ]
         )
         func `RFC 4648 test vectors`(input: String, expected: String) {
-            let bytes = [Byte](input.utf8)
+            let bytes = input.utf8.map(Byte.init(bitPattern:))
             let encoded = String.base64(bytes)
             #expect(encoded == expected, "Encoding '\(input)' should produce '\(expected)'")
 
@@ -27,11 +27,11 @@ extension RFC_4648.Base64 {
 
         @Test(
             arguments: [
-                ([Byte]("f".utf8), false, "Zg", [Byte]?.none),
-                ([Byte]("f".utf8), true, "Zg==", [Byte]("f".utf8)),
-                ([Byte]("fo".utf8), false, "Zm8", [Byte]?.none),
-                ([Byte]("fo".utf8), true, "Zm8=", [Byte]("fo".utf8)),
-                ([Byte]("foo".utf8), false, "Zm9v", [Byte]("foo".utf8)),
+                ("f".utf8.map(Byte.init(bitPattern:)), false, "Zg", [Byte]?.none),
+                ("f".utf8.map(Byte.init(bitPattern:)), true, "Zg==", "f".utf8.map(Byte.init(bitPattern:))),
+                ("fo".utf8.map(Byte.init(bitPattern:)), false, "Zm8", [Byte]?.none),
+                ("fo".utf8.map(Byte.init(bitPattern:)), true, "Zm8=", "fo".utf8.map(Byte.init(bitPattern:))),
+                ("foo".utf8.map(Byte.init(bitPattern:)), false, "Zm9v", "foo".utf8.map(Byte.init(bitPattern:))),
 
             ]
         )
@@ -58,7 +58,7 @@ extension RFC_4648.Base64 {
         )
         func `Base64 decoding with whitespace`(input: String) {
             let decoded = [Byte](base64Encoded: input)
-            #expect(decoded == [Byte]("foobar".utf8), "Whitespace should be ignored")
+            #expect(decoded == "foobar".utf8.map(Byte.init(bitPattern:)), "Whitespace should be ignored")
         }
 
         @Test(
@@ -76,9 +76,9 @@ extension RFC_4648.Base64 {
 
         @Test(
             arguments: [
-                ([0x00, 0xFF, 0x80, 0x7F], nil),
-                ([0x00, 0x00, 0x00], "AAAA"),
-                ([0xFF, 0xFF, 0xFF], "////"),
+                (([0x00, 0xFF, 0x80, 0x7F] as [UInt8]).map(Byte.init(bitPattern:)), nil),
+                (([0x00, 0x00, 0x00] as [UInt8]).map(Byte.init(bitPattern:)), "AAAA"),
+                (([0xFF, 0xFF, 0xFF] as [UInt8]).map(Byte.init(bitPattern:)), "////"),
             ]
         )
         func `Base64 binary data patterns`(input: [Byte], expectedEncoded: String?) {
@@ -95,7 +95,7 @@ extension RFC_4648.Base64 {
         @Test
         func `Base64 round-trip long string`() {
             let longString = String(repeating: "Hello, World! ", count: 100)
-            let input = [Byte](longString.utf8)
+            let input = longString.utf8.map(Byte.init(bitPattern:))
             let encoded = String.base64(input)
             let decoded = [Byte](base64Encoded: encoded)
             #expect(decoded == input)
@@ -122,8 +122,8 @@ extension RFC_4648.Base64.Test {
 
         @Test
         func `whitespace decoding produces the exact expected bytes`() {
-            #expect([Byte](base64Encoded: "Zm9v\nYmFy") == [Byte]("foobar".utf8))
-            #expect([Byte](base64Encoded: "Zm9v YmFy") == [Byte]("foobar".utf8))
+            #expect([Byte](base64Encoded: "Zm9v\nYmFy") == "foobar".utf8.map(Byte.init(bitPattern:)))
+            #expect([Byte](base64Encoded: "Zm9v YmFy") == "foobar".utf8.map(Byte.init(bitPattern:)))
         }
     }
 }
@@ -146,10 +146,10 @@ extension RFC_4648.Base64.Test.`Edge Case` {
     @Test
     func `strict strictness rejects nonzero trailing padding bits`() {
 
-        #expect(RFC_4648.Base64.decode("AB==", strictness: .lenient) == [0x00])
+        #expect(RFC_4648.Base64.decode("AB==", strictness: .lenient) == ([0x00] as [UInt8]).map(Byte.init(bitPattern:)))
         #expect(RFC_4648.Base64.decode("AB==", strictness: .strict) == nil)
 
-        #expect(RFC_4648.Base64.decode("AA==", strictness: .strict) == [0x00])
+        #expect(RFC_4648.Base64.decode("AA==", strictness: .strict) == ([0x00] as [UInt8]).map(Byte.init(bitPattern:)))
     }
 }
 
@@ -157,7 +157,7 @@ extension RFC_4648.Base64.Test.`Edge Case` {
     @Test
     func `decode(as:) matches the documented doc-example value`() throws {
 
-        let value: UInt32? = RFC_4648.Base64.decode(try [ASCII.Code]("AQIDBA==".utf8))
+        let value: UInt32? = RFC_4648.Base64.decode(try "AQIDBA==".utf8.map { try ASCII.Code(Byte(bitPattern: $0)) })
         #expect(value == 0x0102_0304)
     }
 
@@ -165,7 +165,7 @@ extension RFC_4648.Base64.Test.`Edge Case` {
     func `decode(as:) matches octet semantics of the FixedWidthInteger init family`() throws {
         let value = UInt32(123_456)
         let encoded = String.base64(value)
-        let codes = try [ASCII.Code](encoded.utf8)
+        let codes = try encoded.utf8.map { try ASCII.Code(Byte(bitPattern: $0)) }
 
         #expect(RFC_4648.Base64.decode(codes, as: UInt32.self) == value)
         #expect(RFC_4648.Base64.decode(codes, as: UInt32.self) == UInt32(base64Encoded: encoded))
@@ -174,7 +174,7 @@ extension RFC_4648.Base64.Test.`Edge Case` {
     @Test
     func `decode(as:) rejects a byte count that does not match the target width`() throws {
         let encoded = String.base64(UInt32(123_456))
-        let codes = try [ASCII.Code](encoded.utf8)
+        let codes = try encoded.utf8.map { try ASCII.Code(Byte(bitPattern: $0)) }
         #expect(RFC_4648.Base64.decode(codes, as: UInt8.self) == nil)
         #expect(RFC_4648.Base64.decode(codes, as: UInt64.self) == nil)
     }

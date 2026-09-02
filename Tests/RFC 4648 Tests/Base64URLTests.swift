@@ -8,7 +8,7 @@ extension RFC_4648.Base64.URL {
         @Test(
             arguments: [
                 ([], ""),
-                ([Byte]("hello".utf8), nil),
+                ("hello".utf8.map(Byte.init(bitPattern:)), nil),
             ]
         )
         func `Base64URL basic patterns`(input: [Byte], expectedEncoded: String?) {
@@ -25,7 +25,7 @@ extension RFC_4648.Base64.URL {
         @Test
         func `Base64URL uses URL-safe characters`() {
 
-            let input: [Byte] = [0xFB, 0xFF, 0xFF]
+            let input: [Byte] = ([0xFB, 0xFF, 0xFF] as [UInt8]).map(Byte.init(bitPattern:))
             let encoded = String.base64.url(input)
 
             #expect(encoded.contains("-") || encoded.contains("_"))
@@ -39,7 +39,7 @@ extension RFC_4648.Base64.URL {
         @Test
         func `Base64URL with special chars`() {
 
-            let input: [Byte] = [0xFF, 0xFF]
+            let input: [Byte] = ([0xFF, 0xFF] as [UInt8]).map(Byte.init(bitPattern:))
             let encoded = String.base64.url(input)
 
             #expect(encoded.contains("_"))
@@ -48,11 +48,11 @@ extension RFC_4648.Base64.URL {
 
         @Test(
             arguments: [
-                ([Byte]("f".utf8), false, "Zg", false),
-                ([Byte]("f".utf8), true, "Zg==", true),
-                ([Byte]("fo".utf8), false, "Zm8", false),
-                ([Byte]("fo".utf8), true, "Zm8=", true),
-                ([Byte]("foo".utf8), false, "Zm9v", false),
+                ("f".utf8.map(Byte.init(bitPattern:)), false, "Zg", false),
+                ("f".utf8.map(Byte.init(bitPattern:)), true, "Zg==", true),
+                ("fo".utf8.map(Byte.init(bitPattern:)), false, "Zm8", false),
+                ("fo".utf8.map(Byte.init(bitPattern:)), true, "Zm8=", true),
+                ("foo".utf8.map(Byte.init(bitPattern:)), false, "Zm9v", false),
             ]
         )
         func `Base64URL padding variations`(
@@ -73,7 +73,7 @@ extension RFC_4648.Base64.URL {
         func `Base64URL decoding with whitespace`() {
             let input = "Zm9v\nYmFy"
             let decoded = [Byte](base64URLEncoded: input)
-            #expect(decoded == [Byte]("foobar".utf8))
+            #expect(decoded == "foobar".utf8.map(Byte.init(bitPattern:)))
         }
 
         @Test(
@@ -92,7 +92,7 @@ extension RFC_4648.Base64.URL {
         @Test
         func `Base64URL JWT header example`() {
 
-            let headerJSON = [Byte]("{\"alg\":\"HS256\",\"typ\":\"JWT\"}".utf8)
+            let headerJSON = "{\"alg\":\"HS256\",\"typ\":\"JWT\"}".utf8.map(Byte.init(bitPattern:))
             let encoded = String.base64.url(headerJSON, padding: false)
 
             #expect(!encoded.contains("+"))
@@ -105,7 +105,7 @@ extension RFC_4648.Base64.URL {
 
         @Test
         func `Base64URL binary data`() {
-            let input: [Byte] = [0x00, 0xFF, 0x80, 0x7F, 0x3E, 0x3F]
+            let input: [Byte] = ([0x00, 0xFF, 0x80, 0x7F, 0x3E, 0x3F] as [UInt8]).map(Byte.init(bitPattern:))
             let encoded = String.base64.url(input)
             let decoded = [Byte](base64URLEncoded: encoded)
             #expect(decoded == input)
@@ -114,7 +114,7 @@ extension RFC_4648.Base64.URL {
         @Test
         func `Base64URL all special characters`() {
 
-            let input: [Byte] = [0xFF, 0xEF, 0xFF, 0xEF]
+            let input: [Byte] = ([0xFF, 0xEF, 0xFF, 0xEF] as [UInt8]).map(Byte.init(bitPattern:))
             let encoded = String.base64.url(input)
 
             if encoded.contains("_") {
@@ -131,7 +131,7 @@ extension RFC_4648.Base64.URL {
         @Test
         func `Base64URL round-trip long string`() {
             let longString = String(repeating: "Hello, World! ", count: 100)
-            let input = [Byte](longString.utf8)
+            let input = longString.utf8.map(Byte.init(bitPattern:))
             let encoded = String.base64.url(input, padding: false)
             let decoded = [Byte](base64URLEncoded: encoded)
             #expect(decoded == input)
@@ -139,7 +139,7 @@ extension RFC_4648.Base64.URL {
 
         @Test
         func `Base64URL produces different output than Base64 for special chars`() {
-            let input: [Byte] = [0xFF, 0xFF]
+            let input: [Byte] = ([0xFF, 0xFF] as [UInt8]).map(Byte.init(bitPattern:))
 
             let base64 = String.base64(input, padding: true)
             let base64url = String.base64.url(input, padding: false)
@@ -159,7 +159,7 @@ extension RFC_4648.Base64.URL.Test {
         func `decode(as:) matches octet semantics of the FixedWidthInteger init family`() throws {
             let value = UInt32(123_456)
             let encoded = String.base64.url(value)
-            let codes = try [ASCII.Code](encoded.utf8)
+            let codes = try encoded.utf8.map { try ASCII.Code(Byte(bitPattern: $0)) }
 
             #expect(RFC_4648.Base64.URL.decode(codes, as: UInt32.self) == value)
             #expect(
@@ -171,7 +171,7 @@ extension RFC_4648.Base64.URL.Test {
         @Test
         func `decode(as:) rejects a byte count that does not match the target width`() throws {
             let encoded = String.base64.url(UInt32(123_456))
-            let codes = try [ASCII.Code](encoded.utf8)
+            let codes = try encoded.utf8.map { try ASCII.Code(Byte(bitPattern: $0)) }
             #expect(RFC_4648.Base64.URL.decode(codes, as: UInt8.self) == nil)
             #expect(RFC_4648.Base64.URL.decode(codes, as: UInt64.self) == nil)
         }

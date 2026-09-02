@@ -20,7 +20,8 @@ extension RFC_4648.Base32.Hex.SpanWrapper {
     public func encoded(padding: Bool = true) -> String {
         span.withUnsafeBufferPointer { buffer in
             unsafe String(
-                decoding: RFC_4648.Base32.Hex.encode(buffer, padding: padding) as [ASCII.Code],
+                decoding: (RFC_4648.Base32.Hex.encode(buffer, padding: padding) as [ASCII.Code])
+                    .map(\.underlying),
                 as: UTF8.self
             )
         }

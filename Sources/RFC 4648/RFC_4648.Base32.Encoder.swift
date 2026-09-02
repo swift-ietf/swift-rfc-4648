@@ -1,5 +1,6 @@
 import ASCII
-public import Binary
+public import Binary_Endianness
+public import Binary_Standard_Library_Integration
 
 extension RFC_4648.Base32 {
 
@@ -16,7 +17,8 @@ extension RFC_4648.Base32.Encoder {
         _ bytes: Bytes,
         padding: Bool = true
     ) -> String where Bytes.Element == Byte {
-        String(decoding: RFC_4648.Base32.encode(bytes, padding: padding), as: UTF8.self)
+        let codes: [ASCII.Code] = RFC_4648.Base32.encode(bytes, padding: padding)
+        return String(decoding: codes.map(\.underlying), as: UTF8.self)
     }
 
     @inlinable

@@ -17,7 +17,7 @@ extension RFC_4648.Base16 {
             ]
         )
         func `RFC 4648 test vectors`(input: String, expected: String) {
-            let bytes = [Byte](input.utf8)
+            let bytes = input.utf8.map(Byte.init(bitPattern:))
             let encoded = String.hex(bytes)
             #expect(encoded == expected, "Encoding '\(input)' should produce '\(expected)'")
 
@@ -27,14 +27,14 @@ extension RFC_4648.Base16 {
 
         @Test
         func `Hex encoding lowercase by default`() {
-            let input: [Byte] = [0xFF, 0xAB, 0xCD]
+            let input: [Byte] = ([0xFF, 0xAB, 0xCD] as [UInt8]).map(Byte.init(bitPattern:))
             let encoded = String.hex(input)
             #expect(encoded == "ffabcd")
         }
 
         @Test
         func `Hex encoding uppercase when requested`() {
-            let input: [Byte] = [0xFF, 0xAB, 0xCD]
+            let input: [Byte] = ([0xFF, 0xAB, 0xCD] as [UInt8]).map(Byte.init(bitPattern:))
             let encoded = String.hex(input, uppercase: true)
             #expect(encoded == "FFABCD")
         }
@@ -48,18 +48,18 @@ extension RFC_4648.Base16 {
             ]
         )
         func `Hex decoding is case-insensitive`(encoded: String) {
-            let expected: [Byte] = [0xFF, 0xAB]
+            let expected: [Byte] = ([0xFF, 0xAB] as [UInt8]).map(Byte.init(bitPattern:))
             let decoded = [Byte](hexEncoded: encoded)
             #expect(decoded == expected, "Case-insensitive decoding should work for '\(encoded)'")
         }
 
         @Test(
             arguments: [
-                ("0xFF", [0xFF]),
-                ("0XFF", [0xFF]),
-                ("FF", [0xFF]),
-                ("0xDEADBEEF", [0xDE, 0xAD, 0xBE, 0xEF]),
-                ("0Xdeadbeef", [0xDE, 0xAD, 0xBE, 0xEF]),
+                ("0xFF", ([0xFF] as [UInt8]).map(Byte.init(bitPattern:))),
+                ("0XFF", ([0xFF] as [UInt8]).map(Byte.init(bitPattern:))),
+                ("FF", ([0xFF] as [UInt8]).map(Byte.init(bitPattern:))),
+                ("0xDEADBEEF", ([0xDE, 0xAD, 0xBE, 0xEF] as [UInt8]).map(Byte.init(bitPattern:))),
+                ("0Xdeadbeef", ([0xDE, 0xAD, 0xBE, 0xEF] as [UInt8]).map(Byte.init(bitPattern:))),
             ]
         )
         func `Hex decoding with various prefix formats`(input: String, expected: [Byte]) {
@@ -77,7 +77,7 @@ extension RFC_4648.Base16 {
             ]
         )
         func `Hex decoding with whitespace`(input: String) {
-            let expected: [Byte] = [0xDE, 0xAD, 0xBE, 0xEF]
+            let expected: [Byte] = ([0xDE, 0xAD, 0xBE, 0xEF] as [UInt8]).map(Byte.init(bitPattern:))
             let decoded = [Byte](hexEncoded: input)
             #expect(decoded == expected, "Whitespace should be ignored in '\(input)'")
         }
@@ -98,7 +98,7 @@ extension RFC_4648.Base16 {
         @Test
         func `Hex encoding all byte values`() {
             for byte in 0...255 {
-                let input: [Byte] = [Byte(UInt8(byte))]
+                let input: [Byte] = [Byte(bitPattern: UInt8(byte))]
                 let encoded = String.hex(input)
                 let decoded = [Byte](hexEncoded: encoded)
                 #expect(decoded == input)
@@ -107,7 +107,7 @@ extension RFC_4648.Base16 {
 
         @Test
         func `Hex encoding all zeros`() {
-            let input: [Byte] = [0x00, 0x00, 0x00]
+            let input: [Byte] = ([0x00, 0x00, 0x00] as [UInt8]).map(Byte.init(bitPattern:))
             let encoded = String.hex(input)
             #expect(encoded == "000000")
 
@@ -117,7 +117,7 @@ extension RFC_4648.Base16 {
 
         @Test
         func `Hex encoding all ones`() {
-            let input: [Byte] = [0xFF, 0xFF, 0xFF]
+            let input: [Byte] = ([0xFF, 0xFF, 0xFF] as [UInt8]).map(Byte.init(bitPattern:))
             let encoded = String.hex(input)
             #expect(encoded == "ffffff")
 
@@ -127,7 +127,7 @@ extension RFC_4648.Base16 {
 
         @Test
         func `Hex encoding sequential bytes`() {
-            let input: [Byte] = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05]
+            let input: [Byte] = ([0x00, 0x01, 0x02, 0x03, 0x04, 0x05] as [UInt8]).map(Byte.init(bitPattern:))
             let encoded = String.hex(input)
             #expect(encoded == "000102030405")
 
@@ -138,12 +138,12 @@ extension RFC_4648.Base16 {
         @Test
         func `Hex encoding SHA-256 hash`() {
 
-            let hash: [Byte] = [
+            let hash: [Byte] = ([
                 0xE3, 0xB0, 0xC4, 0x42, 0x98, 0xFC, 0x1C, 0x14,
                 0x9A, 0xFB, 0xF4, 0xC8, 0x99, 0x6F, 0xB9, 0x24,
                 0x27, 0xAE, 0x41, 0xE4, 0x64, 0x9B, 0x93, 0x4C,
                 0xA4, 0x95, 0x99, 0x1B, 0x78, 0x52, 0xB8, 0x55,
-            ]
+            ] as [UInt8]).map(Byte.init(bitPattern:))
 
             let encoded = String.hex(hash)
             #expect(encoded.count == 64)
@@ -155,10 +155,10 @@ extension RFC_4648.Base16 {
         @Test
         func `Hex encoding UUID bytes`() {
 
-            let uuid: [Byte] = [
+            let uuid: [Byte] = ([
                 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0,
                 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0,
-            ]
+            ] as [UInt8]).map(Byte.init(bitPattern:))
 
             let encoded = String.hex(uuid)
             let decoded = [Byte](hexEncoded: encoded)
@@ -168,7 +168,7 @@ extension RFC_4648.Base16 {
         @Test
         func `Hex encoding color values`() {
 
-            let color: [Byte] = [0xFF, 0x57, 0x33]
+            let color: [Byte] = ([0xFF, 0x57, 0x33] as [UInt8]).map(Byte.init(bitPattern:))
             let encoded = String.hex(color, uppercase: true)
             #expect(encoded == "FF5733")
 
@@ -182,7 +182,7 @@ extension RFC_4648.Base16 {
         @Test
         func `Hex round-trip various sizes`() {
             for size in [1, 2, 10, 100, 1000] {
-                let input: [Byte] = (0..<size).map { Byte(UInt8($0 % 256)) }
+                let input: [Byte] = (0..<size).map { Byte(bitPattern: UInt8($0 % 256)) }
                 let encoded = String.hex(input)
                 let decoded = [Byte](hexEncoded: encoded)
                 #expect(decoded == input)
@@ -192,7 +192,7 @@ extension RFC_4648.Base16 {
         @Test
         func `Hex round-trip long string`() {
             let longString = String(repeating: "Hello, World! ", count: 100)
-            let input = [Byte](longString.utf8)
+            let input = longString.utf8.map(Byte.init(bitPattern:))
             let encoded = String.hex(input)
             let decoded = [Byte](hexEncoded: encoded)
             #expect(decoded == input)
@@ -209,14 +209,14 @@ extension RFC_4648.Base16 {
             ]
         )
         func `Hex decoding common format variations`(input: String) {
-            let expected: [Byte] = [0xDE, 0xAD]
+            let expected: [Byte] = ([0xDE, 0xAD] as [UInt8]).map(Byte.init(bitPattern:))
             let decoded = [Byte](hexEncoded: input)
             #expect(decoded == expected, "'\(input)' should decode to \(expected)")
         }
 
         @Test
         func `Hex encoding produces consistent output`() {
-            let input: [Byte] = [0xAB, 0xCD, 0xEF]
+            let input: [Byte] = ([0xAB, 0xCD, 0xEF] as [UInt8]).map(Byte.init(bitPattern:))
 
             let encoded1 = String.hex(input)
             let encoded2 = String.hex(input)
@@ -232,7 +232,7 @@ extension RFC_4648.Base16.Test {
         @Test
         func `leading whitespace before a pair does not swap its nibbles`() {
 
-            #expect([Byte](hexEncoded: " DEAD") == [0xDE, 0xAD])
+            #expect([Byte](hexEncoded: " DEAD") == ([0xDE, 0xAD] as [UInt8]).map(Byte.init(bitPattern:)))
         }
 
         @Test
@@ -245,8 +245,8 @@ extension RFC_4648.Base16.Test {
 
         @Test
         func `whitespace adjacent to the 0x prefix is skipped like any other whitespace`() {
-            #expect([Byte](hexEncoded: "0x DEAD") == [0xDE, 0xAD])
-            #expect([Byte](hexEncoded: "0 xDEAD") == [0xDE, 0xAD])
+            #expect([Byte](hexEncoded: "0x DEAD") == ([0xDE, 0xAD] as [UInt8]).map(Byte.init(bitPattern:)))
+            #expect([Byte](hexEncoded: "0 xDEAD") == ([0xDE, 0xAD] as [UInt8]).map(Byte.init(bitPattern:)))
         }
 
         @Test

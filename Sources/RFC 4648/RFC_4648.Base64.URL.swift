@@ -1,5 +1,6 @@
 import ASCII
-public import Binary
+public import Binary_Endianness
+public import Binary_Standard_Library_Integration
 
 extension RFC_4648.Base64 {
 
@@ -94,11 +95,12 @@ extension RFC_4648.Base64.URL {
         _ string: some StringProtocol,
         strictness: RFC_4648.Strictness = .lenient
     ) -> [Byte]? {
-        let codes: [ASCII.Code]
-        do throws(ASCII.Code.Error) {
-            codes = try [ASCII.Code](string.utf8)
-        } catch {
-            return nil
+        var codes: [ASCII.Code] = []
+        for unit in string.utf8 {
+            guard let code = try? ASCII.Code(Byte(bitPattern: unit)) else {
+                return nil
+            }
+            codes.append(code)
         }
         return decode(codes, strictness: strictness)
     }
@@ -125,7 +127,8 @@ extension RFC_4648.Base64.URL.Wrapper where Wrapped: Collection, Wrapped.Element
 
     @inlinable
     public func encoded(padding: Bool = false) -> String {
-        String(decoding: RFC_4648.Base64.URL.encode(wrapped, padding: padding), as: UTF8.self)
+        let codes: [ASCII.Code] = RFC_4648.Base64.URL.encode(wrapped, padding: padding)
+        return String(decoding: codes.map(\.underlying), as: UTF8.self)
     }
 
     @inlinable
@@ -164,11 +167,12 @@ extension RFC_4648.Base64.URL.Wrapper where Wrapped: StringProtocol {
         into buffer: inout Buffer,
         strictness: RFC_4648.Strictness = .lenient
     ) -> Bool where Buffer.Element == Byte {
-        let codes: [ASCII.Code]
-        do throws(ASCII.Code.Error) {
-            codes = try [ASCII.Code](wrapped.utf8)
-        } catch {
-            return false
+        var codes: [ASCII.Code] = []
+        for unit in wrapped.utf8 {
+            guard let code = try? ASCII.Code(Byte(bitPattern: unit)) else {
+                return false
+            }
+            codes.append(code)
         }
         return RFC_4648.Base64.URL.decode(codes, into: &buffer, strictness: strictness)
     }
@@ -180,11 +184,12 @@ extension RFC_4648.Base64.URL.Wrapper where Wrapped: StringProtocol {
 
     @inlinable
     public func decoded<T: FixedWidthInteger>(as type: T.Type = T.self) -> T? {
-        let codes: [ASCII.Code]
-        do throws(ASCII.Code.Error) {
-            codes = try [ASCII.Code](wrapped.utf8)
-        } catch {
-            return nil
+        var codes: [ASCII.Code] = []
+        for unit in wrapped.utf8 {
+            guard let code = try? ASCII.Code(Byte(bitPattern: unit)) else {
+                return nil
+            }
+            codes.append(code)
         }
         return RFC_4648.Base64.URL.decode(codes, as: type)
     }

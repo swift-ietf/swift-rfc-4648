@@ -1,5 +1,6 @@
 import ASCII
-public import Binary
+public import Binary_Endianness
+public import Binary_Standard_Library_Integration
 
 extension RFC_4648.Base64.URL {
 
@@ -16,7 +17,8 @@ extension RFC_4648.Base64.URL.Encoder {
         _ bytes: Bytes,
         padding: Bool = false
     ) -> String where Bytes.Element == Byte {
-        String(decoding: RFC_4648.Base64.URL.encode(bytes, padding: padding), as: UTF8.self)
+        let codes: [ASCII.Code] = RFC_4648.Base64.URL.encode(bytes, padding: padding)
+        return String(decoding: codes.map(\.underlying), as: UTF8.self)
     }
 
     @inlinable

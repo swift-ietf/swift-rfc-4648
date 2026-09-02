@@ -17,7 +17,7 @@ extension RFC_4648.Base32 {
             ]
         )
         func `RFC 4648 test vectors`(input: String, expected: String) {
-            let bytes = [Byte](input.utf8)
+            let bytes = input.utf8.map(Byte.init(bitPattern:))
             let encoded = String.base32(bytes)
             #expect(encoded == expected, "Encoding '\(input)' should produce '\(expected)'")
 
@@ -34,14 +34,14 @@ extension RFC_4648.Base32 {
             ]
         )
         func `Base32 decoding is case-insensitive`(encoded: String) {
-            let expected: [Byte] = [Byte]("foo".utf8)
+            let expected: [Byte] = "foo".utf8.map(Byte.init(bitPattern:))
             let decoded = [Byte](base32Encoded: encoded)
             #expect(decoded == expected, "Case-insensitive decoding should work for '\(encoded)'")
         }
 
         @Test
         func `Base32 encoding produces uppercase`() {
-            let input: [Byte] = [Byte]("hello".utf8)
+            let input: [Byte] = "hello".utf8.map(Byte.init(bitPattern:))
             let encoded = String.base32(input)
 
             for char in encoded {
@@ -53,10 +53,10 @@ extension RFC_4648.Base32 {
 
         @Test(
             arguments: [
-                ([Byte]("f".utf8), false, "MY", false),
-                ([Byte]("f".utf8), true, "MY======", true),
-                ([Byte]("foo".utf8), false, "MZXW6", false),
-                ([Byte]("foo".utf8), true, "MZXW6===", true),
+                ("f".utf8.map(Byte.init(bitPattern:)), false, "MY", false),
+                ("f".utf8.map(Byte.init(bitPattern:)), true, "MY======", true),
+                ("foo".utf8.map(Byte.init(bitPattern:)), false, "MZXW6", false),
+                ("foo".utf8.map(Byte.init(bitPattern:)), true, "MZXW6===", true),
             ]
         )
         func `Base32 padding variations`(
@@ -83,7 +83,7 @@ extension RFC_4648.Base32 {
         )
         func `Base32 whitespace handling`(input: String) {
             let decoded = [Byte](base32Encoded: input)
-            #expect(decoded == [Byte]("foobar".utf8), "Whitespace should be ignored in '\(input)'")
+            #expect(decoded == "foobar".utf8.map(Byte.init(bitPattern:)), "Whitespace should be ignored in '\(input)'")
         }
 
         @Test(
@@ -105,7 +105,7 @@ extension RFC_4648.Base32 {
         @Test
         func `Base32 uses correct alphabet (A-Z, 2-7)`() {
 
-            let input: [Byte] = [Byte]("The quick brown fox jumps over the lazy dog".utf8)
+            let input: [Byte] = "The quick brown fox jumps over the lazy dog".utf8.map(Byte.init(bitPattern:))
             let encoded = String.base32(input, padding: false)
 
             for char in encoded {
@@ -116,9 +116,9 @@ extension RFC_4648.Base32 {
 
         @Test(
             arguments: [
-                ([0x00, 0xFF, 0x80, 0x7F], nil),
-                ([0x00, 0x00, 0x00, 0x00, 0x00], "AAAAAAAA"),
-                ([0x00, 0x01, 0x02, 0x03, 0x04], nil),
+                (([0x00, 0xFF, 0x80, 0x7F] as [UInt8]).map(Byte.init(bitPattern:)), nil),
+                (([0x00, 0x00, 0x00, 0x00, 0x00] as [UInt8]).map(Byte.init(bitPattern:)), "AAAAAAAA"),
+                (([0x00, 0x01, 0x02, 0x03, 0x04] as [UInt8]).map(Byte.init(bitPattern:)), nil),
             ]
         )
         func `Base32 binary data patterns`(input: [Byte], expectedEncoded: String?) {
@@ -135,11 +135,11 @@ extension RFC_4648.Base32 {
         @Test
         func `Base32 secret key (typical TOTP use)`() {
 
-            let secret: [Byte] = [
+            let secret: [Byte] = ([
                 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x21, 0xDE, 0xAD,
                 0xBE, 0xEF, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x21,
                 0xDE, 0xAD, 0xBE, 0xEF,
-            ]
+            ] as [UInt8]).map(Byte.init(bitPattern:))
 
             let encoded = String.base32(secret, padding: false)
 
@@ -150,7 +150,7 @@ extension RFC_4648.Base32 {
         @Test
         func `Base32 round-trip various sizes`() {
             for size in [1, 2, 3, 4, 5, 10, 20, 50, 100] {
-                let input: [Byte] = (0..<size).map { Byte(UInt8($0 % 256)) }
+                let input: [Byte] = (0..<size).map { Byte(bitPattern: UInt8($0 % 256)) }
                 let encoded = String.base32(input)
                 let decoded = [Byte](base32Encoded: encoded)
                 #expect(decoded == input)
@@ -160,7 +160,7 @@ extension RFC_4648.Base32 {
         @Test
         func `Base32 round-trip long string`() {
             let longString = String(repeating: "Hello, World! ", count: 100)
-            let input = [Byte](longString.utf8)
+            let input = longString.utf8.map(Byte.init(bitPattern:))
             let encoded = String.base32(input)
             let decoded = [Byte](base32Encoded: encoded)
             #expect(decoded == input)
@@ -208,10 +208,10 @@ extension RFC_4648.Base32.Test.`Edge Case` {
     @Test
     func `strict strictness rejects nonzero trailing padding bits`() {
 
-        #expect(RFC_4648.Base32.decode("AB======", strictness: .lenient) == [0x00])
+        #expect(RFC_4648.Base32.decode("AB======", strictness: .lenient) == ([0x00] as [UInt8]).map(Byte.init(bitPattern:)))
         #expect(RFC_4648.Base32.decode("AB======", strictness: .strict) == nil)
 
-        #expect(RFC_4648.Base32.decode("AA======", strictness: .strict) == [0x00])
+        #expect(RFC_4648.Base32.decode("AA======", strictness: .strict) == ([0x00] as [UInt8]).map(Byte.init(bitPattern:)))
     }
 }
 
@@ -220,7 +220,7 @@ extension RFC_4648.Base32.Test.`Edge Case` {
     func `decode(as:) matches octet semantics of the FixedWidthInteger init family`() throws {
         let value = UInt32(123_456)
         let encoded = String.base32(value)
-        let codes = try [ASCII.Code](encoded.utf8)
+        let codes = try encoded.utf8.map { try ASCII.Code(Byte(bitPattern: $0)) }
 
         #expect(RFC_4648.Base32.decode(codes, as: UInt32.self) == value)
         #expect(RFC_4648.Base32.decode(codes, as: UInt32.self) == UInt32(base32Encoded: encoded))
@@ -229,7 +229,7 @@ extension RFC_4648.Base32.Test.`Edge Case` {
     @Test
     func `decode(as:) rejects a byte count that does not match the target width`() throws {
         let encoded = String.base32(UInt32(123_456))
-        let codes = try [ASCII.Code](encoded.utf8)
+        let codes = try encoded.utf8.map { try ASCII.Code(Byte(bitPattern: $0)) }
         #expect(RFC_4648.Base32.decode(codes, as: UInt8.self) == nil)
         #expect(RFC_4648.Base32.decode(codes, as: UInt64.self) == nil)
     }

@@ -1,5 +1,5 @@
 import ASCII
-public import Binary
+public import Binary_Standard_Library_Integration
 
 extension RFC_4648 {
 
@@ -73,7 +73,7 @@ extension RFC_4648.Base16 {
         for byte in bytes {
 
             encode(
-                byte.underlying,
+                byte.bitPattern,
                 into: &buffer,
                 uppercase: uppercase,
                 suppressLeadingZeros: false
@@ -142,7 +142,7 @@ extension RFC_4648.Base16 {
                 else {
                     return false
                 }
-                buffer.append(Byte((highNibble << 4) | lowNibble))
+                buffer.append(Byte(bitPattern: (highNibble << 4) | lowNibble))
                 pending = nextSignificant()
             }
         }
@@ -152,7 +152,7 @@ extension RFC_4648.Base16 {
             guard let highNibble = decode(nibble: high), let lowNibble = decode(nibble: low) else {
                 return false
             }
-            buffer.append(Byte((highNibble << 4) | lowNibble))
+            buffer.append(Byte(bitPattern: (highNibble << 4) | lowNibble))
             pending = nextSignificant()
         }
 
@@ -175,11 +175,12 @@ extension RFC_4648.Base16 {
         _ string: some StringProtocol,
         skipPrefix: Bool = true
     ) -> [Byte]? {
-        let codes: [ASCII.Code]
-        do throws(ASCII.Code.Error) {
-            codes = try [ASCII.Code](string.utf8)
-        } catch {
-            return nil
+        var codes: [ASCII.Code] = []
+        for unit in string.utf8 {
+            guard let code = try? ASCII.Code(Byte(bitPattern: unit)) else {
+                return nil
+            }
+            codes.append(code)
         }
         return decode(codes, skipPrefix: skipPrefix)
     }
@@ -256,7 +257,7 @@ extension RFC_4648.Base16.Wrapper where Wrapped: Collection, Wrapped.Element == 
     @inlinable
     public func encoded(uppercase: Bool = false) -> String {
         let codes: [ASCII.Code] = RFC_4648.Base16.encode(wrapped, uppercase: uppercase)
-        return String(decoding: codes, as: UTF8.self)
+        return String(decoding: codes.map(\.underlying), as: UTF8.self)
     }
 
     @inlinable
@@ -298,11 +299,12 @@ extension RFC_4648.Base16.Wrapper where Wrapped: StringProtocol {
         into buffer: inout Buffer,
         skipPrefix: Bool = true
     ) -> Bool where Buffer.Element == Byte {
-        let codes: [ASCII.Code]
-        do throws(ASCII.Code.Error) {
-            codes = try [ASCII.Code](wrapped.utf8)
-        } catch {
-            return false
+        var codes: [ASCII.Code] = []
+        for unit in wrapped.utf8 {
+            guard let code = try? ASCII.Code(Byte(bitPattern: unit)) else {
+                return false
+            }
+            codes.append(code)
         }
         return RFC_4648.Base16.decode(codes, into: &buffer, skipPrefix: skipPrefix)
     }
@@ -317,11 +319,12 @@ extension RFC_4648.Base16.Wrapper where Wrapped: StringProtocol {
         as type: T.Type = T.self,
         skipPrefix: Bool = true
     ) -> T? {
-        let codes: [ASCII.Code]
-        do throws(ASCII.Code.Error) {
-            codes = try [ASCII.Code](wrapped.utf8)
-        } catch {
-            return nil
+        var codes: [ASCII.Code] = []
+        for unit in wrapped.utf8 {
+            guard let code = try? ASCII.Code(Byte(bitPattern: unit)) else {
+                return nil
+            }
+            codes.append(code)
         }
         return RFC_4648.Base16.decode(codes, as: type, skipPrefix: skipPrefix)
     }
