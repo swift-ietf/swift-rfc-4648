@@ -65,7 +65,7 @@ extension RFC_4648.Base16 {
     }
 
     @inlinable
-    public static func encode<Bytes: Collection, Buffer: RangeReplaceableCollection>(
+    public static func encode<Bytes: Swift.Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
         uppercase: Bool = false
@@ -82,7 +82,7 @@ extension RFC_4648.Base16 {
     }
 
     @inlinable
-    public static func encode<Bytes: Collection, Result: RangeReplaceableCollection>(
+    public static func encode<Bytes: Swift.Collection, Result: RangeReplaceableCollection>(
         _ bytes: Bytes,
         uppercase: Bool = false
     ) -> Result where Bytes.Element == Byte, Result.Element == ASCII.Code {
@@ -110,7 +110,7 @@ extension RFC_4648.Base16 {
 
     @inlinable
     @discardableResult
-    public static func decode<Bytes: Collection, Buffer: RangeReplaceableCollection>(
+    public static func decode<Bytes: Swift.Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
         skipPrefix: Bool = true
@@ -160,7 +160,7 @@ extension RFC_4648.Base16 {
     }
 
     @inlinable
-    public static func decode<Bytes: Collection>(
+    public static func decode<Bytes: Swift.Collection>(
         _ bytes: Bytes,
         skipPrefix: Bool = true
     ) -> [Byte]? where Bytes.Element == ASCII.Code {
@@ -186,7 +186,7 @@ extension RFC_4648.Base16 {
     }
 
     @inlinable
-    public static func decode<Bytes: Collection, T: FixedWidthInteger>(
+    public static func decode<Bytes: Swift.Collection, T: FixedWidthInteger>(
         _ bytes: Bytes,
         as type: T.Type = T.self,
         skipPrefix: Bool = true
@@ -244,7 +244,7 @@ extension RFC_4648.Base16 {
     }
 }
 
-extension RFC_4648.Base16.Wrapper where Wrapped: Collection, Wrapped.Element == Byte {
+extension RFC_4648.Base16.Wrapper where Wrapped: Swift.Collection, Wrapped.Element == Byte {
 
     @inlinable
     public func encode<Buffer: RangeReplaceableCollection>(
@@ -266,7 +266,7 @@ extension RFC_4648.Base16.Wrapper where Wrapped: Collection, Wrapped.Element == 
     }
 }
 
-extension RFC_4648.Base16.Wrapper where Wrapped: Collection, Wrapped.Element == ASCII.Code {
+extension RFC_4648.Base16.Wrapper where Wrapped: Swift.Collection, Wrapped.Element == ASCII.Code {
 
     @inlinable
     @discardableResult

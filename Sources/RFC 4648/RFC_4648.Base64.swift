@@ -36,7 +36,7 @@ extension RFC_4648.Base64 {
 extension RFC_4648.Base64 {
 
     @inlinable
-    public static func encode<Bytes: Collection, Buffer: RangeReplaceableCollection>(
+    public static func encode<Bytes: Swift.Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
         padding: Bool = true
@@ -45,7 +45,7 @@ extension RFC_4648.Base64 {
     }
 
     @inlinable
-    public static func encode<Bytes: Collection>(
+    public static func encode<Bytes: Swift.Collection>(
         _ bytes: Bytes,
         padding: Bool = true
     ) -> [ASCII.Code] where Bytes.Element == Byte {
@@ -65,7 +65,7 @@ extension RFC_4648.Base64 {
 
     @inlinable
     @discardableResult
-    public static func decode<Bytes: Collection, Buffer: RangeReplaceableCollection>(
+    public static func decode<Bytes: Swift.Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
         strictness: RFC_4648.Strictness = .lenient
@@ -80,7 +80,7 @@ extension RFC_4648.Base64 {
     }
 
     @inlinable
-    public static func decode<Bytes: Collection>(
+    public static func decode<Bytes: Swift.Collection>(
         _ bytes: Bytes,
         strictness: RFC_4648.Strictness = .lenient
     ) -> [Byte]? where Bytes.Element == ASCII.Code {
@@ -106,7 +106,7 @@ extension RFC_4648.Base64 {
     }
 
     @inlinable
-    public static func decode<Bytes: Collection, T: FixedWidthInteger>(
+    public static func decode<Bytes: Swift.Collection, T: FixedWidthInteger>(
         _ bytes: Bytes,
         as type: T.Type = T.self
     ) -> T? where Bytes.Element == ASCII.Code {
@@ -123,7 +123,7 @@ extension RFC_4648.Base64.Wrapper {
     }
 }
 
-extension RFC_4648.Base64.Wrapper where Wrapped: Collection, Wrapped.Element == Byte {
+extension RFC_4648.Base64.Wrapper where Wrapped: Swift.Collection, Wrapped.Element == Byte {
 
     @inlinable
     public func encode<Buffer: RangeReplaceableCollection>(
@@ -145,7 +145,7 @@ extension RFC_4648.Base64.Wrapper where Wrapped: Collection, Wrapped.Element == 
     }
 }
 
-extension RFC_4648.Base64.Wrapper where Wrapped: Collection, Wrapped.Element == ASCII.Code {
+extension RFC_4648.Base64.Wrapper where Wrapped: Swift.Collection, Wrapped.Element == ASCII.Code {
 
     @inlinable
     @discardableResult
