@@ -37,9 +37,8 @@ let package = Package(
                     package: "swift-standard-library-extensions"
                 ),
                 .product(name: "Binary", package: "swift-binary"),
-                .product(name: "Binary Endianness", package: "swift-binary"),
                 .product(
-                    name: "Binary Standard Library Integration",
+                    name: "Binary",
                     package: "swift-binary"
                 ),
                 .product(name: "ASCII", package: "swift-ascii"),

@@ -1,5 +1,5 @@
 import ASCII
-public import Binary_Standard_Library_Integration
+public import Binary
 
 extension RFC_4648 {
 

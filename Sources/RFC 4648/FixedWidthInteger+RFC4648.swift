@@ -1,5 +1,5 @@
-public import Binary_Endianness
-public import Binary_Standard_Library_Integration
+public import Binary
+public import Binary
 import Standard_Library_Extensions
 
 extension FixedWidthInteger {
