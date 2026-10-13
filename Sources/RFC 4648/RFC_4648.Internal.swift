@@ -3,7 +3,7 @@ public import ASCII
 extension RFC_4648 {
 
     @inlinable
-    package static func encodeBase64<Bytes: Swift.Collection, Buffer: RangeReplaceableCollection>(
+    package static func encodeBase64<Bytes: Swift::Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
         table: [ASCII.Code],
@@ -48,7 +48,7 @@ extension RFC_4648 {
 
     @inlinable
     @discardableResult
-    package static func decodeBase64<Bytes: Swift.Collection, Buffer: RangeReplaceableCollection>(
+    package static func decodeBase64<Bytes: Swift::Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
         decodeTable: [UInt8?],
@@ -136,7 +136,7 @@ extension RFC_4648 {
 extension RFC_4648 {
 
     @inlinable
-    package static func encodeBase32<Bytes: Swift.Collection, Buffer: RangeReplaceableCollection>(
+    package static func encodeBase32<Bytes: Swift::Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
         table: [ASCII.Code],
@@ -215,7 +215,7 @@ extension RFC_4648 {
 
     @inlinable
     @discardableResult
-    package static func decodeBase32<Bytes: Swift.Collection, Buffer: RangeReplaceableCollection>(
+    package static func decodeBase32<Bytes: Swift::Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
         decodeTable: [UInt8?],

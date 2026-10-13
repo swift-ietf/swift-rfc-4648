@@ -378,7 +378,7 @@ import Testing
         @Test
         func `Base64 BinaryInteger UInt8 values match Foundation`() {
             for value in [UInt8.min, 1, 127, 128, 255, UInt8.max] {
-                let bytes = withUnsafeBytes(of: value.bigEndian) { $0.map(Byte.init(bitPattern:)) }
+                let bytes = withUnsafeBytes(of: value.bigEndian) { unsafe $0.map(Byte.init(bitPattern:)) }
 
                 let ourEncoded = String.base64(value)
                 let foundationEncoded = Data(bytes.map(\.bitPattern)).base64EncodedString()
@@ -395,7 +395,7 @@ import Testing
             let values: [UInt16] = [0, 1, 255, 256, 32767, 32768, 65535, UInt16.max]
 
             for value in values {
-                let bytes = withUnsafeBytes(of: value.bigEndian) { $0.map(Byte.init(bitPattern:)) }
+                let bytes = withUnsafeBytes(of: value.bigEndian) { unsafe $0.map(Byte.init(bitPattern:)) }
 
                 let ourEncoded = String.base64(value)
                 let foundationEncoded = Data(bytes.map(\.bitPattern)).base64EncodedString()
@@ -416,7 +416,7 @@ import Testing
             ]
 
             for value in values {
-                let bytes = withUnsafeBytes(of: value.bigEndian) { $0.map(Byte.init(bitPattern:)) }
+                let bytes = withUnsafeBytes(of: value.bigEndian) { unsafe $0.map(Byte.init(bitPattern:)) }
 
                 let ourEncoded = String.base64(value)
                 let foundationEncoded = Data(bytes.map(\.bitPattern)).base64EncodedString()
@@ -438,7 +438,7 @@ import Testing
             ]
 
             for value in values {
-                let bytes = withUnsafeBytes(of: value.bigEndian) { $0.map(Byte.init(bitPattern:)) }
+                let bytes = withUnsafeBytes(of: value.bigEndian) { unsafe $0.map(Byte.init(bitPattern:)) }
 
                 let ourEncoded = String.base64(value)
                 let foundationEncoded = Data(bytes.map(\.bitPattern)).base64EncodedString()

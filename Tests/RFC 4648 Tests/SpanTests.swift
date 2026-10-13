@@ -9,7 +9,7 @@ struct `Span Tests` {
     func `Span hex encoding matches Array encoding`() {
         let bytes: [Byte] = ([0xDE, 0xAD, 0xBE, 0xEF] as [UInt8]).map(Byte.init(bitPattern:))
         bytes.withUnsafeBufferPointer { buffer in
-            let span = Span(_unsafeElements: buffer)
+            let span = unsafe Span(_unsafeElements: buffer)
             #expect(span.hex.encoded() == bytes.hex.encoded())
             #expect(span.hex.encoded(uppercase: true) == bytes.hex.encoded(uppercase: true))
         }
@@ -19,7 +19,7 @@ struct `Span Tests` {
     func `Span hex callable syntax`() {
         let bytes: [Byte] = ([0xCA, 0xFE] as [UInt8]).map(Byte.init(bitPattern:))
         bytes.withUnsafeBufferPointer { buffer in
-            let span = Span(_unsafeElements: buffer)
+            let span = unsafe Span(_unsafeElements: buffer)
             #expect(span.hex() == "cafe")
             #expect(span.hex(uppercase: true) == "CAFE")
         }
@@ -29,7 +29,7 @@ struct `Span Tests` {
     func `Empty span hex encoding`() {
         let bytes: [Byte] = []
         bytes.withUnsafeBufferPointer { buffer in
-            let span = Span(_unsafeElements: buffer)
+            let span = unsafe Span(_unsafeElements: buffer)
             #expect(span.hex.encoded().isEmpty)
         }
     }
@@ -38,7 +38,7 @@ struct `Span Tests` {
     func `Span base64 encoding matches Array encoding`() {
         let bytes: [Byte] = ([72, 101, 108, 108, 111] as [UInt8]).map(Byte.init(bitPattern:))
         bytes.withUnsafeBufferPointer { buffer in
-            let span = Span(_unsafeElements: buffer)
+            let span = unsafe Span(_unsafeElements: buffer)
             #expect(span.base64.encoded() == bytes.base64.encoded())
             #expect(span.base64.encoded(padding: false) == bytes.base64.encoded(padding: false))
         }
@@ -48,7 +48,7 @@ struct `Span Tests` {
     func `Span base64 URL encoding matches Array encoding`() {
         let bytes: [Byte] = ([0xFB, 0xFF, 0xBF] as [UInt8]).map(Byte.init(bitPattern:))
         bytes.withUnsafeBufferPointer { buffer in
-            let span = Span(_unsafeElements: buffer)
+            let span = unsafe Span(_unsafeElements: buffer)
             #expect(span.base64.url.encoded() == bytes.base64.url.encoded())
             #expect(
                 span.base64.url.encoded(padding: true) == bytes.base64.url.encoded(padding: true)
@@ -60,7 +60,7 @@ struct `Span Tests` {
     func `Empty span base64 encoding`() {
         let bytes: [Byte] = []
         bytes.withUnsafeBufferPointer { buffer in
-            let span = Span(_unsafeElements: buffer)
+            let span = unsafe Span(_unsafeElements: buffer)
             #expect(span.base64.encoded().isEmpty)
         }
     }
@@ -69,7 +69,7 @@ struct `Span Tests` {
     func `Span base32 encoding matches Array encoding`() {
         let bytes: [Byte] = ([72, 101, 108, 108, 111] as [UInt8]).map(Byte.init(bitPattern:))
         bytes.withUnsafeBufferPointer { buffer in
-            let span = Span(_unsafeElements: buffer)
+            let span = unsafe Span(_unsafeElements: buffer)
             #expect(span.base32.encoded() == bytes.base32.encoded())
             #expect(span.base32.encoded(padding: false) == bytes.base32.encoded(padding: false))
         }
@@ -79,7 +79,7 @@ struct `Span Tests` {
     func `Span base32 hex encoding matches Array encoding`() {
         let bytes: [Byte] = ([72, 101, 108, 108, 111] as [UInt8]).map(Byte.init(bitPattern:))
         bytes.withUnsafeBufferPointer { buffer in
-            let span = Span(_unsafeElements: buffer)
+            let span = unsafe Span(_unsafeElements: buffer)
             #expect(span.base32.hex.encoded() == bytes.base32.hex.encoded())
             #expect(
                 span.base32.hex.encoded(padding: false) == bytes.base32.hex.encoded(padding: false)
@@ -91,7 +91,7 @@ struct `Span Tests` {
     func `Empty span base32 encoding`() {
         let bytes: [Byte] = []
         bytes.withUnsafeBufferPointer { buffer in
-            let span = Span(_unsafeElements: buffer)
+            let span = unsafe Span(_unsafeElements: buffer)
             #expect(span.base32.encoded().isEmpty)
         }
     }
@@ -99,11 +99,11 @@ struct `Span Tests` {
     @Test
     func `Span encoding from temporary allocation`() {
         let result = withUnsafeTemporaryAllocation(of: Byte.self, capacity: 4) { buffer in
-            buffer[0] = Byte(bitPattern: 0xCA)
-            buffer[1] = Byte(bitPattern: 0xFE)
-            buffer[2] = Byte(bitPattern: 0xBA)
-            buffer[3] = Byte(bitPattern: 0xBE)
-            let span = Span(_unsafeElements: UnsafeBufferPointer(buffer))
+            unsafe buffer[0] = Byte(bitPattern: 0xCA)
+            unsafe buffer[1] = Byte(bitPattern: 0xFE)
+            unsafe buffer[2] = Byte(bitPattern: 0xBA)
+            unsafe buffer[3] = Byte(bitPattern: 0xBE)
+            let span = unsafe Span(_unsafeElements: UnsafeBufferPointer(buffer))
             return span.hex.encoded()
         }
         #expect(result == "cafebabe")
@@ -112,10 +112,10 @@ struct `Span Tests` {
     @Test
     func `Span base64 from temporary allocation`() {
         let result = withUnsafeTemporaryAllocation(of: Byte.self, capacity: 3) { buffer in
-            buffer[0] = Byte(bitPattern: 0x48)
-            buffer[1] = Byte(bitPattern: 0x69)
-            buffer[2] = Byte(bitPattern: 0x21)
-            let span = Span(_unsafeElements: UnsafeBufferPointer(buffer))
+            unsafe buffer[0] = Byte(bitPattern: 0x48)
+            unsafe buffer[1] = Byte(bitPattern: 0x69)
+            unsafe buffer[2] = Byte(bitPattern: 0x21)
+            let span = unsafe Span(_unsafeElements: UnsafeBufferPointer(buffer))
             return span.base64.encoded()
         }
         #expect(result == "SGkh")

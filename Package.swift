@@ -37,10 +37,6 @@ let package = Package(
                     package: "swift-standard-library-extensions"
                 ),
                 .product(name: "Binary", package: "swift-binary"),
-                .product(
-                    name: "Binary",
-                    package: "swift-binary"
-                ),
                 .product(name: "ASCII", package: "swift-ascii"),
             ],
             swiftSettings: [
@@ -50,7 +46,7 @@ let package = Package(
         .target(
             name: "RFC 4648 Foundation",
             dependencies: [
-                "RFC 4648",
+                .target(name: "RFC 4648"),
                 .product(
                     name: "Standard Library Extensions",
                     package: "swift-standard-library-extensions"
@@ -60,29 +56,28 @@ let package = Package(
         .testTarget(
             name: "RFC 4648 Tests",
             dependencies: [
-                "RFC 4648"
+                .target(name: "RFC 4648")
             ]
         ),
         .testTarget(
             name: "RFC 4648 Foundation Tests",
             dependencies: [
-                "RFC 4648 Foundation"
+                .target(name: "RFC 4648 Foundation")
             ]
         ),
-    ]
+    ],
+    swiftLanguageModes: [.v6]
 )
 
 for target in package.targets where ![.system, .binary, .plugin, .macro].contains(target.type) {
-    let ecosystem: [SwiftSetting] = [
+    target.swiftSettings = (target.swiftSettings ?? []) + [
         .strictMemorySafety(),
         .enableUpcomingFeature("ExistentialAny"),
         .enableUpcomingFeature("InternalImportsByDefault"),
         .enableUpcomingFeature("MemberImportVisibility"),
         .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+        .enableUpcomingFeature("InferIsolatedConformances"),
         .enableExperimentalFeature("Lifetimes"),
+        .treatAllWarnings(as: .error),
     ]
-
-    let package: [SwiftSetting] = []
-
-    target.swiftSettings = (target.swiftSettings ?? []) + ecosystem + package
 }

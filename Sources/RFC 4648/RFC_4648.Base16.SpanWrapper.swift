@@ -4,11 +4,11 @@ extension RFC_4648.Base16 {
 
     public struct SpanWrapper: ~Copyable, ~Escapable {
         @usableFromInline
-        let span: Swift.Span<Byte>
+        let span: Swift::Span<Byte>
 
         @inlinable
         @_lifetime(copy span)
-        package init(_ span: Swift.Span<Byte>) {
+        package init(_ span: Swift::Span<Byte>) {
             self.span = span
         }
     }

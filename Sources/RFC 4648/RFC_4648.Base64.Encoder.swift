@@ -13,7 +13,7 @@ extension RFC_4648.Base64 {
 extension RFC_4648.Base64.Encoder {
 
     @inlinable
-    public func callAsFunction<Bytes: Swift.Collection>(
+    public func callAsFunction<Bytes: Swift::Collection>(
         _ bytes: Bytes,
         padding: Bool = true
     ) -> String where Bytes.Element == Byte {

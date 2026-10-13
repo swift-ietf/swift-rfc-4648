@@ -53,7 +53,7 @@ extension Array where Element == Byte {
     }
 }
 
-extension Swift.Collection where Element == Byte {
+extension Swift::Collection where Element == Byte {
 
     @inlinable
     public var base64: RFC_4648.Base64.Wrapper<Self> {
@@ -71,7 +71,7 @@ extension Swift.Collection where Element == Byte {
     }
 }
 
-extension Swift.Collection where Element == ASCII.Code {
+extension Swift::Collection where Element == ASCII.Code {
 
     @inlinable
     public var base64: RFC_4648.Base64.Wrapper<Self> {

@@ -99,7 +99,7 @@ struct BinaryIntegerEncodingTests {
             }
 
             let reconstructed = UInt32(
-                bigEndian: bytes.withUnsafeBytes { $0.load(as: UInt32.self) }
+                bigEndian: bytes.withUnsafeBytes { unsafe $0.load(as: UInt32.self) }
             )
 
             #expect(reconstructed == value, "Round-trip failed for \(value)")
@@ -156,7 +156,7 @@ struct BinaryIntegerEncodingTests {
         #expect(decoded != nil, "Decoding should succeed")
         guard let bytes = decoded else { return }
 
-        let reconstructed = UInt32(bigEndian: bytes.withUnsafeBytes { $0.load(as: UInt32.self) })
+        let reconstructed = UInt32(bigEndian: bytes.withUnsafeBytes { unsafe $0.load(as: UInt32.self) })
 
         #expect(reconstructed == value)
     }
