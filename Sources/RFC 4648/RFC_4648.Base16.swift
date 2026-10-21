@@ -19,12 +19,22 @@ extension RFC_4648 {
 extension RFC_4648.Base16 {
 
     public static let encodingTable = RFC_4648.EncodingTable(
-        encode: (0...15).map { ASCII.Hexadecimal.code(UInt8($0), case: .lower)! },
+        encode: (0...15).map { nibble in
+            guard let code = ASCII.Hexadecimal.code(UInt8(nibble), case: .lower) else {
+                preconditionFailure("0...15 are all valid hexadecimal digits")
+            }
+            return code
+        },
         caseInsensitive: true
     )
 
     public static let encodingTableUppercase = RFC_4648.EncodingTable(
-        encode: (0...15).map { ASCII.Hexadecimal.code(UInt8($0), case: .upper)! },
+        encode: (0...15).map { nibble in
+            guard let code = ASCII.Hexadecimal.code(UInt8(nibble), case: .upper) else {
+                preconditionFailure("0...15 are all valid hexadecimal digits")
+            }
+            return code
+        },
         caseInsensitive: true
     )
 }
@@ -45,10 +55,10 @@ extension RFC_4648.Base16 {
         for i in (0..<nibbleCount).reversed() {
             let nibble = Int((value >> (i * 4)) & 0x0F)
 
-            let code =
-                uppercase
-                ? ASCII.Hexadecimal.code(UInt8(nibble), case: .upper)!
-                : ASCII.Hexadecimal.code(UInt8(nibble), case: .lower)!
+            guard let code = ASCII.Hexadecimal.code(UInt8(nibble), case: uppercase ? .upper : .lower)
+            else {
+                preconditionFailure("a masked nibble is always a valid hexadecimal digit")
+            }
 
             if suppressLeadingZeros {
                 if nibble != 0 {
@@ -202,25 +212,24 @@ extension RFC_4648.Base16 {
             guard let first = iterator.next() else { return 0 }
 
             if first == ASCII.Code.`0` {
-                if let second = iterator.next() {
-                    if second == ASCII.Code.x || second == ASCII.Code.X {
-
-                    } else if !second.isWhitespace {
-
-                        guard let highNibble = decode(nibble: first),
-                            let lowNibble = decode(nibble: second)
-                        else { return nil }
-                        result = T(highNibble) << 4 | T(lowNibble)
-                        nibbleCount = 2
-                    } else {
-
-                        guard let nibble = decode(nibble: first) else { return nil }
-                        result = T(nibble)
-                        nibbleCount = 1
-                    }
-                } else {
+                guard let second = iterator.next() else {
 
                     return 0
+                }
+                if second == ASCII.Code.x || second == ASCII.Code.X {
+
+                } else if !second.isWhitespace {
+
+                    guard let highNibble = decode(nibble: first),
+                        let lowNibble = decode(nibble: second)
+                    else { return nil }
+                    result = T(highNibble) << 4 | T(lowNibble)
+                    nibbleCount = 2
+                } else {
+
+                    guard let nibble = decode(nibble: first) else { return nil }
+                    result = T(nibble)
+                    nibbleCount = 1
                 }
             } else if !first.isWhitespace {
                 guard let nibble = decode(nibble: first) else { return nil }
