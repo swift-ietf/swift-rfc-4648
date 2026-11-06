@@ -1,7 +1,9 @@
 import RFC_4648
 import Testing
 
-extension RFC_4648.Base64 {
+enum `RFC_4648.Base64 Tests` {}
+
+extension `RFC_4648.Base64 Tests` {
     @Suite("Base64 Encoding Tests")
     struct Test {
 
@@ -103,7 +105,7 @@ extension RFC_4648.Base64 {
     }
 }
 
-extension RFC_4648.Base64.Test {
+extension `RFC_4648.Base64 Tests`.Test {
     @Suite
     struct `Edge Case` {
 
@@ -128,7 +130,7 @@ extension RFC_4648.Base64.Test {
     }
 }
 
-extension RFC_4648.Base64.Test.`Edge Case` {
+extension `RFC_4648.Base64 Tests`.Test.`Edge Case` {
     @Test
     func `lenient strictness is the default and matches unqualified decode`() {
         #expect(
@@ -153,7 +155,7 @@ extension RFC_4648.Base64.Test.`Edge Case` {
     }
 }
 
-extension RFC_4648.Base64.Test.`Edge Case` {
+extension `RFC_4648.Base64 Tests`.Test.`Edge Case` {
     @Test
     func `decode(as:) matches the documented doc-example value`() throws {
 

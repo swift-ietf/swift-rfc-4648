@@ -1,7 +1,9 @@
 import RFC_4648
 import Testing
 
-extension RFC_4648.Base32.Hex {
+enum `RFC_4648.Base32.Hex Tests` {}
+
+extension `RFC_4648.Base32.Hex Tests` {
     @Suite("Base32-HEX Encoding Tests")
     struct Test {
 
@@ -179,7 +181,7 @@ extension RFC_4648.Base32.Hex {
     }
 }
 
-extension RFC_4648.Base32.Hex.Test {
+extension `RFC_4648.Base32.Hex Tests`.Test {
     @Suite
     struct `Edge Case` {
         @Test

@@ -1,7 +1,9 @@
 import RFC_4648
 import Testing
 
-extension RFC_4648.Base64.URL {
+enum `RFC_4648.Base64.URL Tests` {}
+
+extension `RFC_4648.Base64.URL Tests` {
     @Suite("Base64URL Encoding Tests")
     struct Test {
 
@@ -152,7 +154,7 @@ extension RFC_4648.Base64.URL {
     }
 }
 
-extension RFC_4648.Base64.URL.Test {
+extension `RFC_4648.Base64.URL Tests`.Test {
     @Suite
     struct `Edge Case` {
         @Test

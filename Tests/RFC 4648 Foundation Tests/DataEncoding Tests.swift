@@ -3,7 +3,9 @@ import Testing
 
 @testable import RFC_4648_Foundation
 
-extension Data {
+enum `Data Tests` {}
+
+extension `Data Tests` {
     @Suite("Data Encoding Tests")
     struct Test {
 

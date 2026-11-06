@@ -1,7 +1,9 @@
 import RFC_4648
 import Testing
 
-extension RFC_4648.Base32 {
+enum `RFC_4648.Base32 Tests` {}
+
+extension `RFC_4648.Base32 Tests` {
     @Suite("Base32 Encoding Tests")
     struct Test {
 
@@ -169,7 +171,7 @@ extension RFC_4648.Base32 {
     }
 }
 
-extension RFC_4648.Base32.Test {
+extension `RFC_4648.Base32 Tests`.Test {
     @Suite
     struct `Edge Case` {
 
@@ -199,7 +201,7 @@ extension RFC_4648.Base32.Test {
     }
 }
 
-extension RFC_4648.Base32.Test.`Edge Case` {
+extension `RFC_4648.Base32 Tests`.Test.`Edge Case` {
     @Test
     func `strict strictness rejects whitespace that lenient accepts`() {
         #expect(RFC_4648.Base32.decode("MZXW6YTB OI======", strictness: .lenient) != nil)
@@ -216,7 +218,7 @@ extension RFC_4648.Base32.Test.`Edge Case` {
     }
 }
 
-extension RFC_4648.Base32.Test.`Edge Case` {
+extension `RFC_4648.Base32 Tests`.Test.`Edge Case` {
     @Test
     func `decode(as:) matches octet semantics of the FixedWidthInteger init family`() throws {
         let value = UInt32(123_456)
