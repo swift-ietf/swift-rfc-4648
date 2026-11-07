@@ -2,22 +2,22 @@ import ASCII
 public import Binary
 
 extension RFC_4648 {
-
     public enum Base64 {
+    }
+}
 
-        public struct Wrapper<Wrapped> {
-            public let wrapped: Wrapped
+extension RFC_4648.Base64 {
+    public struct Wrapper<Wrapped> {
+        public let wrapped: Wrapped
 
-            @inlinable
-            public init(_ wrapped: Wrapped) {
-                self.wrapped = wrapped
-            }
+        @inlinable
+        public init(_ wrapped: Wrapped) {
+            self.wrapped = wrapped
         }
     }
 }
 
 extension RFC_4648.Base64 {
-
     public static let encodingTable = RFC_4648.EncodingTable(
         encode: [
             .A, .B, .C, .D, .E, .F, .G, .H,
@@ -33,7 +33,6 @@ extension RFC_4648.Base64 {
 }
 
 extension RFC_4648.Base64 {
-
     @inlinable
     public static func encode<Bytes: Swift::Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
@@ -56,7 +55,6 @@ extension RFC_4648.Base64 {
 }
 
 extension RFC_4648.Base64 {
-
     @inlinable
     public static func decode(sextet: ASCII.Code) -> UInt8? {
         encodingTable.decode[Int(sextet.underlying)]
@@ -115,7 +113,6 @@ extension RFC_4648.Base64 {
 }
 
 extension RFC_4648.Base64.Wrapper {
-
     @inlinable
     public var url: RFC_4648.Base64.URL.Wrapper<Wrapped> {
         RFC_4648.Base64.URL.Wrapper(wrapped)
@@ -123,7 +120,6 @@ extension RFC_4648.Base64.Wrapper {
 }
 
 extension RFC_4648.Base64.Wrapper where Wrapped: Swift::Collection, Wrapped.Element == Byte {
-
     @inlinable
     public func encode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer,
@@ -145,7 +141,6 @@ extension RFC_4648.Base64.Wrapper where Wrapped: Swift::Collection, Wrapped.Elem
 }
 
 extension RFC_4648.Base64.Wrapper where Wrapped: Swift::Collection, Wrapped.Element == ASCII.Code {
-
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
@@ -167,7 +162,6 @@ extension RFC_4648.Base64.Wrapper where Wrapped: Swift::Collection, Wrapped.Elem
 }
 
 extension RFC_4648.Base64.Wrapper where Wrapped: StringProtocol {
-
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
