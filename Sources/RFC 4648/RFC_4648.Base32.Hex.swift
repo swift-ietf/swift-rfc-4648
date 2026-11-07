@@ -2,22 +2,22 @@ import ASCII
 public import Binary
 
 extension RFC_4648.Base32 {
+
     public enum Hex {
-    }
-}
 
-extension RFC_4648.Base32.Hex {
-    public struct Wrapper<Wrapped> {
-        public let wrapped: Wrapped
+        public struct Wrapper<Wrapped> {
+            public let wrapped: Wrapped
 
-        @inlinable
-        public init(_ wrapped: Wrapped) {
-            self.wrapped = wrapped
+            @inlinable
+            public init(_ wrapped: Wrapped) {
+                self.wrapped = wrapped
+            }
         }
     }
 }
 
 extension RFC_4648.Base32.Hex {
+
     public static let encodingTable = RFC_4648.EncodingTable(
         encode: [
             .`0`, .`1`, .`2`, .`3`, .`4`, .`5`, .`6`, .`7`,
@@ -30,6 +30,7 @@ extension RFC_4648.Base32.Hex {
 }
 
 extension RFC_4648.Base32.Hex {
+
     @inlinable
     public static func encode<Bytes: Swift::Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
@@ -52,6 +53,7 @@ extension RFC_4648.Base32.Hex {
 }
 
 extension RFC_4648.Base32.Hex {
+
     @inlinable
     public static func decode(quintet: ASCII.Code) -> UInt8? {
         encodingTable.decode[Int(quintet.underlying)]
@@ -109,6 +111,7 @@ extension RFC_4648.Base32.Hex {
 }
 
 extension RFC_4648.Base32.Hex.Wrapper where Wrapped: Swift::Collection, Wrapped.Element == Byte {
+
     @inlinable
     public func encode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer,
@@ -130,6 +133,7 @@ extension RFC_4648.Base32.Hex.Wrapper where Wrapped: Swift::Collection, Wrapped.
 }
 
 extension RFC_4648.Base32.Hex.Wrapper where Wrapped: Swift::Collection, Wrapped.Element == ASCII.Code {
+
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
@@ -151,6 +155,7 @@ extension RFC_4648.Base32.Hex.Wrapper where Wrapped: Swift::Collection, Wrapped.
 }
 
 extension RFC_4648.Base32.Hex.Wrapper where Wrapped: StringProtocol {
+
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(

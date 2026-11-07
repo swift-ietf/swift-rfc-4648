@@ -2,22 +2,22 @@ import ASCII
 public import Binary
 
 extension RFC_4648 {
+
     public enum Base16 {
-    }
-}
 
-extension RFC_4648.Base16 {
-    public struct Wrapper<Wrapped> {
-        public let wrapped: Wrapped
+        public struct Wrapper<Wrapped> {
+            public let wrapped: Wrapped
 
-        @inlinable
-        public init(_ wrapped: Wrapped) {
-            self.wrapped = wrapped
+            @inlinable
+            public init(_ wrapped: Wrapped) {
+                self.wrapped = wrapped
+            }
         }
     }
 }
 
 extension RFC_4648.Base16 {
+
     public static let encodingTable = RFC_4648.EncodingTable(
         encode: (0...15).map { nibble in
             guard let code = ASCII.Hexadecimal.code(UInt8(nibble), case: .lower) else {
@@ -40,6 +40,7 @@ extension RFC_4648.Base16 {
 }
 
 extension RFC_4648.Base16 {
+
     @inlinable
     public static func encode<Buffer: RangeReplaceableCollection, T: FixedWidthInteger>(
         _ value: T,
@@ -80,6 +81,7 @@ extension RFC_4648.Base16 {
         uppercase: Bool = false
     ) where Bytes.Element == Byte, Buffer.Element == ASCII.Code {
         for byte in bytes {
+
             encode(
                 byte.bitPattern,
                 into: &buffer,
@@ -101,8 +103,10 @@ extension RFC_4648.Base16 {
 }
 
 extension RFC_4648.Base16 {
+
     @inlinable
     public static func decode(nibble: ASCII.Code) -> UInt8? {
+
         nibble.hexValue
     }
 
@@ -136,11 +140,14 @@ extension RFC_4648.Base16 {
 
         if skipPrefix, let first = pending, first == ASCII.Code.`0` {
             guard let second = nextSignificant() else {
+
                 return false
             }
             if second == ASCII.Code.x || second == ASCII.Code.X {
+
                 pending = nextSignificant()
             } else {
+
                 guard let highNibble = decode(nibble: first), let lowNibble = decode(nibble: second)
                 else {
                     return false
@@ -206,16 +213,20 @@ extension RFC_4648.Base16 {
 
             if first == ASCII.Code.`0` {
                 guard let second = iterator.next() else {
+
                     return 0
                 }
                 if second == ASCII.Code.x || second == ASCII.Code.X {
+
                 } else if !second.isWhitespace {
+
                     guard let highNibble = decode(nibble: first),
                         let lowNibble = decode(nibble: second)
                     else { return nil }
                     result = T(highNibble) << 4 | T(lowNibble)
                     nibbleCount = 2
                 } else {
+
                     guard let nibble = decode(nibble: first) else { return nil }
                     result = T(nibble)
                     nibbleCount = 1
@@ -243,6 +254,7 @@ extension RFC_4648.Base16 {
 }
 
 extension RFC_4648.Base16.Wrapper where Wrapped: Swift::Collection, Wrapped.Element == Byte {
+
     @inlinable
     public func encode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer,
@@ -264,6 +276,7 @@ extension RFC_4648.Base16.Wrapper where Wrapped: Swift::Collection, Wrapped.Elem
 }
 
 extension RFC_4648.Base16.Wrapper where Wrapped: Swift::Collection, Wrapped.Element == ASCII.Code {
+
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
@@ -288,6 +301,7 @@ extension RFC_4648.Base16.Wrapper where Wrapped: Swift::Collection, Wrapped.Elem
 }
 
 extension RFC_4648.Base16.Wrapper where Wrapped: StringProtocol {
+
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
@@ -326,5 +340,6 @@ extension RFC_4648.Base16.Wrapper where Wrapped: StringProtocol {
 }
 
 extension RFC_4648 {
+
     public typealias Hex = Base16
 }
