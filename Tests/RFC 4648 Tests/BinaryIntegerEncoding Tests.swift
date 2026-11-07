@@ -1,8 +1,8 @@
 import RFC_4648
 import Testing
 
-@Suite("BinaryInteger Encoding Tests")
-struct BinaryIntegerEncodingTests {
+@Suite
+struct `BinaryInteger Encoding Tests` {
 
     @Test
     func `Base16: Encode UInt8 values`() {

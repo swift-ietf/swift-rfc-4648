@@ -2,8 +2,8 @@ import Testing
 
 @testable import RFC_4648
 
-@Suite("BinaryInteger Decoding Tests")
-struct BinaryIntegerDecodingTests {
+@Suite
+struct `BinaryInteger Decoding Tests` {
 
     @Test
     func `UInt32 Base64 decoding`() {

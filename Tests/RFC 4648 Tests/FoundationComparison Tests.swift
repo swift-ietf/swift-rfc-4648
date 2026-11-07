@@ -4,8 +4,8 @@ import Testing
 #if canImport(Foundation)
     import Foundation
 
-    @Suite("Foundation Comparison Tests")
-    struct FoundationComparisonTests {
+    @Suite
+    struct `Foundation Comparison Tests` {
 
         @Test
         func `Base64 encoding matches Foundation`() {
