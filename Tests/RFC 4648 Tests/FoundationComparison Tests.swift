@@ -221,7 +221,7 @@ import Testing
 
         @Test
         func `Base64 all single-byte values match Foundation`() {
-            for byte in 0...255 {
+            (0...255).forEach { byte in
                 let bytes: [Byte] = [Byte(bitPattern: UInt8(byte))]
 
                 let ourEncoded = String.base64(bytes)
@@ -482,7 +482,7 @@ import Testing
 
         @Test
         func `Base64 powers of two lengths match Foundation`() {
-            for power in 0...10 {
+            (0...10).forEach { power in
                 let length = 1 << power
                 let bytes = (0..<length).map { Byte(bitPattern: UInt8($0 % 256)) }
 

@@ -99,7 +99,7 @@ extension `RFC_4648.Base16 Tests` {
 
         @Test
         func `Hex encoding all byte values`() {
-            for byte in 0...255 {
+            (0...255).forEach { byte in
                 let input: [Byte] = [Byte(bitPattern: UInt8(byte))]
                 let encoded = String.hex(input)
                 let decoded = [Byte](hexEncoded: encoded)

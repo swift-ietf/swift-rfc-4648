@@ -52,7 +52,7 @@ extension RFC_4648.Base16 {
 
         var foundNonZero = false
 
-        for i in (0..<nibbleCount).reversed() {
+        (0..<nibbleCount).reversed().forEach { i in
             let nibble = Int((value >> (i * 4)) & 0x0F)
 
             guard let code = ASCII.Hexadecimal.code(UInt8(nibble), case: uppercase ? .upper : .lower)
