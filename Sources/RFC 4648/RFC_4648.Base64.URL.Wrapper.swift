@@ -1,7 +1,6 @@
 import ASCII
 import Binary
 
-
 extension RFC_4648.Base64.URL {
     public struct Wrapper<Wrapped> {
         public let wrapped: Wrapped

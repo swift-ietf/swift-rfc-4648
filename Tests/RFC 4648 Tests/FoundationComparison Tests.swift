@@ -4,9 +4,9 @@ import Testing
 #if canImport(Foundation)
     import Foundation
 
-enum `FoundationComparison Tests` {}
+    enum `FoundationComparison Tests` {}
 
-extension `FoundationComparison Tests` {
+    extension `FoundationComparison Tests` {
         @Suite
         struct `Foundation Comparison Tests` {
 
@@ -592,7 +592,7 @@ extension `FoundationComparison Tests` {
                 }
             }
         }
-}
+    }
 
     struct SeededRandomNumberGenerator: RandomNumberGenerator {
         private var state: UInt64
