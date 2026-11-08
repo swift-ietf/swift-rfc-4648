@@ -5,7 +5,7 @@ import Testing
 enum `RFC_4648 Tests` {}
 
 extension `RFC_4648 Tests` {
-    @Suite("RFC 4648 Validation Tests")
+    @Suite
     struct Test {
 
         @Test(

@@ -4,7 +4,7 @@ import Testing
 enum `RFC_4648.Base16 Tests` {}
 
 extension `RFC_4648.Base16 Tests` {
-    @Suite("Hex Encoding Tests")
+    @Suite
     struct Test {
 
         @Test(

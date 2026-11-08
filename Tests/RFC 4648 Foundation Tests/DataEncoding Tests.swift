@@ -6,7 +6,7 @@ import Testing
 enum `Data Tests` {}
 
 extension `Data Tests` {
-    @Suite("Data Encoding Tests")
+    @Suite
     struct Test {
 
         @Test
