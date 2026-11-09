@@ -260,3 +260,27 @@ extension `RFC_4648.Base16 Tests`.Test {
         }
     }
 }
+
+extension `RFC_4648.Base16 Tests`.Test.`Edge Case` {
+    @Test
+    func `decode(as:) matches octet semantics of the FixedWidthInteger init family`() throws {
+        let codes = try "0xDEADBEEF".utf8.map { try ASCII.Code(Byte(bitPattern: $0)) }
+        #expect(RFC_4648.Base16.decode(codes, as: UInt32.self) == 0xDEAD_BEEF)
+        #expect(RFC_4648.Base16.decode(codes, as: UInt32.self) == UInt32(hexEncoded: "0xDEADBEEF"))
+    }
+
+    @Test
+    func `decode(as:) rejects a byte count that does not match the target width`() throws {
+        let codes = try "BEEF".utf8.map { try ASCII.Code(Byte(bitPattern: $0)) }
+        #expect(RFC_4648.Base16.decode(codes, as: UInt32.self) == nil)
+        #expect(RFC_4648.Base16.decode(codes, as: UInt8.self) == nil)
+        #expect(UInt32(hexEncoded: "BEEF") == nil)
+    }
+
+    @Test
+    func `decode(as:) on empty input returns nil like the FixedWidthInteger init family`() {
+        let value: UInt32? = RFC_4648.Base16.decode([ASCII.Code]())
+        #expect(value == nil)
+        #expect(value == UInt32(hexEncoded: ""))
+    }
+}

@@ -186,51 +186,8 @@ extension RFC_4648.Base16 {
         as type: T.Type = T.self,
         skipPrefix: Bool = true
     ) -> T? where Bytes.Element == ASCII.Code {
-        guard !bytes.isEmpty else { return 0 }
-
-        var iterator = bytes.makeIterator()
-        var result: T = 0
-        var nibbleCount = 0
-        let maxNibbles = T.bitWidth / 4
-
-        if skipPrefix {
-            guard let first = iterator.next() else { return 0 }
-
-            if first == ASCII.Code.`0` {
-                guard let second = iterator.next() else {
-                    return 0
-                }
-                if second == ASCII.Code.x || second == ASCII.Code.X {
-                } else if !second.isWhitespace {
-                    guard let highNibble = decode(nibble: first),
-                        let lowNibble = decode(nibble: second)
-                    else { return nil }
-                    result = T(highNibble) << 4 | T(lowNibble)
-                    nibbleCount = 2
-                } else {
-                    guard let nibble = decode(nibble: first) else { return nil }
-                    result = T(nibble)
-                    nibbleCount = 1
-                }
-            } else if !first.isWhitespace {
-                guard let nibble = decode(nibble: first) else { return nil }
-                result = T(nibble)
-                nibbleCount = 1
-            }
-        }
-
-        while let code = iterator.next() {
-            guard !code.isWhitespace else { continue }
-
-            guard let nibble = decode(nibble: code) else { return nil }
-
-            nibbleCount += 1
-            guard nibbleCount <= maxNibbles else { return nil }
-
-            result = result << 4 | T(nibble)
-        }
-
-        return result
+        guard let decodedBytes = decode(bytes, skipPrefix: skipPrefix) else { return nil }
+        return T(bytes: decodedBytes, endianness: .big)
     }
 }
 
