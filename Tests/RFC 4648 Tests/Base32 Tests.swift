@@ -244,3 +244,25 @@ extension `RFC_4648.Base32 Tests`.Test.`Edge Case` {
         #expect(value == UInt32(base32Encoded: ""))
     }
 }
+
+extension `RFC_4648.Base32 Tests`.Test.`Edge Case` {
+    @Test(
+        arguments: [
+            "MY=",
+            "MY=====",
+            "MZXQ===",
+            "MZXW6==",
+            "MZXW==",
+        ]
+    )
+    func `rejects a final group whose padding is short of a full group`(input: String) {
+        #expect([Byte](base32Encoded: input) == nil, "'\(input)' must carry no padding or the full amount")
+    }
+
+    @Test
+    func `accepts a final group with full padding or no padding`() {
+        #expect([Byte](base32Encoded: "MY======") == [Byte](base32Encoded: "MY"))
+        #expect([Byte](base32Encoded: "MZXQ====") == [Byte](base32Encoded: "MZXQ"))
+        #expect([Byte](base32Encoded: "MY") != nil)
+    }
+}

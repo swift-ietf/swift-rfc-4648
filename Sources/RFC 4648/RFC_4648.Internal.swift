@@ -259,6 +259,8 @@ extension RFC_4648 {
 
             if totalChars == 0 { break }
 
+            if paddingCount > 0 && totalChars != 8 { return false }
+
             if values.isEmpty { return false }
 
             guard
