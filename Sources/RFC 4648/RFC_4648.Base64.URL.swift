@@ -116,7 +116,7 @@ extension RFC_4648.Base64.URL.Wrapper where Wrapped: Swift::Collection, Wrapped.
     @inlinable
     public func encoded(padding: Bool = false) -> String {
         let codes: [ASCII.Code] = RFC_4648.Base64.URL.encode(wrapped, padding: padding)
-        return String(decoding: codes.map(\.underlying), as: UTF8.self)
+        return String(decoding: codes.map({ $0.underlying }), as: UTF8.self)
     }
 
     @inlinable

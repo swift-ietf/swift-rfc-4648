@@ -21,7 +21,7 @@ extension RFC_4648.Base32.SpanWrapper {
         span.withUnsafeBufferPointer { buffer in
             unsafe String(
                 decoding: (RFC_4648.Base32.encode(buffer, padding: padding) as [ASCII.Code])
-                    .map(\.underlying),
+                    .map({ $0.underlying }),
                 as: UTF8.self
             )
         }

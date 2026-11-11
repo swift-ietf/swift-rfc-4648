@@ -17,7 +17,7 @@ extension RFC_4648.Base64.URL.Encoder {
         padding: Bool = false
     ) -> String where Bytes.Element == Byte {
         let codes: [ASCII.Code] = RFC_4648.Base64.URL.encode(bytes, padding: padding)
-        return String(decoding: codes.map(\.underlying), as: UTF8.self)
+        return String(decoding: codes.map({ $0.underlying }), as: UTF8.self)
     }
 
     @inlinable
