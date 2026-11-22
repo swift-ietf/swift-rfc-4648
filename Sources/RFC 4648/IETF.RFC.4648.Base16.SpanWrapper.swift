@@ -1,6 +1,6 @@
 import ASCII
 
-extension RFC_4648.Base64.URL {
+extension IETF.RFC.`4648`.Base16 {
 
     public struct SpanWrapper: ~Copyable, ~Escapable {
         @usableFromInline
@@ -14,16 +14,21 @@ extension RFC_4648.Base64.URL {
     }
 }
 
-extension RFC_4648.Base64.URL.SpanWrapper {
+extension IETF.RFC.`4648`.Base16.SpanWrapper {
 
     @inlinable
-    public func encoded(padding: Bool = false) -> String {
+    public func encoded(uppercase: Bool = false) -> String {
         span.withUnsafeBufferPointer { buffer in
             unsafe String(
-                decoding: (RFC_4648.Base64.URL.encode(buffer, padding: padding) as [ASCII.Code])
+                decoding: (IETF.RFC.`4648`.Base16.encode(buffer, uppercase: uppercase) as [ASCII.Code])
                     .map({ $0.underlying }),
                 as: UTF8.self
             )
         }
+    }
+
+    @inlinable
+    public func callAsFunction(uppercase: Bool = false) -> String {
+        encoded(uppercase: uppercase)
     }
 }

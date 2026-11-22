@@ -1,6 +1,6 @@
 public import ASCII
 
-extension RFC_4648 {
+extension IETF.RFC.`4648` {
 
     public struct EncodingTable: Sendable {
 

@@ -1,6 +1,6 @@
 public import ASCII
 
-extension RFC_4648 {
+extension IETF.RFC.`4648` {
 
     @inlinable
     package static func encodeBase64<Bytes: Swift::Collection, Buffer: RangeReplaceableCollection>(
@@ -26,8 +26,8 @@ extension RFC_4648 {
 
             guard let b2 else {
                 if padding {
-                    buffer.append(RFC_4648.padding)
-                    buffer.append(RFC_4648.padding)
+                    buffer.append(IETF.RFC.`4648`.padding)
+                    buffer.append(IETF.RFC.`4648`.padding)
                 }
                 break
             }
@@ -37,7 +37,7 @@ extension RFC_4648 {
 
             guard let b3 else {
                 if padding {
-                    buffer.append(RFC_4648.padding)
+                    buffer.append(IETF.RFC.`4648`.padding)
                 }
                 break
             }
@@ -53,7 +53,7 @@ extension RFC_4648 {
         into buffer: inout Buffer,
         decodeTable: [UInt8?],
         requirePadding: Bool,
-        strictness: RFC_4648.Strictness = .lenient
+        strictness: IETF.RFC.`4648`.Strictness = .lenient
     ) -> Bool where Bytes.Element == ASCII.Code, Buffer.Element == Byte {
         guard !bytes.isEmpty else { return true }
 
@@ -75,7 +75,7 @@ extension RFC_4648 {
 
             while values.count + paddingCount < 4 {
                 guard let code = iterator.next() else { break }
-                if code == RFC_4648.padding {
+                if code == IETF.RFC.`4648`.padding {
                     paddingCount += 1
                     continue
                 }
@@ -133,7 +133,7 @@ extension RFC_4648 {
     }
 }
 
-extension RFC_4648 {
+extension IETF.RFC.`4648` {
 
     @inlinable
     package static func encodeBase32<Bytes: Swift::Collection, Buffer: RangeReplaceableCollection>(
@@ -162,9 +162,9 @@ extension RFC_4648 {
             guard let b2 else {
                 if padding {
                     buffer.append(contentsOf: [
-                        RFC_4648.padding, RFC_4648.padding,
-                        RFC_4648.padding, RFC_4648.padding,
-                        RFC_4648.padding, RFC_4648.padding,
+                        IETF.RFC.`4648`.padding, IETF.RFC.`4648`.padding,
+                        IETF.RFC.`4648`.padding, IETF.RFC.`4648`.padding,
+                        IETF.RFC.`4648`.padding, IETF.RFC.`4648`.padding,
                     ])
                 }
                 break
@@ -178,8 +178,8 @@ extension RFC_4648 {
             guard let b3 else {
                 if padding {
                     buffer.append(contentsOf: [
-                        RFC_4648.padding, RFC_4648.padding,
-                        RFC_4648.padding, RFC_4648.padding,
+                        IETF.RFC.`4648`.padding, IETF.RFC.`4648`.padding,
+                        IETF.RFC.`4648`.padding, IETF.RFC.`4648`.padding,
                     ])
                 }
                 break
@@ -191,7 +191,7 @@ extension RFC_4648 {
             guard let b4 else {
                 if padding {
                     buffer.append(contentsOf: [
-                        RFC_4648.padding, RFC_4648.padding, RFC_4648.padding,
+                        IETF.RFC.`4648`.padding, IETF.RFC.`4648`.padding, IETF.RFC.`4648`.padding,
                     ])
                 }
                 break
@@ -204,7 +204,7 @@ extension RFC_4648 {
 
             guard let b5 else {
                 if padding {
-                    buffer.append(RFC_4648.padding)
+                    buffer.append(IETF.RFC.`4648`.padding)
                 }
                 break
             }
@@ -219,7 +219,7 @@ extension RFC_4648 {
         _ bytes: Bytes,
         into buffer: inout Buffer,
         decodeTable: [UInt8?],
-        strictness: RFC_4648.Strictness = .lenient
+        strictness: IETF.RFC.`4648`.Strictness = .lenient
     ) -> Bool where Bytes.Element == ASCII.Code, Buffer.Element == Byte {
         guard !bytes.isEmpty else { return true }
 
@@ -241,7 +241,7 @@ extension RFC_4648 {
 
             while values.count + paddingCount < 8 {
                 guard let code = iterator.next() else { break }
-                if code == RFC_4648.padding {
+                if code == IETF.RFC.`4648`.padding {
                     paddingCount += 1
                     continue
                 }

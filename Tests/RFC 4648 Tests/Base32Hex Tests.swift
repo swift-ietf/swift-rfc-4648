@@ -1,9 +1,9 @@
 import RFC_4648
 import Testing
 
-enum `RFC_4648.Base32.Hex Tests` {}
+enum `IETF.RFC.4648.Base32.Hex Tests` {}
 
-extension `RFC_4648.Base32.Hex Tests` {
+extension `IETF.RFC.4648.Base32.Hex Tests` {
     @Suite
     struct Test {
 
@@ -181,7 +181,7 @@ extension `RFC_4648.Base32.Hex Tests` {
     }
 }
 
-extension `RFC_4648.Base32.Hex Tests`.Test {
+extension `IETF.RFC.4648.Base32.Hex Tests`.Test {
     @Suite
     struct `Edge Case` {
         @Test
@@ -190,9 +190,9 @@ extension `RFC_4648.Base32.Hex Tests`.Test {
             let encoded = String.base32.hex(value)
             let codes = try encoded.utf8.map { try ASCII.Code(Byte(bitPattern: $0)) }
 
-            #expect(RFC_4648.Base32.Hex.decode(codes, as: UInt32.self) == value)
+            #expect(IETF.RFC.`4648`.Base32.Hex.decode(codes, as: UInt32.self) == value)
             #expect(
-                RFC_4648.Base32.Hex.decode(codes, as: UInt32.self)
+                IETF.RFC.`4648`.Base32.Hex.decode(codes, as: UInt32.self)
                     == UInt32(base32HexEncoded: encoded)
             )
         }
@@ -201,13 +201,13 @@ extension `RFC_4648.Base32.Hex Tests`.Test {
         func `decode(as:) rejects a byte count that does not match the target width`() throws {
             let encoded = String.base32.hex(UInt32(123_456))
             let codes = try encoded.utf8.map { try ASCII.Code(Byte(bitPattern: $0)) }
-            #expect(RFC_4648.Base32.Hex.decode(codes, as: UInt8.self) == nil)
-            #expect(RFC_4648.Base32.Hex.decode(codes, as: UInt64.self) == nil)
+            #expect(IETF.RFC.`4648`.Base32.Hex.decode(codes, as: UInt8.self) == nil)
+            #expect(IETF.RFC.`4648`.Base32.Hex.decode(codes, as: UInt64.self) == nil)
         }
 
         @Test
         func `decode(as:) on empty input returns nil like the FixedWidthInteger init family`() {
-            let value: UInt32? = RFC_4648.Base32.Hex.decode([ASCII.Code]())
+            let value: UInt32? = IETF.RFC.`4648`.Base32.Hex.decode([ASCII.Code]())
             #expect(value == nil)
             #expect(value == UInt32(base32HexEncoded: ""))
         }

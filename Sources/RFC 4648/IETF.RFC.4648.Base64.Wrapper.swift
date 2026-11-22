@@ -1,7 +1,7 @@
 import ASCII
 import Binary
 
-extension RFC_4648.Base64.URL {
+extension IETF.RFC.`4648`.Base64 {
     public struct Wrapper<Wrapped> {
         public let wrapped: Wrapped
 

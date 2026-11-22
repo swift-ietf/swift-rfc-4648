@@ -1,16 +1,16 @@
 import ASCII
 public import Binary
 
-extension RFC_4648.Base32 {
+extension IETF.RFC.`4648`.Base32 {
     public enum Hex {
     }
 }
 
-extension RFC_4648.Base32.Hex {
+extension IETF.RFC.`4648`.Base32.Hex {
 }
 
-extension RFC_4648.Base32.Hex {
-    public static let encodingTable = RFC_4648.EncodingTable(
+extension IETF.RFC.`4648`.Base32.Hex {
+    public static let encodingTable = IETF.RFC.`4648`.EncodingTable(
         encode: [
             .`0`, .`1`, .`2`, .`3`, .`4`, .`5`, .`6`, .`7`,
             .`8`, .`9`, .A, .B, .C, .D, .E, .F,
@@ -21,14 +21,14 @@ extension RFC_4648.Base32.Hex {
     )
 }
 
-extension RFC_4648.Base32.Hex {
+extension IETF.RFC.`4648`.Base32.Hex {
     @inlinable
     public static func encode<Bytes: Swift::Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
         padding: Bool = true
     ) where Bytes.Element == Byte, Buffer.Element == ASCII.Code {
-        RFC_4648.encodeBase32(bytes, into: &buffer, table: encodingTable.encode, padding: padding)
+        IETF.RFC.`4648`.encodeBase32(bytes, into: &buffer, table: encodingTable.encode, padding: padding)
     }
 
     @inlinable
@@ -43,7 +43,7 @@ extension RFC_4648.Base32.Hex {
     }
 }
 
-extension RFC_4648.Base32.Hex {
+extension IETF.RFC.`4648`.Base32.Hex {
     @inlinable
     public static func decode(quintet: ASCII.Code) -> UInt8? {
         encodingTable.decode[Int(quintet.underlying)]
@@ -54,9 +54,9 @@ extension RFC_4648.Base32.Hex {
     public static func decode<Bytes: Swift::Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
-        strictness: RFC_4648.Strictness = .lenient
+        strictness: IETF.RFC.`4648`.Strictness = .lenient
     ) -> Bool where Bytes.Element == ASCII.Code, Buffer.Element == Byte {
-        RFC_4648.decodeBase32(
+        IETF.RFC.`4648`.decodeBase32(
             bytes,
             into: &buffer,
             decodeTable: encodingTable.decode,
@@ -67,7 +67,7 @@ extension RFC_4648.Base32.Hex {
     @inlinable
     public static func decode<Bytes: Swift::Collection>(
         _ bytes: Bytes,
-        strictness: RFC_4648.Strictness = .lenient
+        strictness: IETF.RFC.`4648`.Strictness = .lenient
     ) -> [Byte]? where Bytes.Element == ASCII.Code {
         var result: [Byte] = []
         result.reserveCapacity((bytes.count * 5) / 8)
@@ -78,7 +78,7 @@ extension RFC_4648.Base32.Hex {
     @inlinable
     public static func decode(
         _ string: some StringProtocol,
-        strictness: RFC_4648.Strictness = .lenient
+        strictness: IETF.RFC.`4648`.Strictness = .lenient
     ) -> [Byte]? {
         var codes: [ASCII.Code] = []
         for unit in string.utf8 {
@@ -100,18 +100,18 @@ extension RFC_4648.Base32.Hex {
     }
 }
 
-extension RFC_4648.Base32.Hex.Wrapper where Wrapped: Swift::Collection, Wrapped.Element == Byte {
+extension IETF.RFC.`4648`.Base32.Hex.Wrapper where Wrapped: Swift::Collection, Wrapped.Element == Byte {
     @inlinable
     public func encode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer,
         padding: Bool = true
     ) where Buffer.Element == ASCII.Code {
-        RFC_4648.Base32.Hex.encode(wrapped, into: &buffer, padding: padding)
+        IETF.RFC.`4648`.Base32.Hex.encode(wrapped, into: &buffer, padding: padding)
     }
 
     @inlinable
     public func encoded(padding: Bool = true) -> String {
-        let codes: [ASCII.Code] = RFC_4648.Base32.Hex.encode(wrapped, padding: padding)
+        let codes: [ASCII.Code] = IETF.RFC.`4648`.Base32.Hex.encode(wrapped, padding: padding)
         return String(decoding: codes.map({ $0.underlying }), as: UTF8.self)
     }
 
@@ -121,33 +121,33 @@ extension RFC_4648.Base32.Hex.Wrapper where Wrapped: Swift::Collection, Wrapped.
     }
 }
 
-extension RFC_4648.Base32.Hex.Wrapper where Wrapped: Swift::Collection, Wrapped.Element == ASCII.Code {
+extension IETF.RFC.`4648`.Base32.Hex.Wrapper where Wrapped: Swift::Collection, Wrapped.Element == ASCII.Code {
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer,
-        strictness: RFC_4648.Strictness = .lenient
+        strictness: IETF.RFC.`4648`.Strictness = .lenient
     ) -> Bool where Buffer.Element == Byte {
-        RFC_4648.Base32.Hex.decode(wrapped, into: &buffer, strictness: strictness)
+        IETF.RFC.`4648`.Base32.Hex.decode(wrapped, into: &buffer, strictness: strictness)
     }
 
     @inlinable
-    public func decoded(strictness: RFC_4648.Strictness = .lenient) -> [Byte]? {
-        RFC_4648.Base32.Hex.decode(wrapped, strictness: strictness)
+    public func decoded(strictness: IETF.RFC.`4648`.Strictness = .lenient) -> [Byte]? {
+        IETF.RFC.`4648`.Base32.Hex.decode(wrapped, strictness: strictness)
     }
 
     @inlinable
     public func decoded<T: FixedWidthInteger>(as type: T.Type = T.self) -> T? {
-        RFC_4648.Base32.Hex.decode(wrapped, as: type)
+        IETF.RFC.`4648`.Base32.Hex.decode(wrapped, as: type)
     }
 }
 
-extension RFC_4648.Base32.Hex.Wrapper where Wrapped: StringProtocol {
+extension IETF.RFC.`4648`.Base32.Hex.Wrapper where Wrapped: StringProtocol {
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer,
-        strictness: RFC_4648.Strictness = .lenient
+        strictness: IETF.RFC.`4648`.Strictness = .lenient
     ) -> Bool where Buffer.Element == Byte {
         var codes: [ASCII.Code] = []
         for unit in wrapped.utf8 {
@@ -156,12 +156,12 @@ extension RFC_4648.Base32.Hex.Wrapper where Wrapped: StringProtocol {
             }
             codes.append(code)
         }
-        return RFC_4648.Base32.Hex.decode(codes, into: &buffer, strictness: strictness)
+        return IETF.RFC.`4648`.Base32.Hex.decode(codes, into: &buffer, strictness: strictness)
     }
 
     @inlinable
-    public func decoded(strictness: RFC_4648.Strictness = .lenient) -> [Byte]? {
-        RFC_4648.Base32.Hex.decode(wrapped, strictness: strictness)
+    public func decoded(strictness: IETF.RFC.`4648`.Strictness = .lenient) -> [Byte]? {
+        IETF.RFC.`4648`.Base32.Hex.decode(wrapped, strictness: strictness)
     }
 
     @inlinable
@@ -173,6 +173,6 @@ extension RFC_4648.Base32.Hex.Wrapper where Wrapped: StringProtocol {
             }
             codes.append(code)
         }
-        return RFC_4648.Base32.Hex.decode(codes, as: type)
+        return IETF.RFC.`4648`.Base32.Hex.decode(codes, as: type)
     }
 }

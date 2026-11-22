@@ -1,7 +1,7 @@
 import ASCII
 import Binary
 
-extension RFC_4648.Base16 {
+extension IETF.RFC.`4648`.Base32.Hex {
     public struct Wrapper<Wrapped> {
         public let wrapped: Wrapped
 

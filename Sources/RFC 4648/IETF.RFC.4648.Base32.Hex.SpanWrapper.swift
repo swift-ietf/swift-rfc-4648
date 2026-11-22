@@ -1,6 +1,6 @@
 import ASCII
 
-extension RFC_4648.Base64 {
+extension IETF.RFC.`4648`.Base32.Hex {
 
     public struct SpanWrapper: ~Copyable, ~Escapable {
         @usableFromInline
@@ -14,24 +14,16 @@ extension RFC_4648.Base64 {
     }
 }
 
-extension RFC_4648.Base64.SpanWrapper {
+extension IETF.RFC.`4648`.Base32.Hex.SpanWrapper {
 
     @inlinable
     public func encoded(padding: Bool = true) -> String {
         span.withUnsafeBufferPointer { buffer in
             unsafe String(
-                decoding: (RFC_4648.Base64.encode(buffer, padding: padding) as [ASCII.Code])
+                decoding: (IETF.RFC.`4648`.Base32.Hex.encode(buffer, padding: padding) as [ASCII.Code])
                     .map({ $0.underlying }),
                 as: UTF8.self
             )
-        }
-    }
-
-    @inlinable
-    public var url: RFC_4648.Base64.URL.SpanWrapper {
-        @_lifetime(copy self)
-        get {
-            RFC_4648.Base64.URL.SpanWrapper(span)
         }
     }
 }

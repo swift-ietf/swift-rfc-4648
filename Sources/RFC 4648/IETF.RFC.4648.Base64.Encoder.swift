@@ -1,7 +1,7 @@
 import ASCII
 public import Binary
 
-extension RFC_4648.Base64.URL {
+extension IETF.RFC.`4648`.Base64 {
 
     public struct Encoder: Sendable {
         @inlinable
@@ -9,22 +9,27 @@ extension RFC_4648.Base64.URL {
     }
 }
 
-extension RFC_4648.Base64.URL.Encoder {
+extension IETF.RFC.`4648`.Base64.Encoder {
 
     @inlinable
     public func callAsFunction<Bytes: Swift::Collection>(
         _ bytes: Bytes,
-        padding: Bool = false
+        padding: Bool = true
     ) -> String where Bytes.Element == Byte {
-        let codes: [ASCII.Code] = RFC_4648.Base64.URL.encode(bytes, padding: padding)
+        let codes: [ASCII.Code] = IETF.RFC.`4648`.Base64.encode(bytes, padding: padding)
         return String(decoding: codes.map({ $0.underlying }), as: UTF8.self)
     }
 
     @inlinable
     public func callAsFunction<T: FixedWidthInteger>(
         _ value: T,
-        padding: Bool = false
+        padding: Bool = true
     ) -> String {
         callAsFunction(value.bytes(endianness: .big), padding: padding)
+    }
+
+    @inlinable
+    public var url: IETF.RFC.`4648`.Base64.URL.Encoder {
+        IETF.RFC.`4648`.Base64.URL.Encoder()
     }
 }

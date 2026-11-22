@@ -2,9 +2,9 @@ import Testing
 
 @testable import RFC_4648
 
-enum `RFC_4648 Tests` {}
+enum `IETF.RFC.4648 Tests` {}
 
-extension `RFC_4648 Tests` {
+extension `IETF.RFC.4648 Tests` {
     @Suite
     struct Test {
 
@@ -21,7 +21,7 @@ extension `RFC_4648 Tests` {
             ]
         )
         func `Valid Base64 strings`(input: String) {
-            #expect(RFC_4648.Base64.isValid(input), "\(input) should be valid Base64")
+            #expect(IETF.RFC.`4648`.Base64.isValid(input), "\(input) should be valid Base64")
         }
 
         @Test(
@@ -34,15 +34,15 @@ extension `RFC_4648 Tests` {
             ]
         )
         func `Invalid Base64 strings`(input: String) {
-            #expect(!RFC_4648.Base64.isValid(input), "\(input) should be invalid Base64")
+            #expect(!IETF.RFC.`4648`.Base64.isValid(input), "\(input) should be invalid Base64")
         }
 
         @Test
         func `Base64 validation with whitespace`() {
 
-            #expect(RFC_4648.Base64.isValid("Zm9v\nYmFy"))
-            #expect(RFC_4648.Base64.isValid("Zm9v YmFy"))
-            #expect(RFC_4648.Base64.isValid("Zm9v\tYmFy"))
+            #expect(IETF.RFC.`4648`.Base64.isValid("Zm9v\nYmFy"))
+            #expect(IETF.RFC.`4648`.Base64.isValid("Zm9v YmFy"))
+            #expect(IETF.RFC.`4648`.Base64.isValid("Zm9v\tYmFy"))
         }
 
         @Test(
@@ -58,7 +58,7 @@ extension `RFC_4648 Tests` {
             ]
         )
         func `Valid Base64URL strings`(input: String) {
-            #expect(RFC_4648.Base64.URL.isValid(input), "\(input) should be valid Base64URL")
+            #expect(IETF.RFC.`4648`.Base64.URL.isValid(input), "\(input) should be valid Base64URL")
         }
 
         @Test(
@@ -68,7 +68,7 @@ extension `RFC_4648 Tests` {
             ]
         )
         func `Invalid Base64URL strings`(input: String) {
-            #expect(!RFC_4648.Base64.URL.isValid(input), "\(input) should be invalid Base64URL")
+            #expect(!IETF.RFC.`4648`.Base64.URL.isValid(input), "\(input) should be invalid Base64URL")
         }
 
         @Test(
@@ -80,14 +80,14 @@ extension `RFC_4648 Tests` {
             ]
         )
         func `Valid Base32 strings`(input: String) {
-            #expect(RFC_4648.Base32.isValid(input), "\(input) should be valid Base32")
+            #expect(IETF.RFC.`4648`.Base32.isValid(input), "\(input) should be valid Base32")
         }
 
         @Test
         func `Base32 case insensitive validation`() {
-            #expect(RFC_4648.Base32.isValid("MZXW6==="))
-            #expect(RFC_4648.Base32.isValid("mzxw6==="))
-            #expect(RFC_4648.Base32.isValid("MzXw6==="))
+            #expect(IETF.RFC.`4648`.Base32.isValid("MZXW6==="))
+            #expect(IETF.RFC.`4648`.Base32.isValid("mzxw6==="))
+            #expect(IETF.RFC.`4648`.Base32.isValid("MzXw6==="))
         }
 
         @Test(
@@ -98,7 +98,7 @@ extension `RFC_4648 Tests` {
             ]
         )
         func `Invalid Base32 strings`(input: String) {
-            #expect(!RFC_4648.Base32.isValid(input), "\(input) should be invalid Base32")
+            #expect(!IETF.RFC.`4648`.Base32.isValid(input), "\(input) should be invalid Base32")
         }
 
         @Test(
@@ -110,14 +110,14 @@ extension `RFC_4648 Tests` {
             ]
         )
         func `Valid Base32-HEX strings`(input: String) {
-            #expect(RFC_4648.Base32.Hex.isValid(input), "\(input) should be valid Base32-HEX")
+            #expect(IETF.RFC.`4648`.Base32.Hex.isValid(input), "\(input) should be valid Base32-HEX")
         }
 
         @Test
         func `Base32-HEX case insensitive validation`() {
-            #expect(RFC_4648.Base32.Hex.isValid("CPNMU==="))
-            #expect(RFC_4648.Base32.Hex.isValid("cpnmu==="))
-            #expect(RFC_4648.Base32.Hex.isValid("CpNmU==="))
+            #expect(IETF.RFC.`4648`.Base32.Hex.isValid("CPNMU==="))
+            #expect(IETF.RFC.`4648`.Base32.Hex.isValid("cpnmu==="))
+            #expect(IETF.RFC.`4648`.Base32.Hex.isValid("CpNmU==="))
         }
 
         @Test(
@@ -128,7 +128,7 @@ extension `RFC_4648 Tests` {
             ]
         )
         func `Invalid Base32-HEX strings`(input: String) {
-            #expect(!RFC_4648.Base32.Hex.isValid(input), "\(input) should be invalid Base32-HEX")
+            #expect(!IETF.RFC.`4648`.Base32.Hex.isValid(input), "\(input) should be invalid Base32-HEX")
         }
 
         @Test(
@@ -147,7 +147,7 @@ extension `RFC_4648 Tests` {
             ]
         )
         func `Valid hexadecimal strings`(input: String) {
-            #expect(RFC_4648.Base16.isValid(input), "\(input) should be valid hexadecimal")
+            #expect(IETF.RFC.`4648`.Base16.isValid(input), "\(input) should be valid hexadecimal")
         }
 
         @Test(
@@ -159,16 +159,16 @@ extension `RFC_4648 Tests` {
             ]
         )
         func `Invalid hexadecimal strings`(input: String) {
-            #expect(!RFC_4648.Base16.isValid(input), "\(input) should be invalid hexadecimal")
+            #expect(!IETF.RFC.`4648`.Base16.isValid(input), "\(input) should be invalid hexadecimal")
             #expect(!input.hex.isValid, "\(input) should be invalid hexadecimal")
         }
 
         @Test
         func `Hexadecimal validation with prefix`() {
-            #expect(RFC_4648.Base16.isValid("0xdeadbeef"))
-            #expect(RFC_4648.Base16.isValid("0xDEADBEEF"))
-            #expect(RFC_4648.Base16.isValid("0XDEADBEEF"))
-            #expect(RFC_4648.Base16.isValid("deadbeef"))
+            #expect(IETF.RFC.`4648`.Base16.isValid("0xdeadbeef"))
+            #expect(IETF.RFC.`4648`.Base16.isValid("0xDEADBEEF"))
+            #expect(IETF.RFC.`4648`.Base16.isValid("0XDEADBEEF"))
+            #expect(IETF.RFC.`4648`.Base16.isValid("deadbeef"))
         }
 
         @Test
@@ -176,8 +176,8 @@ extension `RFC_4648 Tests` {
             let largeValid = String(repeating: "Zm9vYmFy", count: 1000)
             let largeInvalid = String(repeating: "!!!!", count: 1000)
 
-            #expect(RFC_4648.Base64.isValid(largeValid))
-            #expect(!RFC_4648.Base64.isValid(largeInvalid))
+            #expect(IETF.RFC.`4648`.Base64.isValid(largeValid))
+            #expect(!IETF.RFC.`4648`.Base64.isValid(largeInvalid))
         }
 
         @Test
@@ -190,7 +190,7 @@ extension `RFC_4648 Tests` {
             ]
 
             for test in testCases {
-                let isValid = RFC_4648.Base64.isValid(test)
+                let isValid = IETF.RFC.`4648`.Base64.isValid(test)
                 let canDecode = [Byte](base64Encoded: test) != nil
 
                 #expect(
@@ -209,7 +209,7 @@ extension `RFC_4648 Tests` {
             ]
 
             for test in testCases {
-                let isValid = RFC_4648.Base32.isValid(test)
+                let isValid = IETF.RFC.`4648`.Base32.isValid(test)
                 let canDecode = [Byte](base32Encoded: test) != nil
 
                 #expect(
@@ -230,7 +230,7 @@ extension `RFC_4648 Tests` {
             ]
 
             for test in testCases {
-                let isValid = RFC_4648.Base16.isValid(test)
+                let isValid = IETF.RFC.`4648`.Base16.isValid(test)
                 let canDecode = [Byte](hexEncoded: test) != nil
 
                 #expect(
@@ -244,19 +244,19 @@ extension `RFC_4648 Tests` {
         func `Empty string validation across all encodings`() {
             let empty = ""
 
-            #expect(RFC_4648.Base64.isValid(empty))
-            #expect(RFC_4648.Base64.URL.isValid(empty))
-            #expect(RFC_4648.Base32.isValid(empty))
-            #expect(RFC_4648.Base32.Hex.isValid(empty))
-            #expect(RFC_4648.Base16.isValid(empty))
+            #expect(IETF.RFC.`4648`.Base64.isValid(empty))
+            #expect(IETF.RFC.`4648`.Base64.URL.isValid(empty))
+            #expect(IETF.RFC.`4648`.Base32.isValid(empty))
+            #expect(IETF.RFC.`4648`.Base32.Hex.isValid(empty))
+            #expect(IETF.RFC.`4648`.Base16.isValid(empty))
         }
 
         @Test
         func `Unicode characters in validation`() {
 
-            #expect(!RFC_4648.Base64.isValid("Zm9v🚀"))
-            #expect(!RFC_4648.Base32.isValid("MZXW6😀"))
-            #expect(!RFC_4648.Base16.isValid("dead你好"))
+            #expect(!IETF.RFC.`4648`.Base64.isValid("Zm9v🚀"))
+            #expect(!IETF.RFC.`4648`.Base32.isValid("MZXW6😀"))
+            #expect(!IETF.RFC.`4648`.Base16.isValid("dead你好"))
         }
     }
 }

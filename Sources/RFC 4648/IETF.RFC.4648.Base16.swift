@@ -1,16 +1,16 @@
 import ASCII
 public import Binary
 
-extension RFC_4648 {
+extension IETF.RFC.`4648` {
     public enum Base16 {
     }
 }
 
-extension RFC_4648.Base16 {
+extension IETF.RFC.`4648`.Base16 {
 }
 
-extension RFC_4648.Base16 {
-    public static let encodingTable = RFC_4648.EncodingTable(
+extension IETF.RFC.`4648`.Base16 {
+    public static let encodingTable = IETF.RFC.`4648`.EncodingTable(
         encode: (0...15).map { nibble in
             guard let code = ASCII.Hexadecimal.code(UInt8(nibble), case: .lower) else {
                 preconditionFailure("0...15 are all valid hexadecimal digits")
@@ -20,7 +20,7 @@ extension RFC_4648.Base16 {
         caseInsensitive: true
     )
 
-    public static let encodingTableUppercase = RFC_4648.EncodingTable(
+    public static let encodingTableUppercase = IETF.RFC.`4648`.EncodingTable(
         encode: (0...15).map { nibble in
             guard let code = ASCII.Hexadecimal.code(UInt8(nibble), case: .upper) else {
                 preconditionFailure("0...15 are all valid hexadecimal digits")
@@ -31,7 +31,7 @@ extension RFC_4648.Base16 {
     )
 }
 
-extension RFC_4648.Base16 {
+extension IETF.RFC.`4648`.Base16 {
     @inlinable
     public static func encode<Buffer: RangeReplaceableCollection, T: FixedWidthInteger>(
         _ value: T,
@@ -92,7 +92,7 @@ extension RFC_4648.Base16 {
     }
 }
 
-extension RFC_4648.Base16 {
+extension IETF.RFC.`4648`.Base16 {
     @inlinable
     public static func decode(nibble: ASCII.Code) -> UInt8? {
         nibble.hexValue
@@ -191,18 +191,18 @@ extension RFC_4648.Base16 {
     }
 }
 
-extension RFC_4648.Base16.Wrapper where Wrapped: Swift::Collection, Wrapped.Element == Byte {
+extension IETF.RFC.`4648`.Base16.Wrapper where Wrapped: Swift::Collection, Wrapped.Element == Byte {
     @inlinable
     public func encode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer,
         uppercase: Bool = false
     ) where Buffer.Element == ASCII.Code {
-        RFC_4648.Base16.encode(wrapped, into: &buffer, uppercase: uppercase)
+        IETF.RFC.`4648`.Base16.encode(wrapped, into: &buffer, uppercase: uppercase)
     }
 
     @inlinable
     public func encoded(uppercase: Bool = false) -> String {
-        let codes: [ASCII.Code] = RFC_4648.Base16.encode(wrapped, uppercase: uppercase)
+        let codes: [ASCII.Code] = IETF.RFC.`4648`.Base16.encode(wrapped, uppercase: uppercase)
         return String(decoding: codes.map({ $0.underlying }), as: UTF8.self)
     }
 
@@ -212,19 +212,19 @@ extension RFC_4648.Base16.Wrapper where Wrapped: Swift::Collection, Wrapped.Elem
     }
 }
 
-extension RFC_4648.Base16.Wrapper where Wrapped: Swift::Collection, Wrapped.Element == ASCII.Code {
+extension IETF.RFC.`4648`.Base16.Wrapper where Wrapped: Swift::Collection, Wrapped.Element == ASCII.Code {
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer,
         skipPrefix: Bool = true
     ) -> Bool where Buffer.Element == Byte {
-        RFC_4648.Base16.decode(wrapped, into: &buffer, skipPrefix: skipPrefix)
+        IETF.RFC.`4648`.Base16.decode(wrapped, into: &buffer, skipPrefix: skipPrefix)
     }
 
     @inlinable
     public func decoded(skipPrefix: Bool = true) -> [Byte]? {
-        RFC_4648.Base16.decode(wrapped, skipPrefix: skipPrefix)
+        IETF.RFC.`4648`.Base16.decode(wrapped, skipPrefix: skipPrefix)
     }
 
     @inlinable
@@ -232,11 +232,11 @@ extension RFC_4648.Base16.Wrapper where Wrapped: Swift::Collection, Wrapped.Elem
         as type: T.Type = T.self,
         skipPrefix: Bool = true
     ) -> T? {
-        RFC_4648.Base16.decode(wrapped, as: type, skipPrefix: skipPrefix)
+        IETF.RFC.`4648`.Base16.decode(wrapped, as: type, skipPrefix: skipPrefix)
     }
 }
 
-extension RFC_4648.Base16.Wrapper where Wrapped: StringProtocol {
+extension IETF.RFC.`4648`.Base16.Wrapper where Wrapped: StringProtocol {
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
@@ -250,12 +250,12 @@ extension RFC_4648.Base16.Wrapper where Wrapped: StringProtocol {
             }
             codes.append(code)
         }
-        return RFC_4648.Base16.decode(codes, into: &buffer, skipPrefix: skipPrefix)
+        return IETF.RFC.`4648`.Base16.decode(codes, into: &buffer, skipPrefix: skipPrefix)
     }
 
     @inlinable
     public func decoded(skipPrefix: Bool = true) -> [Byte]? {
-        RFC_4648.Base16.decode(wrapped, skipPrefix: skipPrefix)
+        IETF.RFC.`4648`.Base16.decode(wrapped, skipPrefix: skipPrefix)
     }
 
     @inlinable
@@ -270,10 +270,10 @@ extension RFC_4648.Base16.Wrapper where Wrapped: StringProtocol {
             }
             codes.append(code)
         }
-        return RFC_4648.Base16.decode(codes, as: type, skipPrefix: skipPrefix)
+        return IETF.RFC.`4648`.Base16.decode(codes, as: type, skipPrefix: skipPrefix)
     }
 }
 
-extension RFC_4648 {
+extension IETF.RFC.`4648` {
     public typealias Hex = Base16
 }

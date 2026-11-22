@@ -1,9 +1,9 @@
 import RFC_4648
 import Testing
 
-enum `RFC_4648.Base32 Tests` {}
+enum `IETF.RFC.4648.Base32 Tests` {}
 
-extension `RFC_4648.Base32 Tests` {
+extension `IETF.RFC.4648.Base32 Tests` {
     @Suite
     struct Test {
 
@@ -171,7 +171,7 @@ extension `RFC_4648.Base32 Tests` {
     }
 }
 
-extension `RFC_4648.Base32 Tests`.Test {
+extension `IETF.RFC.4648.Base32 Tests`.Test {
     @Suite
     struct `Edge Case` {
 
@@ -201,51 +201,51 @@ extension `RFC_4648.Base32 Tests`.Test {
     }
 }
 
-extension `RFC_4648.Base32 Tests`.Test.`Edge Case` {
+extension `IETF.RFC.4648.Base32 Tests`.Test.`Edge Case` {
     @Test
     func `strict strictness rejects whitespace that lenient accepts`() {
-        #expect(RFC_4648.Base32.decode("MZXW6YTB OI======", strictness: .lenient) != nil)
-        #expect(RFC_4648.Base32.decode("MZXW6YTB OI======", strictness: .strict) == nil)
+        #expect(IETF.RFC.`4648`.Base32.decode("MZXW6YTB OI======", strictness: .lenient) != nil)
+        #expect(IETF.RFC.`4648`.Base32.decode("MZXW6YTB OI======", strictness: .strict) == nil)
     }
 
     @Test
     func `strict strictness rejects nonzero trailing padding bits`() {
 
-        #expect(RFC_4648.Base32.decode("AB======", strictness: .lenient) == ([0x00] as [UInt8]).map(Byte.init(bitPattern:)))
-        #expect(RFC_4648.Base32.decode("AB======", strictness: .strict) == nil)
+        #expect(IETF.RFC.`4648`.Base32.decode("AB======", strictness: .lenient) == ([0x00] as [UInt8]).map(Byte.init(bitPattern:)))
+        #expect(IETF.RFC.`4648`.Base32.decode("AB======", strictness: .strict) == nil)
 
-        #expect(RFC_4648.Base32.decode("AA======", strictness: .strict) == ([0x00] as [UInt8]).map(Byte.init(bitPattern:)))
+        #expect(IETF.RFC.`4648`.Base32.decode("AA======", strictness: .strict) == ([0x00] as [UInt8]).map(Byte.init(bitPattern:)))
     }
 }
 
-extension `RFC_4648.Base32 Tests`.Test.`Edge Case` {
+extension `IETF.RFC.4648.Base32 Tests`.Test.`Edge Case` {
     @Test
     func `decode(as:) matches octet semantics of the FixedWidthInteger init family`() throws {
         let value = UInt32(123_456)
         let encoded = String.base32(value)
         let codes = try encoded.utf8.map { try ASCII.Code(Byte(bitPattern: $0)) }
 
-        #expect(RFC_4648.Base32.decode(codes, as: UInt32.self) == value)
-        #expect(RFC_4648.Base32.decode(codes, as: UInt32.self) == UInt32(base32Encoded: encoded))
+        #expect(IETF.RFC.`4648`.Base32.decode(codes, as: UInt32.self) == value)
+        #expect(IETF.RFC.`4648`.Base32.decode(codes, as: UInt32.self) == UInt32(base32Encoded: encoded))
     }
 
     @Test
     func `decode(as:) rejects a byte count that does not match the target width`() throws {
         let encoded = String.base32(UInt32(123_456))
         let codes = try encoded.utf8.map { try ASCII.Code(Byte(bitPattern: $0)) }
-        #expect(RFC_4648.Base32.decode(codes, as: UInt8.self) == nil)
-        #expect(RFC_4648.Base32.decode(codes, as: UInt64.self) == nil)
+        #expect(IETF.RFC.`4648`.Base32.decode(codes, as: UInt8.self) == nil)
+        #expect(IETF.RFC.`4648`.Base32.decode(codes, as: UInt64.self) == nil)
     }
 
     @Test
     func `decode(as:) on empty input returns nil like the FixedWidthInteger init family`() {
-        let value: UInt32? = RFC_4648.Base32.decode([ASCII.Code]())
+        let value: UInt32? = IETF.RFC.`4648`.Base32.decode([ASCII.Code]())
         #expect(value == nil)
         #expect(value == UInt32(base32Encoded: ""))
     }
 }
 
-extension `RFC_4648.Base32 Tests`.Test.`Edge Case` {
+extension `IETF.RFC.4648.Base32 Tests`.Test.`Edge Case` {
     @Test(
         arguments: [
             "MY=",

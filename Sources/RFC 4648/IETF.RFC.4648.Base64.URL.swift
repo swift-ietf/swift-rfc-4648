@@ -1,52 +1,55 @@
 import ASCII
 public import Binary
 
-extension RFC_4648 {
-    public enum Base32 {
+extension IETF.RFC.`4648`.Base64 {
+    public enum URL {
     }
 }
 
-extension RFC_4648.Base32 {
+extension IETF.RFC.`4648`.Base64.URL {
 }
 
-extension RFC_4648.Base32 {
-    public static let encodingTable = RFC_4648.EncodingTable(
+extension IETF.RFC.`4648`.Base64.URL {
+    public static let encodingTable = IETF.RFC.`4648`.EncodingTable(
         encode: [
             .A, .B, .C, .D, .E, .F, .G, .H,
             .I, .J, .K, .L, .M, .N, .O, .P,
             .Q, .R, .S, .T, .U, .V, .W, .X,
-            .Y, .Z, .`2`, .`3`, .`4`, .`5`, .`6`, .`7`,
-        ] as [ASCII.Code],
-        caseInsensitive: true
+            .Y, .Z, .a, .b, .c, .d, .e, .f,
+            .g, .h, .i, .j, .k, .l, .m, .n,
+            .o, .p, .q, .r, .s, .t, .u, .v,
+            .w, .x, .y, .z, .`0`, .`1`, .`2`, .`3`,
+            .`4`, .`5`, .`6`, .`7`, .`8`, .`9`, .hyphen, .underscore,
+        ] as [ASCII.Code]
     )
 }
 
-extension RFC_4648.Base32 {
+extension IETF.RFC.`4648`.Base64.URL {
     @inlinable
     public static func encode<Bytes: Swift::Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
-        padding: Bool = true
+        padding: Bool = false
     ) where Bytes.Element == Byte, Buffer.Element == ASCII.Code {
-        RFC_4648.encodeBase32(bytes, into: &buffer, table: encodingTable.encode, padding: padding)
+        IETF.RFC.`4648`.encodeBase64(bytes, into: &buffer, table: encodingTable.encode, padding: padding)
     }
 
     @inlinable
     public static func encode<Bytes: Swift::Collection>(
         _ bytes: Bytes,
-        padding: Bool = true
+        padding: Bool = false
     ) -> [ASCII.Code] where Bytes.Element == Byte {
         var result: [ASCII.Code] = []
-        result.reserveCapacity(((bytes.count + 4) / 5) * 8)
+        result.reserveCapacity(((bytes.count + 2) / 3) * 4)
         encode(bytes, into: &result, padding: padding)
         return result
     }
 }
 
-extension RFC_4648.Base32 {
+extension IETF.RFC.`4648`.Base64.URL {
     @inlinable
-    public static func decode(quintet: ASCII.Code) -> UInt8? {
-        encodingTable.decode[Int(quintet.underlying)]
+    public static func decode(sextet: ASCII.Code) -> UInt8? {
+        encodingTable.decode[Int(sextet.underlying)]
     }
 
     @inlinable
@@ -54,12 +57,13 @@ extension RFC_4648.Base32 {
     public static func decode<Bytes: Swift::Collection, Buffer: RangeReplaceableCollection>(
         _ bytes: Bytes,
         into buffer: inout Buffer,
-        strictness: RFC_4648.Strictness = .lenient
+        strictness: IETF.RFC.`4648`.Strictness = .lenient
     ) -> Bool where Bytes.Element == ASCII.Code, Buffer.Element == Byte {
-        RFC_4648.decodeBase32(
+        IETF.RFC.`4648`.decodeBase64(
             bytes,
             into: &buffer,
             decodeTable: encodingTable.decode,
+            requirePadding: false,
             strictness: strictness
         )
     }
@@ -67,10 +71,10 @@ extension RFC_4648.Base32 {
     @inlinable
     public static func decode<Bytes: Swift::Collection>(
         _ bytes: Bytes,
-        strictness: RFC_4648.Strictness = .lenient
+        strictness: IETF.RFC.`4648`.Strictness = .lenient
     ) -> [Byte]? where Bytes.Element == ASCII.Code {
         var result: [Byte] = []
-        result.reserveCapacity((bytes.count * 5) / 8)
+        result.reserveCapacity((bytes.count * 3) / 4)
         guard decode(bytes, into: &result, strictness: strictness) else { return nil }
         return result
     }
@@ -78,7 +82,7 @@ extension RFC_4648.Base32 {
     @inlinable
     public static func decode(
         _ string: some StringProtocol,
-        strictness: RFC_4648.Strictness = .lenient
+        strictness: IETF.RFC.`4648`.Strictness = .lenient
     ) -> [Byte]? {
         var codes: [ASCII.Code] = []
         for unit in string.utf8 {
@@ -100,61 +104,54 @@ extension RFC_4648.Base32 {
     }
 }
 
-extension RFC_4648.Base32.Wrapper {
-    @inlinable
-    public var hex: RFC_4648.Base32.Hex.Wrapper<Wrapped> {
-        RFC_4648.Base32.Hex.Wrapper(wrapped)
-    }
-}
-
-extension RFC_4648.Base32.Wrapper where Wrapped: Swift::Collection, Wrapped.Element == Byte {
+extension IETF.RFC.`4648`.Base64.URL.Wrapper where Wrapped: Swift::Collection, Wrapped.Element == Byte {
     @inlinable
     public func encode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer,
-        padding: Bool = true
+        padding: Bool = false
     ) where Buffer.Element == ASCII.Code {
-        RFC_4648.Base32.encode(wrapped, into: &buffer, padding: padding)
+        IETF.RFC.`4648`.Base64.URL.encode(wrapped, into: &buffer, padding: padding)
     }
 
     @inlinable
-    public func encoded(padding: Bool = true) -> String {
-        let codes: [ASCII.Code] = RFC_4648.Base32.encode(wrapped, padding: padding)
+    public func encoded(padding: Bool = false) -> String {
+        let codes: [ASCII.Code] = IETF.RFC.`4648`.Base64.URL.encode(wrapped, padding: padding)
         return String(decoding: codes.map({ $0.underlying }), as: UTF8.self)
     }
 
     @inlinable
-    public func callAsFunction(padding: Bool = true) -> String {
+    public func callAsFunction(padding: Bool = false) -> String {
         encoded(padding: padding)
     }
 }
 
-extension RFC_4648.Base32.Wrapper where Wrapped: Swift::Collection, Wrapped.Element == ASCII.Code {
+extension IETF.RFC.`4648`.Base64.URL.Wrapper where Wrapped: Swift::Collection, Wrapped.Element == ASCII.Code {
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer,
-        strictness: RFC_4648.Strictness = .lenient
+        strictness: IETF.RFC.`4648`.Strictness = .lenient
     ) -> Bool where Buffer.Element == Byte {
-        RFC_4648.Base32.decode(wrapped, into: &buffer, strictness: strictness)
+        IETF.RFC.`4648`.Base64.URL.decode(wrapped, into: &buffer, strictness: strictness)
     }
 
     @inlinable
-    public func decoded(strictness: RFC_4648.Strictness = .lenient) -> [Byte]? {
-        RFC_4648.Base32.decode(wrapped, strictness: strictness)
+    public func decoded(strictness: IETF.RFC.`4648`.Strictness = .lenient) -> [Byte]? {
+        IETF.RFC.`4648`.Base64.URL.decode(wrapped, strictness: strictness)
     }
 
     @inlinable
     public func decoded<T: FixedWidthInteger>(as type: T.Type = T.self) -> T? {
-        RFC_4648.Base32.decode(wrapped, as: type)
+        IETF.RFC.`4648`.Base64.URL.decode(wrapped, as: type)
     }
 }
 
-extension RFC_4648.Base32.Wrapper where Wrapped: StringProtocol {
+extension IETF.RFC.`4648`.Base64.URL.Wrapper where Wrapped: StringProtocol {
     @inlinable
     @discardableResult
     public func decode<Buffer: RangeReplaceableCollection>(
         into buffer: inout Buffer,
-        strictness: RFC_4648.Strictness = .lenient
+        strictness: IETF.RFC.`4648`.Strictness = .lenient
     ) -> Bool where Buffer.Element == Byte {
         var codes: [ASCII.Code] = []
         for unit in wrapped.utf8 {
@@ -163,12 +160,12 @@ extension RFC_4648.Base32.Wrapper where Wrapped: StringProtocol {
             }
             codes.append(code)
         }
-        return RFC_4648.Base32.decode(codes, into: &buffer, strictness: strictness)
+        return IETF.RFC.`4648`.Base64.URL.decode(codes, into: &buffer, strictness: strictness)
     }
 
     @inlinable
-    public func decoded(strictness: RFC_4648.Strictness = .lenient) -> [Byte]? {
-        RFC_4648.Base32.decode(wrapped, strictness: strictness)
+    public func decoded(strictness: IETF.RFC.`4648`.Strictness = .lenient) -> [Byte]? {
+        IETF.RFC.`4648`.Base64.URL.decode(wrapped, strictness: strictness)
     }
 
     @inlinable
@@ -180,6 +177,6 @@ extension RFC_4648.Base32.Wrapper where Wrapped: StringProtocol {
             }
             codes.append(code)
         }
-        return RFC_4648.Base32.decode(codes, as: type)
+        return IETF.RFC.`4648`.Base64.URL.decode(codes, as: type)
     }
 }

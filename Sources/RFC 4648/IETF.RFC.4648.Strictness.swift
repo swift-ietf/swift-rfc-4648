@@ -1,4 +1,4 @@
-extension RFC_4648 {
+extension IETF.RFC.`4648` {
 
     public struct Strictness: Sendable, Hashable {
 
