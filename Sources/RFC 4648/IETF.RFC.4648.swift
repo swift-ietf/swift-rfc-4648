@@ -1,5 +1,5 @@
-public import IETF_RFC
 public import ASCII
+public import IETF_RFC
 import Standard_Library_Extensions
 
 extension IETF.RFC {
